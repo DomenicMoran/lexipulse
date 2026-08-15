@@ -1,0 +1,18 @@
+# Normalise to LF in the repository and on checkout. Mixed line endings break
+# multi-line string replacement in editors and diff tooling on Windows.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.epub binary
+*.aab binary
+*.apk binary
+*.ipa binary
