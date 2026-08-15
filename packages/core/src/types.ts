@@ -30,6 +30,17 @@ export interface RsvpToken {
   endsParagraph: boolean;
   /** True when the token contains at least one digit. */
   isNumeric: boolean;
+  /**
+   * True when this token is a non-final segment of a word the tokenizer had to split.
+   * Rejoining must not insert a space after it.
+   */
+  continuesWord?: boolean;
+  /**
+   * True when the trailing hyphen was inserted by the splitter rather than present in
+   * the source. Only such a hyphen may be dropped when rejoining — removing a real one
+   * would turn "Bundes-Immissionsschutz" into "BundesImmissionsschutz".
+   */
+  syntheticHyphen?: boolean;
 }
 
 /** A logical section of a document. */

@@ -3,6 +3,10 @@ import {
   contextAround,
   isAbbreviation,
   isSentenceTerminator,
+  joinTokens,
+  sentenceRange,
+  sentenceText,
+  sentenceTextAt,
   splitLongWord,
   tokenize,
   tokenizeChapters,
@@ -48,27 +52,80 @@ describe('isSentenceTerminator', () => {
 });
 
 describe('splitLongWord', () => {
+  const texts = (word: string, max: number) => splitLongWord(word, max).map((s) => s.text);
+
   it('leaves normal words untouched', () => {
-    expect(splitLongWord('Entwicklung', 22)).toEqual(['Entwicklung']);
+    expect(splitLongWord('Entwicklung', 22)).toEqual([
+      { text: 'Entwicklung', hardBreak: false },
+    ]);
   });
 
   it('hard-breaks an overlong word and marks the break with a hyphen', () => {
     const segments = splitLongWord('Donaudampfschifffahrtsgesellschaftskapitaen', 22);
     expect(segments.length).toBeGreaterThan(1);
-    expect(segments[0]).toMatch(/-$/);
-    expect(segments.join('').replace(/-/g, '')).toBe(
-      'Donaudampfschifffahrtsgesellschaftskapitaen',
-    );
+    expect(segments[0]?.text).toMatch(/-$/);
+    expect(segments[0]?.hardBreak).toBe(true);
+    expect(
+      segments
+        .map((s) => (s.hardBreak ? s.text.slice(0, -1) : s.text))
+        .join(''),
+    ).toBe('Donaudampfschifffahrtsgesellschaftskapitaen');
   });
 
-  it('prefers an existing hyphen as the break point', () => {
+  it('prefers an existing hyphen as the break point and does not call it a hard break', () => {
     const segments = splitLongWord('Bundes-Immissionsschutzverordnung', 20);
-    expect(segments[0]).toBe('Bundes-');
+    expect(segments[0]?.text).toBe('Bundes-');
+    expect(segments[0]?.hardBreak).toBe(false);
   });
 
   it('is a no-op when splitting is disabled', () => {
     const long = 'a'.repeat(60);
-    expect(splitLongWord(long, 0)).toEqual([long]);
+    expect(texts(long, 0)).toEqual([long]);
+  });
+});
+
+describe('joinTokens / sentenceText', () => {
+  it('reassembles a plain sentence', () => {
+    const { tokens } = tokenize('Ein kurzer Satz.', { wpm: 300 });
+    expect(joinTokens(tokens)).toBe('Ein kurzer Satz.');
+  });
+
+  it('drops only the hyphen the splitter invented', () => {
+    const { tokens } = tokenize('Donaudampfschifffahrtsgesellschaft faehrt', {
+      wpm: 300,
+      maxWordLength: 20,
+    });
+    expect(joinTokens(tokens)).toBe('Donaudampfschifffahrtsgesellschaft faehrt');
+  });
+
+  it('keeps a real compound hyphen', () => {
+    const { tokens } = tokenize('Bundes-Immissionsschutzverordnung gilt', {
+      wpm: 300,
+      maxWordLength: 20,
+    });
+    expect(joinTokens(tokens)).toBe('Bundes-Immissionsschutzverordnung gilt');
+  });
+
+  it('returns the sentence the engine is currently in', () => {
+    const { tokens } = tokenize('Erster Satz hier. Zweiter Satz dort. Dritter Satz.', {
+      wpm: 300,
+    });
+    expect(sentenceText(tokens, 0)).toBe('Erster Satz hier.');
+    expect(sentenceText(tokens, 1)).toBe('Zweiter Satz dort.');
+    expect(sentenceTextAt(tokens, 4)).toBe('Zweiter Satz dort.');
+  });
+
+  it('reports the token range of a sentence', () => {
+    const { tokens } = tokenize('Eins zwei. Drei vier.', { wpm: 300 });
+    expect(sentenceRange(tokens, 0)).toEqual({ start: 0, end: 2 });
+    expect(sentenceRange(tokens, 1)).toEqual({ start: 2, end: 4 });
+    expect(sentenceRange(tokens, 9)).toBeNull();
+  });
+
+  it('handles an empty stream', () => {
+    expect(joinTokens([])).toBe('');
+    expect(sentenceText([], 0)).toBe('');
+    expect(sentenceTextAt([], 0)).toBe('');
   });
 });
 

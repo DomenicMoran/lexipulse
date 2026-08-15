@@ -101,16 +101,22 @@ function containsDigit(word: string): boolean {
   return /\p{Nd}/u.test(word);
 }
 
+export interface WordSegment {
+  text: string;
+  /** The trailing hyphen was inserted here, not present in the source word. */
+  hardBreak: boolean;
+}
+
 /**
  * Split an overlong word into render-safe segments.
- * Segments break on an existing hyphen when there is one nearby, otherwise hard-break
- * and append a hyphen so the reader sees the continuation.
+ * Segments break on an existing hyphen when there is one in the window, otherwise
+ * hard-break and append a hyphen so the reader sees the continuation.
  */
-export function splitLongWord(word: string, maxLength: number): string[] {
+export function splitLongWord(word: string, maxLength: number): WordSegment[] {
   const chars = Array.from(word);
-  if (maxLength <= 0 || chars.length <= maxLength) return [word];
+  if (maxLength <= 0 || chars.length <= maxLength) return [{ text: word, hardBreak: false }];
 
-  const segments: string[] = [];
+  const segments: WordSegment[] = [];
   let rest = chars;
   while (rest.length > maxLength) {
     // Prefer the rightmost existing hyphen inside the window — a real compound break
@@ -123,14 +129,14 @@ export function splitLongWord(word: string, maxLength: number): string[] {
       }
     }
     if (cut > 0) {
-      segments.push(rest.slice(0, cut).join(''));
+      segments.push({ text: rest.slice(0, cut).join(''), hardBreak: false });
       rest = rest.slice(cut);
     } else {
-      segments.push(`${rest.slice(0, maxLength - 1).join('')}-`);
+      segments.push({ text: `${rest.slice(0, maxLength - 1).join('')}-`, hardBreak: true });
       rest = rest.slice(maxLength - 1);
     }
   }
-  segments.push(rest.join(''));
+  segments.push({ text: rest.join(''), hardBreak: false });
   return segments;
 }
 
@@ -183,14 +189,14 @@ export function tokenize(text: string, options: TokenizeOptions): TokenizeResult
       const lastSegmentIdx = segments.length - 1;
 
       for (let s = 0; s < segments.length; s += 1) {
-        const segment = segments[s] as string;
+        const segment = segments[s] as WordSegment;
         const isLast = s === lastSegmentIdx;
         const endsSentence = isLast && isSentenceTerminator(word);
 
         const token: RsvpToken = {
           index,
-          text: segment,
-          orp: computeOrp(segment),
+          text: segment.text,
+          orp: computeOrp(segment.text),
           durationMs: 0,
           chapterIndex,
           paragraphIndex,
@@ -198,11 +204,13 @@ export function tokenize(text: string, options: TokenizeOptions): TokenizeResult
           charOffset,
           endsSentence,
           endsParagraph: false,
-          isNumeric: containsDigit(segment),
+          isNumeric: containsDigit(segment.text),
+          continuesWord: !isLast,
+          syntheticHyphen: segment.hardBreak,
         };
         paragraphTokens.push(token);
         index += 1;
-        charOffset += segment.length;
+        charOffset += segment.text.length;
         if (endsSentence) sentenceIndex += 1;
       }
       charOffset += 1; // the space we split on
@@ -262,6 +270,60 @@ export function tokenizeChapters(
   }
 
   return all;
+}
+
+/**
+ * Token range `[start, end)` of a sentence.
+ *
+ * The engine reports which sentence it just entered; TTS and the bookmark preview need
+ * the actual words. Tokens carry `sentenceIndex` and are in reading order, so this is a
+ * scan from the first match to the last.
+ */
+export function sentenceRange(
+  tokens: readonly RsvpToken[],
+  sentenceIndex: number,
+): { start: number; end: number } | null {
+  let start = -1;
+  for (let i = 0; i < tokens.length; i += 1) {
+    const s = (tokens[i] as RsvpToken).sentenceIndex;
+    if (s === sentenceIndex && start === -1) start = i;
+    else if (start !== -1 && s !== sentenceIndex) return { start, end: i };
+  }
+  return start === -1 ? null : { start, end: tokens.length };
+}
+
+/**
+ * The sentence at `sentenceIndex` as speakable text.
+ *
+ * Hyphenated continuation segments produced by {@link splitLongWord} are rejoined, so
+ * the synthesiser is never handed "Donaudampfschiff- fahrt".
+ */
+export function sentenceText(tokens: readonly RsvpToken[], sentenceIndex: number): string {
+  const range = sentenceRange(tokens, sentenceIndex);
+  if (!range) return '';
+  return joinTokens(tokens.slice(range.start, range.end));
+}
+
+/** Sentence containing a given token index. */
+export function sentenceTextAt(tokens: readonly RsvpToken[], tokenIndex: number): string {
+  const token = tokens[Math.min(Math.max(tokenIndex, 0), tokens.length - 1)];
+  return token ? sentenceText(tokens, token.sentenceIndex) : '';
+}
+
+/**
+ * Reassemble tokens into readable text.
+ * Segments of a split word are glued back together; only a hyphen the splitter itself
+ * inserted is removed.
+ */
+export function joinTokens(tokens: readonly RsvpToken[]): string {
+  let out = '';
+  for (let i = 0; i < tokens.length; i += 1) {
+    const token = tokens[i] as RsvpToken;
+    const continues = token.continuesWord === true && i < tokens.length - 1;
+    out += continues && token.syntheticHyphen === true ? token.text.slice(0, -1) : token.text;
+    if (!continues && i < tokens.length - 1) out += ' ';
+  }
+  return out;
 }
 
 /** Plain-text preview around a token — used for bookmarks and the scrubber tooltip. */

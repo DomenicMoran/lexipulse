@@ -63,8 +63,22 @@ tokenizeChapters(chapters, { wpm, pacing?, maxWordLength? }): RsvpToken[]
   // schreibt startToken/tokenCount in die Kapitel zurück
 
 contextAround(tokens, index, radius?): { before[], current, after[] }
-isSentenceTerminator(word), isAbbreviation(word), splitLongWord(word, maxLength)
+isSentenceTerminator(word), isAbbreviation(word)
+splitLongWord(word, maxLength): { text, hardBreak }[]
+
+// Für TTS und Lesezeichen-Vorschau:
+sentenceText(tokens, sentenceIndex): string       // Satz als sprechbarer Text
+sentenceTextAt(tokens, tokenIndex): string        // Satz, in dem dieses Token steht
+sentenceRange(tokens, sentenceIndex): { start, end } | null
+joinTokens(tokens): string                        // Tokens wieder zu Text
 ```
+
+`RsvpToken` trägt zusätzlich die optionalen Felder `continuesWord` und
+`syntheticHyphen`. Sie markieren Teilstücke eines zu langen Wortes. Nur ein vom
+Tokenizer **selbst eingefügter** Bindestrich darf beim Zusammenfügen wegfallen — ein
+echter Kompositum-Bindestrich („Bundes-Immissionsschutzverordnung") muss bleiben.
+`joinTokens` und `sentenceText` machen das korrekt; eigene Rekonstruktion per
+`tokens.map(t => t.text).join(' ')` macht es falsch.
 
 Absätze werden an Leerzeilen getrennt, einfache Zeilenumbrüche gelten als weicher
 Umbruch. Wörter über 22 Zeichen werden in mehrere Tokens zerlegt (mit Bindestrich).
