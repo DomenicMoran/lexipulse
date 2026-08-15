@@ -20,7 +20,13 @@ import { computeOrp } from '@lexipulse/core';
 export const BRAND = {
   name: 'LexiPulse',
   tagline: 'Ultimate RSVP & Document Reader',
-  taglineDe: 'Lies schneller. Ein Wort nach dem anderen.',
+  /**
+   * Describes what the app does, not what the reader will achieve. "Lies schneller"
+   * would be a promise about the user's result, and how much faster somebody reads
+   * depends on the text and the person — the store description says exactly that. An
+   * advert that contradicts the product description is needless § 5 UWG exposure.
+   */
+  taglineDe: 'Ein Wort nach dem anderen. Immer an derselben Stelle.',
   domain: 'lexipulse.de',
 } as const;
 

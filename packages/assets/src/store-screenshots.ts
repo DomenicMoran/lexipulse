@@ -25,7 +25,8 @@ import { mkdirSync, readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
-import type { Browser } from 'playwright';
+import type { Browser, Page } from 'playwright';
+import { seedEntries } from './seed.js';
 
 import { REPO_ROOT } from './fonts.js';
 import { SCREENS } from './templates/screens.js';
@@ -190,6 +191,53 @@ async function reachable(url: string, timeoutMs = 2000): Promise<boolean> {
   }
 }
 
+/**
+ * Give the app a library before photographing it.
+ *
+ * A live capture only beats a rebuilt template if the app has something to show. With an
+ * empty IndexedDB the statistics screen renders zeros, and zeros under the headline
+ * "see how much you really read" promise the opposite of what the picture delivers.
+ *
+ * Seeding has to happen on the app's own origin — IndexedDB is origin-scoped — so we land
+ * on the root first, write, and only then navigate to the screen.
+ */
+async function seedLibrary(page: Page, origin: string): Promise<void> {
+  await page.goto(origin, { waitUntil: 'domcontentloaded', timeout: 20_000 });
+  const written = await page.evaluate(async (entries: [string, string][]) => {
+    // Runs in the page. Writes straight into the `kv` object store the IndexedDB driver
+    // uses, creating the database at the driver's version if the app has not opened it.
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open('lexipulse', 1);
+      request.onupgradeneeded = () => {
+        if (!request.result.objectStoreNames.contains('kv')) {
+          request.result.createObjectStore('kv');
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction('kv', 'readwrite');
+      const store = tx.objectStore('kv');
+      for (const [key, value] of entries) store.put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+    const count = await new Promise<number>((resolve, reject) => {
+      const tx = db.transaction('kv', 'readonly');
+      const request = tx.objectStore('kv').count();
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return count;
+  }, seedEntries());
+
+  if (written < seedEntries().length) {
+    throw new Error(`Seeding wrote only ${written} keys; the capture would show an empty app.`);
+  }
+}
+
 async function openScreen(browser: Browser, url: string, locale: Locale) {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
@@ -199,6 +247,7 @@ async function openScreen(browser: Browser, url: string, locale: Locale) {
     locale: locale === 'de' ? 'de-DE' : 'en-US',
   });
   const page = await context.newPage();
+  await seedLibrary(page, new URL(url).origin);
   await page.goto(url, { waitUntil: 'networkidle', timeout: 20_000 });
   await page.addStyleTag({ content: HIDE_DEV_CHROME });
   return { context, page };
