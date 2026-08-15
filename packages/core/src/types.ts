@@ -56,9 +56,13 @@ export interface LexiDocument {
   origin: string | null;
   language: string | null;
   chapters: DocumentChapter[];
-  /** Total token count across all chapters. */
+  /**
+   * Estimated token count. Equal to `wordCount` at import time; the real count is
+   * settings-dependent, because words above the tokenizer's length cap are split into
+   * several tokens. Use it for library badges, not for progress arithmetic.
+   */
   totalTokens: number;
-  /** Total word count (identical to totalTokens; kept explicit for reporting). */
+  /** Whitespace-delimited word count. Stable across settings. */
   wordCount: number;
   /** Cover image as a data URL, when the source provided one. */
   coverDataUrl: string | null;

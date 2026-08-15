@@ -44,13 +44,15 @@ LexiPulse/
 - [x] `@lexipulse/core`: types, ORP, Pacing-Matrix, Tokenizer, Engine, Settings
 - [x] `@lexipulse/core`: Parser (EPUB, PDF+Smart-Filter, HTML-Artikel, TXT/MD)
 - [x] `@lexipulse/core`: Storage-Abstraktion (Driver + LexiStore + Stats)
-- [ ] Unit-Tests grün (ORP, Pacing, Tokenizer, Engine, Clean-Filter, Store)
-- [ ] `pnpm install` sauber, typecheck 0 Fehler
+- [x] Unit- und Integrationstests grün — **206 Tests, 11 Dateien**
+- [x] `pnpm install` sauber, typecheck 0 Fehler, ESLint 0 Errors
 
-### P1 — Design-System (Lead)
-- [ ] `@lexipulse/ui`: Tokens (4 Themes × 3 Akzente), Typo-Skala, Spacing, Motion
-- [ ] Web-Komponenten: Button, Card, BentoGrid, Slider, Switch, Segmented, Dialog
-- [ ] RSVP-Player-Komponente (web) mit ORP-Fixierung, monospace, Focus-Rails
+### P1 — Design-System (Lead) ✅
+- [x] `@lexipulse/ui`: Tokens (4 Themes × 3 Akzente), Typo-Skala, Spacing, Motion
+- [x] Web-Komponenten: Button, IconButton, Card, Badge, Kbd, Divider, ProgressBar,
+      Slider, Switch, SegmentedControl, Stepper, BentoGrid/Cell/Heading, StatTile
+- [x] `RsvpStage`/`RsvpWord` mit ORP-Fixierung per `translateX(…ch)`, Fokuslinien
+- [x] Player-Geometrie plattformneutral (`computeStageGeometry`, `pivotOffsetPx`) — 13 Tests
 
 ### P2 — Web-App + Landingpage (Agent WEB)
 - [ ] Landing: Hero mit Live-RSVP-Demo, Bento-Feature-Grid, Pricing, FAQ, Footer
@@ -86,6 +88,16 @@ LexiPulse/
 - [ ] Web live: Lighthouse LCP < 2,5 s, CLS < 0,1, INP < 200 ms
 - [ ] Browser-Durchlauf der kompletten Reader-Strecke (Screenshot-Beleg)
 - [ ] EAS-Build-Artefakte vorhanden
+
+## Infrastruktur (Lead) — erledigt
+
+- [x] GitHub `DomenicMoran/lexipulse` angelegt und gepusht (Autor `Domenic Moran`)
+- [x] `.gitattributes` mit `eol=lf`, `.gitignore` mit verankerten Expo-Pfaden
+- [x] GitHub Actions: `ci.yml` (typecheck/lint/test, Web-Build, Expo-Export),
+      `eas-build.yml` (nur auf Tag oder manuell — Build-Slots sind knapp)
+- [x] Vercel-Projekt `lexipulse` (`prj_xkeizdRdseopIECdkLBc5Ft7xNk5`), Root `apps/web`,
+      GitHub-verknüpft, Install `cd ../.. && pnpm install --frozen-lockfile`
+- [x] DNS `lexipulse.de` bei INWX auf Vercel gezeigt, `misconfigured: false`
 
 ## Legal-Check (pro Feature)
 - DSGVO: keine Server-Speicherung von Dokumenten; Import läuft lokal. `/api/extract`

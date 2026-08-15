@@ -2,17 +2,21 @@
 
 Aufgaben, die nur du erledigen kannst. Stand: 2026-08-16.
 
-## 1. DNS für lexipulse.de auf Vercel zeigen lassen
+## 1. Vercel-Tarif prüfen (Hobby vs. Pro)
 
-Sobald das Vercel-Projekt steht, trage bei deinem Domain-Anbieter ein:
+Das Projekt `lexipulse` liegt im Team `domenicmos-projects`, Tarif **Hobby**. Die Vercel-
+Nutzungsbedingungen erlauben auf Hobby keine kommerzielle Nutzung. Die Web-App selbst ist
+kostenlos, bewirbt aber eine kostenpflichtige App für 4,99 € — das kann Vercel als
+kommerziell werten.
 
-```
-A     @      76.76.21.21
-CNAME www    cname.vercel-dns.com
-```
+Entweder auf Pro wechseln (20 $/Monat) oder in Kauf nehmen, dass Vercel das Projekt bei
+einer Prüfung beanstandet. Deine Entscheidung, ich habe hier nichts geändert.
 
-Danach in Vercel unter Project → Settings → Domains `lexipulse.de` und `www.lexipulse.de`
-hinzufügen. Vercel stellt das Zertifikat automatisch aus.
+Erledigt ist dagegen:
+- Vercel-Projekt `lexipulse` angelegt, Root `apps/web`, mit GitHub verknüpft
+- DNS bei INWX umgestellt: `lexipulse.de` → A 216.198.79.1 + 64.29.17.1,
+  `www` → CNAME cname.vercel-dns.com, INWX-Parkeintrag entfernt
+- Vercel meldet `misconfigured: false`
 
 ## 2. E-Mail-Postfach unter lexipulse.de
 
