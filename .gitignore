@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# builds
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# expo — anchored on purpose: a bare "android/" would also swallow any unrelated
+# directory of that name anywhere in the tree.
+.expo/
+.expo-shared/
+/apps/mobile/android/
+/apps/mobile/ios/
+*.apk
+*.aab
+*.ipa
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# vercel
+.vercel/
+
+# editor / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# test
+coverage/
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

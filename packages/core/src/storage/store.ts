@@ -1,0 +1,325 @@
+import { normalizeSettings } from '../settings.js';
+import type {
+  Bookmark,
+  LexiDocument,
+  LibraryEntry,
+  ReadingProgress,
+  ReadingStats,
+  RsvpSettings,
+} from '../types.js';
+import type { StorageDriver } from './driver.js';
+
+export const SCHEMA_VERSION = 1;
+
+const KEY = {
+  schema: 'lexi:schema',
+  settings: 'lexi:settings',
+  stats: 'lexi:stats',
+  doc: (id: string) => `lexi:doc:${id}`,
+  docPrefix: 'lexi:doc:',
+  progress: (id: string) => `lexi:progress:${id}`,
+  progressPrefix: 'lexi:progress:',
+  bookmark: (docId: string, id: string) => `lexi:bm:${docId}:${id}`,
+  bookmarkPrefix: (docId: string) => `lexi:bm:${docId}:`,
+  allBookmarks: 'lexi:bm:',
+} as const;
+
+function safeParse<T>(raw: string | null, fallback: T): T {
+  if (raw === null) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function emptyStats(): ReadingStats {
+  return {
+    totalMsRead: 0,
+    totalTokensRead: 0,
+    documentsStarted: 0,
+    documentsFinished: 0,
+    averageWpm: 0,
+    daily: {},
+    streakDays: 0,
+  };
+}
+
+/** YYYY-MM-DD in local time — the unit the activity heatmap counts in. */
+export function dayKey(timestamp: number): string {
+  const d = new Date(timestamp);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${month}-${day}`;
+}
+
+/** Consecutive days ending today (or yesterday, so an unfinished today does not reset it). */
+export function computeStreak(daily: Record<string, number>, now = Date.now()): number {
+  const day = 86_400_000;
+  let cursor = now;
+  if (!daily[dayKey(cursor)]) cursor -= day; // grace period for "not yet today"
+  let streak = 0;
+  while (daily[dayKey(cursor)]) {
+    streak += 1;
+    cursor -= day;
+  }
+  return streak;
+}
+
+/**
+ * The offline-first data layer.
+ *
+ * Every read tolerates corrupt or missing values, because a reader that loses your
+ * library on a schema change is worse than one that never had it.
+ */
+export class LexiStore {
+  constructor(private readonly driver: StorageDriver) {}
+
+  async init(): Promise<void> {
+    const current = await this.driver.get(KEY.schema);
+    const version = current === null ? 0 : Number.parseInt(current, 10) || 0;
+    if (version < SCHEMA_VERSION) {
+      await this.migrate(version);
+      await this.driver.set(KEY.schema, String(SCHEMA_VERSION));
+    }
+  }
+
+  /** Reserved for future schema changes; version 0 → 1 is a no-op besides stamping. */
+  private async migrate(_from: number): Promise<void> {
+    void _from;
+    return Promise.resolve();
+  }
+
+  // ------------------------------------------------------------------ settings
+
+  async getSettings(): Promise<RsvpSettings> {
+    const raw = await this.driver.get(KEY.settings);
+    return normalizeSettings(safeParse<unknown>(raw, null));
+  }
+
+  async saveSettings(settings: RsvpSettings): Promise<void> {
+    await this.driver.set(KEY.settings, JSON.stringify(normalizeSettings(settings)));
+  }
+
+  // ----------------------------------------------------------------- documents
+
+  async saveDocument(document: LexiDocument): Promise<void> {
+    await this.driver.set(
+      KEY.doc(document.id),
+      JSON.stringify({ ...document, updatedAt: Date.now() }),
+    );
+  }
+
+  async getDocument(id: string): Promise<LexiDocument | null> {
+    const raw = await this.driver.get(KEY.doc(id));
+    return safeParse<LexiDocument | null>(raw, null);
+  }
+
+  async deleteDocument(id: string): Promise<void> {
+    await this.driver.delete(KEY.doc(id));
+    await this.driver.delete(KEY.progress(id));
+    const bookmarkKeys = await this.driver.keys(KEY.bookmarkPrefix(id));
+    for (const key of bookmarkKeys) await this.driver.delete(key);
+  }
+
+  async listDocuments(): Promise<LexiDocument[]> {
+    const keys = await this.driver.keys(KEY.docPrefix);
+    const values = await this.readMany(keys);
+    const docs: LexiDocument[] = [];
+    for (const value of values) {
+      const doc = safeParse<LexiDocument | null>(value, null);
+      if (doc && typeof doc.id === 'string' && Array.isArray(doc.chapters)) docs.push(doc);
+    }
+    docs.sort((a, b) => b.updatedAt - a.updatedAt);
+    return docs;
+  }
+
+  /** Documents plus their progress — one call for the library screen. */
+  async listLibrary(): Promise<LibraryEntry[]> {
+    const documents = await this.listDocuments();
+    const entries: LibraryEntry[] = [];
+    for (const document of documents) {
+      entries.push({ document, progress: await this.getProgress(document.id) });
+    }
+    return entries;
+  }
+
+  private async readMany(keys: string[]): Promise<(string | null)[]> {
+    if (this.driver.getMany) return this.driver.getMany(keys);
+    const out: (string | null)[] = [];
+    for (const key of keys) out.push(await this.driver.get(key));
+    return out;
+  }
+
+  // ------------------------------------------------------------------ progress
+
+  async getProgress(documentId: string): Promise<ReadingProgress | null> {
+    const raw = await this.driver.get(KEY.progress(documentId));
+    return safeParse<ReadingProgress | null>(raw, null);
+  }
+
+  async saveProgress(progress: ReadingProgress): Promise<void> {
+    await this.driver.set(
+      KEY.progress(progress.documentId),
+      JSON.stringify({ ...progress, updatedAt: Date.now() }),
+    );
+  }
+
+  // ----------------------------------------------------------------- bookmarks
+
+  async addBookmark(bookmark: Bookmark): Promise<void> {
+    await this.driver.set(
+      KEY.bookmark(bookmark.documentId, bookmark.id),
+      JSON.stringify(bookmark),
+    );
+  }
+
+  async deleteBookmark(documentId: string, id: string): Promise<void> {
+    await this.driver.delete(KEY.bookmark(documentId, id));
+  }
+
+  async listBookmarks(documentId: string): Promise<Bookmark[]> {
+    const keys = await this.driver.keys(KEY.bookmarkPrefix(documentId));
+    const values = await this.readMany(keys);
+    const marks: Bookmark[] = [];
+    for (const value of values) {
+      const mark = safeParse<Bookmark | null>(value, null);
+      if (mark && typeof mark.id === 'string') marks.push(mark);
+    }
+    marks.sort((a, b) => a.tokenIndex - b.tokenIndex);
+    return marks;
+  }
+
+  async listAllBookmarks(): Promise<Bookmark[]> {
+    const keys = await this.driver.keys(KEY.allBookmarks);
+    const values = await this.readMany(keys);
+    const marks: Bookmark[] = [];
+    for (const value of values) {
+      const mark = safeParse<Bookmark | null>(value, null);
+      if (mark && typeof mark.id === 'string') marks.push(mark);
+    }
+    marks.sort((a, b) => b.createdAt - a.createdAt);
+    return marks;
+  }
+
+  // --------------------------------------------------------------------- stats
+
+  async getStats(): Promise<ReadingStats> {
+    const raw = await this.driver.get(KEY.stats);
+    const stats = safeParse<ReadingStats>(raw, emptyStats());
+    return {
+      ...emptyStats(),
+      ...stats,
+      daily: typeof stats.daily === 'object' && stats.daily !== null ? stats.daily : {},
+    };
+  }
+
+  /**
+   * Fold one finished reading session into the aggregate stats.
+   * `msRead` is wall-clock time the player was actually playing, not time on screen.
+   */
+  async recordSession(input: {
+    tokensRead: number;
+    msRead: number;
+    finished?: boolean;
+    started?: boolean;
+    now?: number;
+  }): Promise<ReadingStats> {
+    const now = input.now ?? Date.now();
+    const stats = await this.getStats();
+    const daily = { ...stats.daily };
+    const key = dayKey(now);
+    daily[key] = (daily[key] ?? 0) + Math.max(0, input.tokensRead);
+
+    const totalTokensRead = stats.totalTokensRead + Math.max(0, input.tokensRead);
+    const totalMsRead = stats.totalMsRead + Math.max(0, input.msRead);
+
+    const next: ReadingStats = {
+      totalMsRead,
+      totalTokensRead,
+      documentsStarted: stats.documentsStarted + (input.started ? 1 : 0),
+      documentsFinished: stats.documentsFinished + (input.finished ? 1 : 0),
+      averageWpm: totalMsRead > 0 ? (totalTokensRead / totalMsRead) * 60_000 : 0,
+      daily,
+      streakDays: computeStreak(daily, now),
+    };
+    await this.driver.set(KEY.stats, JSON.stringify(next));
+    return next;
+  }
+
+  // ------------------------------------------------------------------- export
+
+  /** Full backup as JSON — the user's data belongs to the user (Art. 20 DSGVO). */
+  async exportAll(): Promise<string> {
+    return JSON.stringify(
+      {
+        schema: SCHEMA_VERSION,
+        exportedAt: new Date().toISOString(),
+        settings: await this.getSettings(),
+        stats: await this.getStats(),
+        documents: await this.listDocuments(),
+        progress: await this.listAllProgress(),
+        bookmarks: await this.listAllBookmarks(),
+      },
+      null,
+      2,
+    );
+  }
+
+  async listAllProgress(): Promise<ReadingProgress[]> {
+    const keys = await this.driver.keys(KEY.progressPrefix);
+    const values = await this.readMany(keys);
+    const out: ReadingProgress[] = [];
+    for (const value of values) {
+      const p = safeParse<ReadingProgress | null>(value, null);
+      if (p && typeof p.documentId === 'string') out.push(p);
+    }
+    return out;
+  }
+
+  /** Restore a backup. Existing entries with the same id are overwritten. */
+  async importAll(json: string): Promise<{ documents: number; bookmarks: number }> {
+    const data = safeParse<Record<string, unknown>>(json, {});
+    let documents = 0;
+    let bookmarks = 0;
+
+    if (data.settings) await this.saveSettings(normalizeSettings(data.settings));
+    if (Array.isArray(data.documents)) {
+      for (const doc of data.documents as LexiDocument[]) {
+        if (doc && typeof doc.id === 'string') {
+          await this.saveDocument(doc);
+          documents += 1;
+        }
+      }
+    }
+    if (Array.isArray(data.progress)) {
+      for (const p of data.progress as ReadingProgress[]) {
+        if (p && typeof p.documentId === 'string') await this.saveProgress(p);
+      }
+    }
+    if (Array.isArray(data.bookmarks)) {
+      for (const b of data.bookmarks as Bookmark[]) {
+        if (b && typeof b.id === 'string' && typeof b.documentId === 'string') {
+          await this.addBookmark(b);
+          bookmarks += 1;
+        }
+      }
+    }
+    if (data.stats && typeof data.stats === 'object') {
+      await this.driver.set(KEY.stats, JSON.stringify(data.stats));
+    }
+    return { documents, bookmarks };
+  }
+
+  /** Wipe everything. Backs the "delete all my data" button. */
+  async clearAll(): Promise<void> {
+    if (this.driver.clear) {
+      await this.driver.clear();
+      return;
+    }
+    for (const prefix of ['lexi:']) {
+      const keys = await this.driver.keys(prefix);
+      for (const key of keys) await this.driver.delete(key);
+    }
+  }
+}

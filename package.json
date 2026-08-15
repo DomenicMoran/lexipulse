@@ -1,0 +1,29 @@
+{
+  "name": "lexipulse",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LexiPulse — Ultimate RSVP & Document Reader",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "clean": "turbo run clean && rimraf node_modules",
+    "assets": "pnpm --filter @lexipulse/assets generate",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,css}\""
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "prettier": "3.4.2",
+    "rimraf": "6.0.1",
+    "turbo": "2.10.10",
+    "typescript": "5.9.3"
+  }
+}

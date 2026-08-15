@@ -1,0 +1,13 @@
+Version 1.0.0
+
+First release of LexiPulse.
+
+• RSVP player with ORP fixation, 100 to 1200 words per minute
+• Import EPUB, PDF with smart filter, web articles, text and Markdown
+• Dynamic pacing matrix and warm-up ramp for an easier start
+• Read-aloud in sync with the stream
+• 4 themes and 3 accent colours
+• Offline library with reading progress, bookmarks and statistics
+• JSON data export
+
+Everything runs locally on your device. No account, no tracking, no ads.
