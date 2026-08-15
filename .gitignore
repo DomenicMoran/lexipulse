@@ -10,6 +10,11 @@ out/
 .turbo/
 *.tsbuildinfo
 
+# The brand vectors are a deliverable, not a build artefact — they get linked from the
+# README and handed to third parties, so they belong in the repository.
+!/packages/assets/out/
+!/packages/assets/out/**
+
 # expo — anchored on purpose: a bare "android/" would also swallow any unrelated
 # directory of that name anywhere in the tree.
 .expo/

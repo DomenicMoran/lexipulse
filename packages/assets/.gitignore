@@ -1,0 +1,5 @@
+# Generated fontconfig for sharp's text rendering (see src/fonts.ts).
+.fontconfig/
+
+# `out/` is already ignored repo-wide; `pnpm --filter @lexipulse/assets generate`
+# recreates it byte-for-byte.

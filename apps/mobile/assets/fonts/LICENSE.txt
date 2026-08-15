@@ -1,0 +1,10 @@
+JetBrains Mono
+Copyright 2020 The JetBrains Mono Project Authors
+https://github.com/JetBrains/JetBrainsMono
+
+Licensed under the SIL Open Font License, Version 1.1.
+Full text: https://scripts.sil.org/OFL
+
+The OFL permits bundling the font inside an application, including a paid one, as long
+as the font itself is not sold on its own and this notice travels with the files. The
+TTFs in this folder are unmodified.

@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "types": ["node"],
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "paths": {
+      "@lexipulse/core": ["../core/src/index.ts"],
+      "@lexipulse/ui": ["../ui/src/index.ts"],
+      "@lexipulse/ui/tokens": ["../ui/src/tokens.ts"],
+      "@lexipulse/ui/geometry": ["../ui/src/player-geometry.ts"],
+      "@lexipulse/ui/*": ["../ui/src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "out"]
+}

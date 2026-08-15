@@ -1,0 +1,31 @@
+{
+  "name": "@lexipulse/assets",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "tsx src/generate.ts",
+    "screenshots": "tsx src/store-screenshots.ts",
+    "build": "tsx src/generate.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings 0",
+    "clean": "rimraf dist out .turbo"
+  },
+  "dependencies": {
+    "@lexipulse/core": "workspace:*",
+    "@lexipulse/ui": "workspace:*",
+    "sharp": "0.34.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@types/node": "22.20.1",
+    "eslint": "9.39.5",
+    "playwright": "1.56.1",
+    "rimraf": "6.0.1",
+    "tsx": "4.23.12",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.67.0",
+    "vitest": "4.1.10"
+  }
+}

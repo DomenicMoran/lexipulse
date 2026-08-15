@@ -1,0 +1,59 @@
+{
+  "name": "LexiPulse — RSVP & Document Reader",
+  "short_name": "LexiPulse",
+  "description": "EPUB, PDF und Web-Artikel Wort für Wort lesen. Offline, ohne Konto, ohne Datenerhebung.",
+  "lang": "de",
+  "dir": "ltr",
+  "start_url": "/reader",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "categories": ["books", "productivity", "education"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Bibliothek",
+      "short_name": "Bibliothek",
+      "url": "/reader/library"
+    },
+    {
+      "name": "Statistik",
+      "short_name": "Statistik",
+      "url": "/reader/stats"
+    }
+  ]
+}
