@@ -30,7 +30,20 @@
         "buildType": "app-bundle"
       },
       "ios": {
-        "simulator": false
+        "simulator": false,
+        /*
+         * Local signing material, and only for iOS.
+         *
+         * The team already holds three Apple distribution certificates, which is the
+         * limit, so EAS cannot mint a fourth and instead fails with "Distribution
+         * Certificate is not validated for non-interactive builds" — a message that
+         * sounds like missing credentials and is not. `credentials.json` reuses an
+         * existing certificate together with a profile created for this bundle id.
+         *
+         * Setting this at the profile level instead of under `ios` would make EAS look
+         * for the Android keystore locally too, and that one lives on the Expo servers.
+         */
+        "credentialsSource": "local"
       }
     }
   },
@@ -40,7 +53,19 @@
         "track": "internal",
         "releaseStatus": "draft"
       },
-      "ios": {}
+      /*
+       * The App Store Connect API key is deliberately absent. `eas submit` wants
+       * `ascApiKeyPath`, `ascApiKeyId` and `ascApiKeyIssuerId` here, and this repository
+       * is public — the key id and issuer id identify the account even though the .p8
+       * itself lives outside the tree. Pass them on the command line instead:
+       *
+       *   eas submit --platform ios --profile production \
+       *     --asc-api-key-path <path to .p8> --asc-api-key-id <id> \
+       *     --asc-api-key-issuer-id <issuer>
+       */
+      "ios": {
+        "ascAppId": "6801979644"
+      }
     }
   }
 }

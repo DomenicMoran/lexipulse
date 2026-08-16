@@ -31,6 +31,15 @@ out/
 .env.*.local
 !.env.example
 
+# Signing material. `credentials.json` holds the p12 password in clear text and points
+# at key files kept outside the repository; this repo is public.
+credentials.json
+*.p12
+*.mobileprovision
+*.keystore
+*.jks
+*.p8
+
 # vercel
 .vercel/
 

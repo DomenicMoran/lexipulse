@@ -2,67 +2,88 @@
 
 Aufgaben, die nur du erledigen kannst. Stand: 2026-08-16.
 
-## 1. Vercel-Tarif prüfen (Hobby vs. Pro)
+## 1. Google Play: Abrechnungsprofil einrichten — der einzige echte Blocker
 
-Das Projekt `lexipulse` liegt im Team `domenicmos-projects`, Tarif **Hobby**. Die Vercel-
-Nutzungsbedingungen erlauben auf Hobby keine kommerzielle Nutzung. Die Web-App selbst ist
-kostenlos, bewirbt aber eine kostenpflichtige App für 4,99 € — das kann Vercel als
-kommerziell werten.
+Der Play-Eintrag ist fertig bis auf eine Sache: **den Preis.** Play sagt unter
+Monetarisierung wörtlich „Richte zuerst dein Abrechnungsprofil ein". Ohne dieses Profil
+lässt sich für eine kostenpflichtige App kein Preis setzen und damit auch keine
+Produktionsfreigabe starten.
 
-Entweder auf Pro wechseln (20 $/Monat) oder in Kauf nehmen, dass Vercel das Projekt bei
-einer Prüfung beanstandet. Deine Entscheidung, ich habe hier nichts geändert.
+Das mache ich nicht für dich: dafür sind Bankverbindung, Steuerdaten und eine
+Identitätsprüfung nötig.
 
-Erledigt ist dagegen:
-- Vercel-Projekt `lexipulse` angelegt, Root `apps/web`, mit GitHub verknüpft
-- DNS bei INWX umgestellt: `lexipulse.de` → A 216.198.79.1 + 64.29.17.1,
-  `www` → CNAME cname.vercel-dns.com, INWX-Parkeintrag entfernt
-- Vercel meldet `misconfigured: false`
+Weg dahin:
 
-## 2. E-Mail-Postfach unter lexipulse.de
+1. Play Console → **Einstellungen → Zahlungsprofil** (Menüpunkt „Bestellverwaltung")
+2. Google-Zahlungsprofil anlegen: Firmenname, Anschrift, Steuernummer, Bankverbindung
+3. Danach App → **Mit Google Play monetarisieren → App-Preise** → 4,99 € setzen und
+   „Preise für alle Länder/Regionen festlegen" bestätigen
+4. Dann App → **Testen und veröffentlichen → Produktion** → das bereits hochgeladene
+   Bundle (versionCode 2) in die Produktion befördern
 
-Die Rechtstexte nennen aktuell `info@menucloud-berlin.de` und
-`datenschutz@menucloud-berlin.de`, weil das die einzigen belegbar existierenden Postfächer
-sind. Eine im Impressum genannte, nicht erreichbare Adresse ist nach § 5 Abs. 1 Nr. 2 TMG
-angreifbar — deshalb steht dort bewusst keine erfundene LexiPulse-Adresse.
+Alles andere steht:
 
-Wenn du `kontakt@lexipulse.de` und `datenschutz@lexipulse.de` in Mailcow anlegst, sag
-Bescheid, dann tausche ich die Adressen in allen fünf Rechtstexten aus.
+- App-Eintrag `de.lexipulse.app`, Name „LexiPulse: Speed Reader"
+- Store-Eintrag DE und EN: Titel, Kurz- und Volltextbeschreibung, Icon, Feature-Grafik,
+  je 6 Screenshots
+- Alle Erklärungen unter App-Inhalte abgeschlossen: Datenschutzerklärung, Werbung
+  („keine"), Anmeldedaten („nicht zugangsbeschränkt"), Werbe-ID („nein"), Behörden-,
+  Finanz- und Gesundheits-Apps („nein"), Zielgruppe 18+, Datensicherheit
+  („keine Datenerfassung"), Altersfreigabe 3+
+- AAB als versionCode 2 im internen Testkanal
 
-## 3. Apple: App-Eintrag anlegen
+## 2. Apple: nichts zu tun, wartet auf Prüfung
 
-In App Store Connect ein neues App-Record anlegen:
+**Version 1.0, Build 2 — „Warten auf Prüfung".**
 
-- Name: **LexiPulse**
-- Bundle-ID: `de.lexipulse.app` (vorher unter Certificates → Identifiers registrieren)
-- SKU: `lexipulse-ios-001`
-- Primärsprache: Deutsch
-- Preisstufe: **4,99 €** (Tier je nach aktueller Apple-Preistabelle)
-- Verfügbarkeit: alle Länder, in denen du verkaufen willst
+Die Freigabe steht auf **manuell**: wenn Apple genehmigt, passiert nichts, bis du in
+App Store Connect auf „Diese Version veröffentlichen" drückst.
 
-Texte, Keywords und die Datenschutz-Antworten liegen fertig unter `store/metadata/`.
+Gesetzt sind: Bundle-ID `de.lexipulse.app`, App-Eintrag `6801979644`, Kategorien
+Produktivität und Bücher, Titel und Untertitel DE+EN, Beschreibungen, Keywords,
+24 Screenshots (6,9" und 6,5", je DE und EN), Preis 4,99 € (Erlös 3,56 €),
+Altersfreigabe 4+, App-Datenschutz „Keine Daten erfasst" (veröffentlicht, nicht nur
+gespeichert), Prüfhinweise mit Testanleitung, Copyright.
 
-## 4. Google Play: App-Eintrag anlegen
+Falls ein Prüfer den URL-Import doch als unbeschränkten Webzugriff wertet: in den
+App-Informationen die Altersfreigabe-Frage „Unrestricted Web Access" auf Ja setzen,
+dann steht dort 17+. Bis dahin gilt 4+, wie besprochen.
 
-In der Play Console eine neue App anlegen:
+## 3. Vercel-Tarif (deine Entscheidung, ich habe nichts geändert)
 
-- Name: **LexiPulse**
-- Standardsprache: Deutsch (Deutschland)
-- App-Typ: App, **kostenpflichtig**, 4,99 €
-- Danach: Zahlungsprofil verknüpfen (ohne das lässt sich kein Preis setzen)
+Das Projekt `lexipulse` liegt im Team `domenicmos-projects`, Tarif **Hobby**. Die
+Vercel-Nutzungsbedingungen erlauben auf Hobby keine kommerzielle Nutzung. Die Web-App
+ist kostenlos, bewirbt aber eine kostenpflichtige App — das kann Vercel als kommerziell
+werten.
 
-## 5. Zwei Dinge, die ich nicht prüfen konnte
+Erledigt: Projekt angelegt (Root `apps/web`, GitHub-verknüpft), DNS bei INWX auf Vercel
+umgestellt, Parkeintrag und Wildcard entfernt, `misconfigured: false`, Seite live.
 
-**Sprachausgabe.** Der Code ist verdrahtet und typgeprüft, aber Playwright-Chromium hat
-keine installierten Stimmen und der Android-Emulator gibt keinen Ton aus. Bitte einmal
-auf einem normalen Desktop-Browser und auf einem echten Telefon anhören: Einstellungen →
-Vorlesen an, Stimme wählen, Player starten. Erwartet: die Stimme liest den Satz, in den
-der Stream gerade eintritt, und bricht bei Pause sofort ab.
+## 4. E-Mail-Postfach unter lexipulse.de
 
-**iOS.** Ohne Mac konnte ich nur den JS-Export und den Typecheck fahren. Der erste
-`eas build --platform ios` wird zeigen, ob die native Seite durchläuft.
+Die Rechtstexte nennen `info@menucloud-berlin.de` und `datenschutz@menucloud-berlin.de`,
+weil das die einzigen belegbar existierenden Postfächer sind. Eine im Impressum genannte,
+nicht erreichbare Adresse ist nach § 5 Abs. 1 Nr. 2 TMG angreifbar — deshalb steht dort
+bewusst keine erfundene LexiPulse-Adresse.
 
-## 6. Prüfen und freigeben
+Legst du `kontakt@lexipulse.de` und `datenschutz@lexipulse.de` in Mailcow an, tausche ich
+die Adressen in allen fünf Rechtstexten und in den Prüfhinweisen aus.
 
-Bevor du einreichst: die Screenshots unter `store/screenshots/` ansehen und die
-Beschreibungen in `store/metadata/` gegenlesen. Das ist der Text, der später im Store
-steht — nichts davon lässt sich nach der Freigabe schnell korrigieren.
+## 5. Eine Sache, die ich nicht prüfen konnte
+
+**Sprachausgabe auf dem Gerät.** Du hast gesagt, sie ist geprüft — für die Akte: mein
+eigener Nachweis fehlt, weil Playwright-Chromium keine Stimmen installiert hat und der
+Android-Emulator keinen Ton ausgibt. Der Code-Pfad, die Stimmenliste und der Abbruch bei
+Pause und Sprung sind implementiert und typgeprüft.
+
+## 6. Signaturmaterial (nur zur Kenntnis)
+
+Liegt außerhalb des Repositorys, weil `DomenicMoran/lexipulse` öffentlich ist:
+
+- `C:\Users\domen\Documents\mc-build\lexipulse-ios\distribution.p12` — vorhandenes
+  Apple-Verteilzertifikat `BY94XCS595`, gültig bis 2027-07-17. Wiederverwendet, weil das
+  Team bereits drei Zertifikate hat und Apple keine vier erlaubt.
+- `C:\Users\domen\Documents\mc-build\lexipulse-ios\lexipulse-appstore.mobileprovision` —
+  neu angelegtes Profil `TNXJUGLT72` für `de.lexipulse.app`
+- `apps/mobile/credentials.json` zeigt auf beide und ist per `.gitignore` ausgeschlossen
+  (mit `git check-ignore -v` belegt)
