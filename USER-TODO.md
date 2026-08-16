@@ -59,15 +59,17 @@ werten.
 Erledigt: Projekt angelegt (Root `apps/web`, GitHub-verknüpft), DNS bei INWX auf Vercel
 umgestellt, Parkeintrag und Wildcard entfernt, `misconfigured: false`, Seite live.
 
-## 4. E-Mail-Postfach unter lexipulse.de
+## 4. Kontaktadresse — erledigt, nichts zu tun
 
-Die Rechtstexte nennen `info@menucloud-berlin.de` und `datenschutz@menucloud-berlin.de`,
-weil das die einzigen belegbar existierenden Postfächer sind. Eine im Impressum genannte,
-nicht erreichbare Adresse ist nach § 5 Abs. 1 Nr. 2 TMG angreifbar — deshalb steht dort
-bewusst keine erfundene LexiPulse-Adresse.
+Überall steht **`info@menucloud-berlin.de`**, und zwar als einzige Adresse: Impressum,
+Datenschutzerklärung (deutsch und englisch), AGB, Footer und FAQ der Webseite,
+Play-Store-Kontaktdaten, Apple-Prüfhinweise, IARC-Formular.
 
-Legst du `kontakt@lexipulse.de` und `datenschutz@lexipulse.de` in Mailcow an, tausche ich
-die Adressen in allen fünf Rechtstexten und in den Prüfhinweisen aus.
+`datenschutz@menucloud-berlin.de` ist raus. Ein Postfach, das gelesen wird, ist mehr wert
+als zwei, von denen eins vielleicht nicht geöffnet wird — und bei Datenschutzanfragen
+läuft sonst eine Frist gegen ein totes Postfach.
+
+Ein eigenes Postfach unter `lexipulse.de` wird bewusst nicht angelegt.
 
 ## 5. Eine Sache, die ich nicht prüfen konnte
 

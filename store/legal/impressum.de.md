@@ -24,8 +24,9 @@ Diensteanbieters.
 
 Telefon: +49 30 767 645 46
 E-Mail: info@menucloud-berlin.de
-Datenschutzanfragen: datenschutz@menucloud-berlin.de
 Website: https://lexipulse.de
+
+Diese Adresse gilt für alle Anliegen, auch für Anfragen zum Datenschutz.
 
 ## Steuerliche Angaben
 
