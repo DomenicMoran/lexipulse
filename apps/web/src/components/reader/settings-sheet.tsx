@@ -5,6 +5,8 @@ import {
   ACCENTS,
   FONT_LABELS,
   FONTS,
+  OVERLAYS,
+  READER_FONTS,
   SPEED_PRESETS,
   THEME_LABELS,
   THEMES,
@@ -14,6 +16,8 @@ import {
   applyPreset,
   type AccentName,
   type FontKey,
+  type OverlayKey,
+  type ReaderFontKey,
   type ThemeName,
 } from '@lexipulse/core';
 import { Divider, IconButton, SegmentedControl, Slider, Stepper, Switch } from '@lexipulse/ui';
@@ -27,6 +31,37 @@ const ACCENT_SWATCH: Record<AccentName, string> = {
   coral: '#FF4D4D',
   amber: '#FFB020',
   cyber: '#22E584',
+};
+
+const READER_FONT_LABELS: Record<ReaderFontKey, string> = {
+  literata: 'Literata (Serif)',
+  inter: 'Inter (Sans)',
+  system: 'System',
+  // Named as it is, with the caveat: the face is not bundled, so it only takes effect
+  // where the reader has it installed. Promising more than that would be a lie to the
+  // people who need this option most.
+  'open-dyslexic': 'OpenDyslexic (falls installiert)',
+};
+
+const OVERLAY_LABELS: Record<OverlayKey, string> = {
+  none: 'Keine',
+  cream: 'Creme',
+  peach: 'Pfirsich',
+  rose: 'Rosé',
+  mint: 'Mint',
+  sky: 'Himmel',
+  lilac: 'Flieder',
+};
+
+/** Swatches at full strength — over the page the same hues run at 0.10 alpha. */
+const OVERLAY_SWATCH: Record<OverlayKey, string | null> = {
+  none: null,
+  cream: '#FFF6D6',
+  peach: '#FFD6BA',
+  rose: '#FFC8D6',
+  mint: '#C4F5DC',
+  sky: '#C4E2FF',
+  lilac: '#DED0FF',
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -240,6 +275,101 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
               description="Restzeit, effektives Tempo und Wortposition unter dem Player."
               checked={settings.showStats}
               onCheckedChange={(showStats) => update({ showStats })}
+            />
+          </Section>
+
+          <Divider />
+
+          {/* Applies to the running-text panel behind the page button, not to the
+              stage — the two surfaces read differently and carry separate typography. */}
+          <Section title="Fließtext">
+            <Field label="Schriftart">
+              <select
+                aria-label="Schriftart im Fließtext"
+                value={settings.readerFont}
+                onChange={(event) =>
+                  update({ readerFont: event.target.value as ReaderFontKey })
+                }
+                className="h-9 rounded-[8px] border border-[var(--lx-border)] bg-[var(--lx-bg)] px-2 text-[14px] text-[var(--lx-text)]"
+              >
+                {READER_FONTS.map((font) => (
+                  <option key={font} value={font}>
+                    {READER_FONT_LABELS[font]}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Slider
+              label="Schriftgröße"
+              min={12}
+              max={42}
+              step={1}
+              value={settings.readerFontSize}
+              valueLabel={`${settings.readerFontSize} px`}
+              onValueChange={(readerFontSize) => update({ readerFontSize })}
+            />
+
+            <Slider
+              label="Zeilenabstand"
+              min={1.1}
+              max={2.6}
+              step={0.05}
+              value={settings.readerLineHeight}
+              valueLabel={settings.readerLineHeight.toFixed(2).replace('.', ',')}
+              onValueChange={(readerLineHeight) => update({ readerLineHeight })}
+            />
+
+            <Slider
+              label="Seitenrand"
+              min={0}
+              max={72}
+              step={2}
+              value={settings.readerMargin}
+              valueLabel={`${settings.readerMargin} px`}
+              onValueChange={(readerMargin) => update({ readerMargin })}
+            />
+
+            <Stepper
+              label="Bionische Hervorhebung"
+              min={0}
+              max={5}
+              step={1}
+              value={settings.readerBionic}
+              format={(value) => (value === 0 ? 'aus' : `Stufe ${value}`)}
+              onValueChange={(readerBionic) => update({ readerBionic })}
+            />
+
+            <Field label="Farbfilter">
+              <SegmentedControl<OverlayKey>
+                className="flex-wrap"
+                label="Farbfilter über dem Fließtext"
+                value={settings.readerOverlay}
+                options={OVERLAYS.map((overlay) => ({
+                  value: overlay,
+                  title: OVERLAY_LABELS[overlay],
+                  label: (
+                    <span className="flex items-center gap-1.5">
+                      {OVERLAY_SWATCH[overlay] !== null && (
+                        <span
+                          className="block h-3 w-3 rounded-full border border-[var(--lx-border)]"
+                          style={{ backgroundColor: OVERLAY_SWATCH[overlay] as string }}
+                        />
+                      )}
+                      {OVERLAY_LABELS[overlay]}
+                    </span>
+                  ),
+                }))}
+                onValueChange={(readerOverlay) => update({ readerOverlay })}
+                size="sm"
+              />
+            </Field>
+
+            <Switch
+              label="Blocksatz"
+              description="Bündig auf beiden Seiten statt Flattersatz rechts."
+              checked={settings.readerJustify}
+              onCheckedChange={(readerJustify) => update({ readerJustify })}
             />
           </Section>
 

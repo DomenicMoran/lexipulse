@@ -9,6 +9,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   ACCENT_LABELS,
+  OVERLAYS,
+  READER_FONTS,
   SPEED_PRESETS,
   THEME_LABELS,
   WPM_MAX,
@@ -31,7 +33,8 @@ import {
   T,
 } from '../../src/components/ui';
 import { useAlert } from '../../src/components/alert';
-import { t } from '../../src/i18n';
+import { language, t } from '../../src/i18n';
+import { OVERLAY_LABELS } from '../../src/reader/typography';
 import { store } from '../../src/lib/store';
 import { useLibrary } from '../../src/state/library';
 import { useReader } from '../../src/state/reader';
@@ -51,21 +54,14 @@ export default function SettingsScreen() {
 
       {/* ------------------------------------------------------------------ speed */}
       <Section title={t('settings.section.speed')}>
-        <View style={{ padding: theme.space[4], gap: theme.space[2] }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <T>{t('settings.wpm')}</T>
-            <T tone="accent" variant="mono">
-              {settings.wpm}
-            </T>
-          </View>
-          <Slider
-            value={settings.wpm}
-            min={WPM_MIN}
-            max={WPM_MAX}
-            step={WPM_STEP}
-            onChange={(wpm) => update({ wpm })}
-          />
-        </View>
+        <SliderRow
+          label={t('settings.wpm')}
+          value={settings.wpm}
+          min={WPM_MIN}
+          max={WPM_MAX}
+          step={WPM_STEP}
+          onChange={(wpm) => update({ wpm })}
+        />
         <Divider />
         <View style={{ padding: theme.space[4], gap: theme.space[3] }}>
           <T variant="small" tone="muted">
@@ -140,19 +136,133 @@ export default function SettingsScreen() {
           />
         </View>
         <Divider />
-        <View style={{ padding: theme.space[4], gap: theme.space[2] }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <T>{t('settings.fontSize')}</T>
-            <T tone="accent" variant="mono">
-              {settings.fontSize}
+        <SliderRow
+          label={t('settings.fontSize')}
+          value={settings.fontSize}
+          min={20}
+          max={96}
+          step={2}
+          onChange={(fontSize) => update({ fontSize })}
+        />
+      </Section>
+
+      {/* ------------------------------------------------------------- page mode */}
+      <Section title={t('settings.section.reader')}>
+        <View style={{ padding: theme.space[4], gap: theme.space[3] }}>
+          <T variant="small" tone="muted">
+            {t('settings.reader.font')}
+          </T>
+          <Segmented
+            options={READER_FONTS.map((font) => ({
+              value: font,
+              label: t(`settings.reader.font.${font}`),
+            }))}
+            value={settings.readerFont}
+            onChange={(readerFont) => update({ readerFont })}
+          />
+        </View>
+        <Divider />
+        <SliderRow
+          label={t('settings.reader.size')}
+          value={settings.readerFontSize}
+          min={12}
+          max={42}
+          step={1}
+          onChange={(readerFontSize) => update({ readerFontSize })}
+        />
+        <Divider />
+        <SliderRow
+          label={t('settings.reader.lineHeight')}
+          value={settings.readerLineHeight}
+          display={settings.readerLineHeight.toFixed(2)}
+          min={1.1}
+          max={2.6}
+          step={0.05}
+          // A 0.05 step lands on values like 1.7500000000000002; the reader multiplies the
+          // line height by the font size, so the noise would reach the layout.
+          onChange={(value) => update({ readerLineHeight: Math.round(value * 100) / 100 })}
+        />
+        <Divider />
+        <SliderRow
+          label={t('settings.reader.margin')}
+          value={settings.readerMargin}
+          min={0}
+          max={72}
+          step={2}
+          onChange={(readerMargin) => update({ readerMargin })}
+        />
+        <Divider />
+        <Row
+          label={t('settings.reader.justify')}
+          hint={t('settings.reader.justify.hint')}
+          right={
+            <Switch
+              value={settings.readerJustify}
+              onChange={(readerJustify) => update({ readerJustify })}
+            />
+          }
+        />
+        <Divider />
+        <Row
+          label={t('settings.reader.paged')}
+          hint={t('settings.reader.paged.hint')}
+          right={
+            <Switch
+              value={settings.readerPaged}
+              onChange={(readerPaged) => update({ readerPaged })}
+            />
+          }
+        />
+        <Divider />
+        <SliderRow
+          label={t('settings.reader.autoScroll')}
+          hint={t('settings.reader.autoScroll.hint')}
+          value={settings.readerAutoScroll}
+          min={0}
+          max={200}
+          step={5}
+          onChange={(readerAutoScroll) => update({ readerAutoScroll })}
+        />
+      </Section>
+
+      {/* ----------------------------------------------------------- reading aids */}
+      <Section title={t('settings.section.reading-aids')}>
+        <Stepper
+          label={t('settings.reader.bionic')}
+          hint={t('settings.reader.bionic.hint')}
+          value={settings.readerBionic}
+          min={0}
+          max={5}
+          step={1}
+          onChange={(readerBionic) => update({ readerBionic })}
+        />
+        <Divider />
+        <Stepper
+          label={t('settings.reader.ruler')}
+          hint={t('settings.reader.ruler.hint')}
+          value={settings.readerRuler}
+          min={0}
+          max={3}
+          step={1}
+          onChange={(readerRuler) => update({ readerRuler })}
+        />
+        <Divider />
+        <View style={{ padding: theme.space[4], gap: theme.space[3] }}>
+          <View style={{ gap: 2 }}>
+            <T variant="small" tone="muted">
+              {t('settings.reader.overlay')}
+            </T>
+            <T variant="small" tone="faint">
+              {t('settings.reader.overlay.hint')}
             </T>
           </View>
-          <Slider
-            value={settings.fontSize}
-            min={20}
-            max={96}
-            step={2}
-            onChange={(fontSize) => update({ fontSize })}
+          <SegmentedGrid
+            options={OVERLAYS.map((overlay) => ({
+              value: overlay,
+              label: OVERLAY_LABELS[overlay][language],
+            }))}
+            value={settings.readerOverlay}
+            onChange={(readerOverlay) => update({ readerOverlay })}
           />
         </View>
       </Section>
@@ -311,6 +421,83 @@ function activePreset(wpm: number): string {
     }
   }
   return closest;
+}
+
+/** A slider with its label and live value, the way every numeric setting is shown. */
+function SliderRow({
+  label,
+  hint,
+  value,
+  display,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: number;
+  /** Overrides the printed value where the raw number is not what the user thinks in. */
+  display?: string;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (next: number) => void;
+}) {
+  const theme = useTheme();
+  return (
+    <View style={{ padding: theme.space[4], gap: theme.space[2] }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <T>{label}</T>
+        <T tone="accent" variant="mono">
+          {display ?? value}
+        </T>
+      </View>
+      {hint ? (
+        <T variant="small" tone="faint">
+          {hint}
+        </T>
+      ) : null}
+      <Slider value={value} min={min} max={max} step={step} onChange={onChange} />
+    </View>
+  );
+}
+
+/**
+ * A segmented control that wraps onto several rows.
+ *
+ * Segments share the width evenly, so past four options the labels start eliding — the
+ * seven colour filters would read as "Pfir…", "Him…". Splitting them across rows keeps
+ * every option legible; only the row holding the current value shows a selection.
+ */
+function SegmentedGrid<Value extends string>({
+  options,
+  value,
+  onChange,
+  perRow = 4,
+}: {
+  options: { value: Value; label: string }[];
+  value: Value;
+  onChange: (next: Value) => void;
+  perRow?: number;
+}) {
+  const theme = useTheme();
+  const rows: { value: Value; label: string }[][] = [];
+  for (let index = 0; index < options.length; index += perRow) {
+    rows.push(options.slice(index, index + perRow));
+  }
+  return (
+    <View style={{ gap: theme.space[2] }}>
+      {rows.map((row) => (
+        <Segmented
+          key={row.map((option) => option.value).join('|')}
+          options={row}
+          value={value}
+          onChange={onChange}
+        />
+      ))}
+    </View>
+  );
 }
 
 function Stepper({

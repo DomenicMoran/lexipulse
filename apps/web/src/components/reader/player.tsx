@@ -5,13 +5,17 @@ import {
   WPM_MAX,
   WPM_MIN,
   WPM_STEP,
+  bionicPrefix,
   contextAround,
   effectiveWpmFor,
   formatDuration,
+  paragraphsOf,
   sentenceText,
   sentenceTextAt,
   type EngineStatus,
   type LexiDocument,
+  type OverlayKey,
+  type ReaderFontKey,
   type RsvpToken,
 } from '@lexipulse/core';
 import { IconButton, RsvpStage } from '@lexipulse/ui';
@@ -567,14 +571,51 @@ export function Player({
 }
 
 /**
- * The chapter as a page, with the current word marked.
+ * Page-mode typefaces, resolved to the faces this app actually ships.
+ *
+ * The RSVP stage wants a monospace face — the fixation column only holds still if every
+ * character is the same width. Running prose wants the opposite, so page mode carries its
+ * own font setting instead of borrowing the player's.
+ */
+const READER_FONT_STACKS: Record<ReaderFontKey, string> = {
+  literata: "var(--lx-font-literata), Georgia, 'Times New Roman', serif",
+  inter: 'var(--lx-font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
+  system: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  // Deliberately not bundled: a fourth web font would be paid for by every reader on
+  // every visit for an option few pick. An OpenDyslexic installed on the machine is used
+  // when it is there, otherwise the stack falls through to the system face.
+  'open-dyslexic':
+    "'OpenDyslexic', 'Open Dyslexic', -apple-system, BlinkMacSystemFont, sans-serif",
+};
+
+/**
+ * Irlen-style tints, laid over the page at low alpha.
+ *
+ * They help some readers with visual stress and do nothing for others, which is why they
+ * are a choice and not a default. The alpha stays at 0.10 so body text keeps its contrast
+ * ratio — a tint that makes the page prettier and the text unreadable helps nobody.
+ */
+const OVERLAY_TINTS: Record<OverlayKey, string | null> = {
+  none: null,
+  cream: 'rgba(255, 246, 214, 0.10)',
+  peach: 'rgba(255, 214, 186, 0.10)',
+  rose: 'rgba(255, 200, 214, 0.10)',
+  mint: 'rgba(196, 245, 220, 0.10)',
+  sky: 'rgba(196, 226, 255, 0.10)',
+  lilac: 'rgba(222, 208, 255, 0.10)',
+};
+
+/**
+ * The document as a page, with the current word marked.
  *
  * RSVP takes the page away, which is what makes it fast and also what makes losing the
  * thread expensive: there is nothing to look back at, only a rewind and another pass. This
- * gives the page back — and every word in it is a way into the stream.
+ * gives the page back — the whole document, not just the chapter — and every word in it is
+ * a way into the stream.
  *
- * Only the chapter the reader is in gets rendered. A whole book of clickable words would
- * cost more than it buys, and chapters are one control away.
+ * Typography is set once on the scroll container and inherited. That is not only less
+ * markup: it keeps the per-paragraph memo out of the settings' reach, so moving the
+ * line-height slider does not have to re-render a book's worth of buttons.
  */
 function PageView({
   tokens,
@@ -585,21 +626,12 @@ function PageView({
   activeIndex: number;
   onSelect: (index: number) => void;
 }) {
+  const { settings } = useSettings();
   const active = React.useRef<HTMLButtonElement | null>(null);
-  const chapter = tokens[activeIndex]?.chapterIndex ?? 0;
 
-  // Grouping depends on the chapter, not on the word. Keying this on `activeIndex` walked
-  // the whole token array again for every word the stream advanced.
-  const paragraphs = React.useMemo(() => {
-    const groups: { key: number; tokens: RsvpToken[] }[] = [];
-    for (const token of tokens) {
-      if (token.chapterIndex !== chapter) continue;
-      const last = groups[groups.length - 1];
-      if (last && last.key === token.paragraphIndex) last.tokens.push(token);
-      else groups.push({ key: token.paragraphIndex, tokens: [token] });
-    }
-    return groups;
-  }, [tokens, chapter]);
+  // Grouping depends on the token stream, nothing else. Keying this on `activeIndex`
+  // walked the whole array again for every word the stream advanced.
+  const paragraphs = React.useMemo(() => paragraphsOf(tokens), [tokens]);
 
   // `block: 'nearest'` keeps the page still while the stream is paused on a word that is
   // already visible; without it every re-render would yank the scroll position.
@@ -607,32 +639,51 @@ function PageView({
     active.current?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex]);
 
+  const tint = OVERLAY_TINTS[settings.readerOverlay];
+
   return (
-    <div
-      className="max-h-[46vh] overflow-y-auto rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] px-4 py-4 sm:px-6"
-      aria-label="Fließtext"
-    >
-      <p className="mb-3 text-[12px] text-[var(--lx-text-muted)]">
-        Ein Wort anklicken, um dort weiterzulesen.
-      </p>
-      {paragraphs.map((paragraph) => {
-        const first = paragraph.tokens[0]?.index ?? 0;
-        const last = paragraph.tokens[paragraph.tokens.length - 1]?.index ?? 0;
-        const holdsActive = activeIndex >= first && activeIndex <= last;
-        return (
+    <div className="relative">
+      <div
+        role="region"
+        aria-label="Fließtext"
+        className="max-h-[46vh] overflow-y-auto rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] py-4 text-[var(--lx-text)]"
+        style={{
+          fontFamily: READER_FONT_STACKS[settings.readerFont],
+          fontSize: `${settings.readerFontSize}px`,
+          lineHeight: settings.readerLineHeight,
+          paddingInline: `${settings.readerMargin}px`,
+          textAlign: settings.readerJustify ? 'justify' : 'left',
+        }}
+      >
+        <p className="mb-3 text-left text-[12px] leading-normal text-[var(--lx-text-muted)]">
+          Ein Wort anklicken, um dort weiterzulesen.
+        </p>
+        {paragraphs.map((paragraph) => (
           <PageParagraph
             key={paragraph.key}
             tokens={paragraph.tokens}
             // Every other paragraph gets the same `-1` on every word the stream
             // advances, so memo sees no change and skips it. Without this the whole
-            // chapter re-rendered several times a second — over a thousand buttons at
+            // document re-rendered several times a second — thousands of buttons at
             // 350 words per minute, which froze the tab outright.
-            activeIndex={holdsActive ? activeIndex : -1}
+            activeIndex={
+              activeIndex >= paragraph.firstToken && activeIndex <= paragraph.lastToken
+                ? activeIndex
+                : -1
+            }
             activeRef={active}
+            bionic={settings.readerBionic}
             onSelect={onSelect}
           />
-        );
-      })}
+        ))}
+      </div>
+      {tint !== null && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[14px]"
+          style={{ backgroundColor: tint }}
+        />
+      )}
     </div>
   );
 }
@@ -641,17 +692,27 @@ const PageParagraph = React.memo(function PageParagraph({
   tokens,
   activeIndex,
   activeRef,
+  bionic,
   onSelect,
 }: {
   tokens: RsvpToken[];
   activeIndex: number;
   activeRef: React.RefObject<HTMLButtonElement | null>;
+  /** 0 is off, 1–5 how much of each word opening is emboldened. */
+  bionic: number;
   onSelect: (index: number) => void;
 }) {
   return (
-    <p className="mb-4 text-[16px] leading-[1.75] text-[var(--lx-text)]">
+    // Size and spacing come from the container, so `em` here rather than a fixed step:
+    // the gap between paragraphs has to grow with the type or the page loses its rhythm.
+    // `content-visibility` lets the browser skip layout and paint for the paragraphs that
+    // are off screen, which is what makes a whole book affordable instead of a chapter.
+    <p className="mb-[0.9em] [contain-intrinsic-size:auto_6em] [content-visibility:auto]">
       {tokens.map((token, position) => {
         const isActive = token.index === activeIndex;
+        // Bionic reading fixes the eye on word openings; core decides how far in the
+        // bold runs, this only draws it.
+        const cut = bionic > 0 ? bionicPrefix(token.text, bionic) : 0;
         return (
           <React.Fragment key={token.index}>
             {position === 0 ? '' : ' '}
@@ -666,7 +727,16 @@ const PageParagraph = React.memo(function PageParagraph({
                   : 'rounded-[3px] px-[2px] hover:bg-[var(--lx-accent-soft)]'
               }
             >
-              {token.text}
+              {cut > 0 ? (
+                <>
+                  {/* `b`, not `strong`: this is weight, not importance — screen readers
+                      should read the word, not stress every one of them. */}
+                  <b className="font-semibold">{token.text.slice(0, cut)}</b>
+                  {token.text.slice(cut)}
+                </>
+              ) : (
+                token.text
+              )}
             </button>
           </React.Fragment>
         );
