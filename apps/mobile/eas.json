@@ -1,13 +1,12 @@
 {
   "cli": {
-    "version": ">= 16.0.0",
+    "version": ">= 22.0.0",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development",
       "android": {
         "buildType": "apk",
         "gradleCommand": ":app:assembleDebug"
@@ -18,7 +17,6 @@
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview",
       "android": {
         "buildType": "apk"
       },
@@ -27,7 +25,6 @@
       }
     },
     "production": {
-      "channel": "production",
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
@@ -43,9 +40,7 @@
         "track": "internal",
         "releaseStatus": "draft"
       },
-      "ios": {
-        "appleTeamId": "REPLACE_WITH_TEAM_ID"
-      }
+      "ios": {}
     }
   }
 }

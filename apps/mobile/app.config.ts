@@ -11,6 +11,7 @@ import type { ExpoConfig } from 'expo/config';
 const config: ExpoConfig = {
   name: 'LexiPulse',
   slug: 'lexipulse',
+  owner: 'menucloudberlin',
   version: '1.0.0',
   orientation: 'portrait',
   scheme: 'lexipulse',
@@ -26,7 +27,10 @@ const config: ExpoConfig = {
   assetBundlePatterns: ['**/*'],
   ios: {
     bundleIdentifier: 'de.lexipulse.app',
-    buildNumber: '1',
+    // No `buildNumber`: `eas.json` sets appVersionSource to remote, so EAS owns the
+    // build number. A value here would be ignored by the build and still show up in
+    // `Constants.expoConfig`, which is exactly how a wrong version ends up on a screen.
+    // Read `Application.nativeBuildVersion` at runtime instead.
     // No tablet-specific layout exists, so claiming iPad support would ship a stretched
     // phone UI — App Review rejects exactly that.
     supportsTablet: false,
@@ -41,7 +45,7 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'de.lexipulse.app',
-    versionCode: 1,
+    // No `versionCode` — see the note on iOS `buildNumber` above.
     // No `edgeToEdgeEnabled` flag: SDK 57 dropped it because edge-to-edge is now always
     // on, which is why every screen pads itself with `useSafeAreaInsets`.
     predictiveBackGestureEnabled: false,
@@ -115,6 +119,21 @@ const config: ExpoConfig = {
   experiments: {
     typedRoutes: true,
     reactCompiler: false,
+  },
+  /*
+   * Written by hand: `eas init` cannot edit a TypeScript config, so it prints the id and
+   * stops. The project lives at expo.dev/accounts/menucloudberlin/projects/lexipulse.
+   *
+   * There is deliberately no `updates` block and no `expo-updates` dependency. Over-the-air
+   * updates would have the app contact Expo's servers on every launch, and the privacy
+   * policy states that the only network call the app ever makes is the URL import the
+   * user starts themselves. Shipping a fix through the stores is slower; saying something
+   * untrue about where the data goes is worse.
+   */
+  extra: {
+    eas: {
+      projectId: '5aebaf91-fab9-4402-8b53-1a30052c9f14',
+    },
   },
 };
 
