@@ -1,22 +1,18 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { LEGAL_SOURCES, type LegalSlug } from '@/generated/legal';
 import { renderMarkdown, type MarkdownDocument } from './markdown';
 
 /**
  * The legal texts are authored once in `store/legal` and shipped to the stores from
- * there. The website reads the same files at build time instead of keeping a second
- * copy that would quietly drift out of sync with the submitted version.
+ * there. The website renders the same files, so the published page and the submitted
+ * version cannot drift apart.
+ *
+ * They arrive through a generated module rather than `readFileSync`, because a file
+ * outside the module graph does not invalidate Next's build cache: the imprint changed,
+ * the build succeeded, and the site quietly kept serving the previous text.
+ * `scripts/generate-legal.mjs` runs before every build.
  */
-const LEGAL_DIR = join(process.cwd(), '..', '..', 'store', 'legal');
-
-export type LegalSlug = 'impressum' | 'datenschutz' | 'agb';
-
-const FILES: Record<LegalSlug, string> = {
-  impressum: 'impressum.de.md',
-  datenschutz: 'datenschutz.de.md',
-  agb: 'agb.de.md',
-};
+export type { LegalSlug };
 
 export function loadLegal(slug: LegalSlug): MarkdownDocument {
-  return renderMarkdown(readFileSync(join(LEGAL_DIR, FILES[slug]), 'utf8'));
+  return renderMarkdown(LEGAL_SOURCES[slug]);
 }

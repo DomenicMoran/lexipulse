@@ -11,7 +11,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
-    "clean": "rimraf .next .turbo out"
+    "clean": "rimraf .next .turbo out",
+    "prebuild": "node scripts/generate-legal.mjs",
+    "predev": "node scripts/generate-legal.mjs",
+    "pretypecheck": "node scripts/generate-legal.mjs"
   },
   "dependencies": {
     "@lexipulse/core": "workspace:*",
