@@ -75,6 +75,16 @@ export function Player({
   const [index, setIndex] = React.useState(startIndex);
   const [status, setStatus] = React.useState<EngineStatus>('idle');
   const [showPage, setShowPage] = React.useState(false);
+
+  // Stable identity, or the memo on each paragraph never holds and the whole chapter
+  // re-renders on every word.
+  const seekFromPage = React.useCallback(
+    (target: number) => {
+      cancelSpeech();
+      engine.seek(target);
+    },
+    [engine],
+  );
   // Derived, not stored: `effectiveWpmFor` computes the rate the stream would run at
   // without touching the tokens, so there is no effect-then-setState round trip and no
   // window in which the number on screen belongs to the previous speed.
@@ -515,16 +525,7 @@ export function Player({
         </IconButton>
       </div>
 
-      {showPage ? (
-        <PageView
-          tokens={tokens}
-          activeIndex={index}
-          onSelect={(target) => {
-            cancelSpeech();
-            engine.seek(target);
-          }}
-        />
-      ) : null}
+      {showPage ? <PageView tokens={tokens} activeIndex={index} onSelect={seekFromPage} /> : null}
 
       <div className="flex flex-col gap-3">
         <label htmlFor="lx-wpm" className="sr-only">
@@ -582,9 +583,11 @@ function PageView({
   onSelect: (index: number) => void;
 }) {
   const active = React.useRef<HTMLButtonElement | null>(null);
+  const chapter = tokens[activeIndex]?.chapterIndex ?? 0;
 
+  // Grouping depends on the chapter, not on the word. Keying this on `activeIndex` walked
+  // the whole token array again for every word the stream advanced.
   const paragraphs = React.useMemo(() => {
-    const chapter = tokens[activeIndex]?.chapterIndex ?? 0;
     const groups: { key: number; tokens: RsvpToken[] }[] = [];
     for (const token of tokens) {
       if (token.chapterIndex !== chapter) continue;
@@ -593,7 +596,7 @@ function PageView({
       else groups.push({ key: token.paragraphIndex, tokens: [token] });
     }
     return groups;
-  }, [tokens, activeIndex]);
+  }, [tokens, chapter]);
 
   // `block: 'nearest'` keeps the page still while the stream is paused on a word that is
   // already visible; without it every re-render would yank the scroll position.
@@ -609,34 +612,65 @@ function PageView({
       <p className="mb-3 text-[12px] text-[var(--lx-text-muted)]">
         Ein Wort anklicken, um dort weiterzulesen.
       </p>
-      {paragraphs.map((paragraph) => (
-        <p key={paragraph.key} className="mb-4 text-[16px] leading-[1.75] text-[var(--lx-text)]">
-          {paragraph.tokens.map((token, position) => {
-            const isActive = token.index === activeIndex;
-            return (
-              <React.Fragment key={token.index}>
-                {position === 0 ? '' : ' '}
-                <button
-                  ref={isActive ? active : undefined}
-                  type="button"
-                  onClick={() => onSelect(token.index)}
-                  aria-current={isActive ? 'true' : undefined}
-                  className={
-                    isActive
-                      ? 'rounded-[3px] bg-[var(--lx-accent)] px-[2px] text-[var(--lx-accent-on)]'
-                      : 'rounded-[3px] px-[2px] hover:bg-[var(--lx-accent-soft)]'
-                  }
-                >
-                  {token.text}
-                </button>
-              </React.Fragment>
-            );
-          })}
-        </p>
-      ))}
+      {paragraphs.map((paragraph) => {
+        const first = paragraph.tokens[0]?.index ?? 0;
+        const last = paragraph.tokens[paragraph.tokens.length - 1]?.index ?? 0;
+        const holdsActive = activeIndex >= first && activeIndex <= last;
+        return (
+          <PageParagraph
+            key={paragraph.key}
+            tokens={paragraph.tokens}
+            // Every other paragraph gets the same `-1` on every word the stream
+            // advances, so memo sees no change and skips it. Without this the whole
+            // chapter re-rendered several times a second — over a thousand buttons at
+            // 350 words per minute, which froze the tab outright.
+            activeIndex={holdsActive ? activeIndex : -1}
+            activeRef={active}
+            onSelect={onSelect}
+          />
+        );
+      })}
     </div>
   );
 }
+
+const PageParagraph = React.memo(function PageParagraph({
+  tokens,
+  activeIndex,
+  activeRef,
+  onSelect,
+}: {
+  tokens: RsvpToken[];
+  activeIndex: number;
+  activeRef: React.RefObject<HTMLButtonElement | null>;
+  onSelect: (index: number) => void;
+}) {
+  return (
+    <p className="mb-4 text-[16px] leading-[1.75] text-[var(--lx-text)]">
+      {tokens.map((token, position) => {
+        const isActive = token.index === activeIndex;
+        return (
+          <React.Fragment key={token.index}>
+            {position === 0 ? '' : ' '}
+            <button
+              ref={isActive ? activeRef : undefined}
+              type="button"
+              onClick={() => onSelect(token.index)}
+              aria-current={isActive ? 'true' : undefined}
+              className={
+                isActive
+                  ? 'rounded-[3px] bg-[var(--lx-accent)] px-[2px] text-[var(--lx-accent-on)]'
+                  : 'rounded-[3px] px-[2px] hover:bg-[var(--lx-accent-soft)]'
+              }
+            >
+              {token.text}
+            </button>
+          </React.Fragment>
+        );
+      })}
+    </p>
+  );
+});
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
