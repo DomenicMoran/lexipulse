@@ -20,7 +20,7 @@ export const de = {
   'library.finished': 'Gelesen',
   'library.notStarted': 'Nicht begonnen',
   'library.continue': 'Weiterlesen',
-  'library.swipeHint': 'Nach links wischen zum Löschen',
+  'library.swipeHint': 'Nach links wischen zum Löschen, lange drücken für Schlagwörter',
   'library.sourceLabel.epub': 'EPUB',
   'library.sourceLabel.pdf': 'PDF',
   'library.sourceLabel.html': 'Artikel',
@@ -66,6 +66,9 @@ export const de = {
   'player.toRsvp': 'Zum Wortstrom',
   'player.text.hint': 'Tippe ein Wort an, um dort weiterzulesen.',
   'player.text.here': 'Hier bist du',
+  'player.page': 'Seite {page} von {total}',
+  'player.page.prev': 'Seite zurück',
+  'player.page.next': 'Seite vor',
   'player.loading': 'Wird geladen…',
 
   // Onboarding
@@ -208,8 +211,16 @@ export const de = {
   'library.filter.reading': 'Angefangen',
   'library.filter.unread': 'Ungelesen',
   'library.filter.finished': 'Gelesen',
-  'library.search.placeholder': 'Bibliothek durchsuchen',
+  'library.search.placeholder': 'Titel, Autor oder Schlagwort',
   'library.empty.filtered': 'Nichts passt zu diesem Filter.',
+  'library.tags': 'Schlagwörter',
+  'library.tags.edit': 'Schlagwörter bearbeiten',
+  'library.tags.placeholder': 'Neues Schlagwort',
+  'library.tags.add': 'Hinzufügen',
+  'library.tags.remove': '„{tag}" entfernen',
+  'library.tags.empty': 'Noch keine Schlagwörter vergeben.',
+  'library.tags.suggestions': 'Schon vergeben',
+  'library.tags.save': 'Sichern',
 
   // Generic
   'common.cancel': 'Abbrechen',

@@ -16,7 +16,7 @@ Gerät geprüft, bevor die nächste beginnt.
 | 1.2 | Eine Position für RSVP und Seite, in beide Richtungen | **fertig** |
 | 1.3 | Position folgt dem Scrollen und wird gespeichert | **fertig** |
 | 1.4 | Schriftgröße, Zeilenabstand, Ränder, Blocksatz | **fertig** |
-| 1.5 | Schriftwahl: Serif, Sans, System, OpenDyslexic | **fertig** (Schriftdateien: **offen**) |
+| 1.5 | Schriftwahl: Serif, Sans, System, OpenDyslexic | **fertig** |
 | 1.6 | Wort antippen springt in den Wortstrom | **fertig** |
 
 ## Stufe 2 — Was man von einem Reader erwartet
@@ -25,12 +25,12 @@ Gerät geprüft, bevor die nächste beginnt.
 |---|---|---|
 | 2.1 | Volltextsuche mit Trefferliste und Sprung | **fertig** |
 | 2.2 | Umlauttolerante Suche („fur" findet „für") | **fertig** |
-| 2.3 | Markierungen in fünf Farben | **in Arbeit** (Speicher fertig, Bedienung offen) |
-| 2.4 | Notiz an einer Markierung | **in Arbeit** |
-| 2.5 | Liste aller Markierungen, Sprung dorthin | **offen** |
+| 2.3 | Markierungen in fünf Farben | **fertig** |
+| 2.4 | Notiz an einer Markierung | **fertig** |
+| 2.5 | Liste aller Markierungen, Sprung dorthin | **fertig** |
 | 2.6 | Markierungen im Export enthalten | **fertig** |
-| 2.7 | Auto-Scroll mit Geschwindigkeit | **offen** |
-| 2.8 | Blättern mit Seitenzahlen | **offen** |
+| 2.7 | Auto-Scroll mit Geschwindigkeit | **fertig** |
+| 2.8 | Blättern mit Seitenzahlen | **in Arbeit** |
 
 ## Stufe 3 — Der Unterschied zum Rest des Marktes
 
@@ -41,9 +41,9 @@ zusammen.
 |---|---|---|
 | 3.1 | Bionic-Hervorhebung, Stärke einstellbar | **fertig** |
 | 3.2 | Farbfilter über der Seite (7 Töne) | **fertig** |
-| 3.3 | Leselineal, das der Zeile folgt | **offen** |
-| 3.4 | OpenDyslexic als Schriftdatei einbetten | **offen** |
-| 3.5 | Geführte Hervorhebung im Fließtext (wie Outread) | **offen** |
+| 3.3 | Leselineal, das der Zeile folgt | **fertig** |
+| 3.4 | OpenDyslexic als Schriftdatei einbetten | **fertig** |
+| 3.5 | Geführte Hervorhebung im Fließtext (wie Outread) | **in Arbeit** |
 
 ## Stufe 4 — Bibliothek und Nachschlagen
 
@@ -52,9 +52,9 @@ zusammen.
 | 4.1 | Bibliothek durchsuchen | **fertig** |
 | 4.2 | Sortieren: zuletzt, Titel, hinzugefügt, Fortschritt | **fertig** |
 | 4.3 | Filtern: alle, angefangen, ungelesen, gelesen | **fertig** |
-| 4.4 | Sammlungen und Tags | **offen** |
-| 4.5 | Wörterbuch beim Antippen eines Wortes | **offen** |
-| 4.6 | Übersetzung der Auswahl | **offen** |
+| 4.4 | Sammlungen und Tags | **in Arbeit** |
+| 4.5 | Wörterbuch beim Antippen eines Wortes | **bewusst nicht** |
+| 4.6 | Übersetzung der Auswahl | **bewusst nicht** |
 
 ## Stufe 5 — Web-App auf gleichem Stand
 
@@ -62,8 +62,8 @@ zusammen.
 |---|---|---|
 | 5.1 | Seitenmodus über das ganze Dokument | **fertig** |
 | 5.2 | Typografie, Bionic, Farbfilter | **fertig** |
-| 5.3 | Suche | **offen** |
-| 5.4 | Markierungen | **offen** |
+| 5.3 | Suche | **fertig** |
+| 5.4 | Markierungen | **fertig** |
 
 ---
 
@@ -81,12 +81,26 @@ Nicht aus Bequemlichkeit weggelassen, sondern weil es dem Produkt schadet:
 - **CBZ/CBR (Comics).** RSVP ergibt bei Bildern keinen Sinn.
 - **Plugin-System wie KOReader.** Ein Wartungsversprechen, das eine App mit einem
   Entwickler nicht halten kann.
+- **Wörterbuch und Übersetzung (4.5, 4.6).** Die Datenschutzerklärung zählt
+  abschließend auf, welche einzige Funktion überhaupt einen Server kontaktiert:
+  der Import eines Web-Artikels. Eine Nachschlage- oder Übersetzungsfunktion
+  würde diese Aussage falsch machen — in `privacy.en.md`, in
+  `datenschutz.de.md` und in beiden Store-Einträgen. Ein Wörterbuch offline
+  mitzuliefern scheitert an Größe und Lizenz, das Betriebssystem bietet
+  plattformübergreifend keine brauchbare Schnittstelle. Wird nur gebaut, wenn
+  die Rechtstexte vorher geändert und neu eingereicht werden.
 
 ## Was zuletzt entschieden wird
 
-**Blättern mit Seitenzahlen** (2.8) ist der aufwendigste Punkt: In React Native
-gibt es keinen Seitenumbruch, das Layout müsste über `onTextLayout` selbst
-berechnet und bei jeder Änderung von Schriftgröße, Zeilenabstand oder Rand neu
-gemessen werden. Ein halb funktionierender Blättermodus ist schlechter als ein
-guter Scrollmodus. Wird gebaut, wenn alles darüber steht — sonst begründet
-verschoben.
+**Blättern mit Seitenzahlen** (2.8) war als aufwendigster Punkt zurückgestellt,
+weil React Native keinen Seitenumbruch kennt. Der Weg dorthin hat sich beim Bau
+des Leselineals ergeben: `onTextLayout` liefert die tatsächlich gerenderten
+Zeilenkästen, das Layout muss also nicht nachgebaut, sondern nur ausgelesen
+werden. Seitenumbrüche entstehen daraus durch gieriges Füllen der Fensterhöhe
+und werden bei jeder Änderung von Schriftgröße, Zeilenabstand oder Rand
+automatisch neu bestimmt, weil `onTextLayout` dann ohnehin erneut feuert.
+
+Die Einstellung `readerPaged` samt Schalter existierte bereits, wurde aber
+nirgends gelesen — der Schalter tat nichts. Ein sichtbares Versprechen ohne
+Funktion ist schlechter als eine fehlende Funktion, deshalb ist der Punkt jetzt
+in Arbeit statt verschoben.

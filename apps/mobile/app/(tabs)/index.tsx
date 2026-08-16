@@ -4,9 +4,10 @@ import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Image, Pressable, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { fold, formatDuration, type LibraryEntry } from '@lexipulse/core';
+import { fold, formatDuration, type LexiDocument, type LibraryEntry } from '@lexipulse/core';
 
 import { SwipeToDelete } from '../../src/components/swipe';
+import { TagEditor, TagFilterBar } from '../../src/components/tags';
 import {
   Button,
   EmptyState,
@@ -18,6 +19,7 @@ import {
 } from '../../src/components/ui';
 import { useAlert } from '../../src/components/alert';
 import { formatNumber, t, type MessageKey } from '../../src/i18n';
+import { initStore, store } from '../../src/lib/store';
 import { useLibrary } from '../../src/state/library';
 import { useReader } from '../../src/state/reader';
 import { useSettings, useTheme } from '../../src/state/settings';
@@ -65,6 +67,40 @@ export default function LibraryScreen() {
   const [sort, setSort] = useState<SortKey>('recent');
   const [filter, setFilter] = useState<FilterKey>('all');
   const [controlsOpen, setControlsOpen] = useState(false);
+  const [tags, setTags] = useState<Record<string, string[]>>({});
+  /** Folded, because that is what the chip and the entry are compared in. */
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [editing, setEditing] = useState<LexiDocument | null>(null);
+
+  /**
+   * Tags live beside the documents rather than inside them, so the library state does not
+   * carry them; one indexed read per visit is cheaper than widening every entry.
+   */
+  const loadTags = useCallback(async () => {
+    try {
+      await initStore();
+      setTags(await store.tagIndex());
+    } catch (error) {
+      // Same reasoning as in the library provider: a database that will not answer must
+      // not take the whole screen down with it.
+      console.error('[LexiPulse] could not read the tags', error);
+    }
+  }, []);
+
+  /** Every tag in the library; the first spelling encountered names the shelf. */
+  const allTags = useMemo(() => {
+    const bySpelling = new Map<string, string>();
+    for (const list of Object.values(tags)) {
+      for (const tag of list) if (!bySpelling.has(fold(tag))) bySpelling.set(fold(tag), tag);
+    }
+    return [...bySpelling.values()].sort((a, b) => fold(a).localeCompare(fold(b)));
+  }, [tags]);
+
+  // Derived instead of corrected in an effect: removing the last document of a shelf makes
+  // its chip disappear, and a selection still pointing at it would hide the whole library
+  // with no visible filter to switch off.
+  const activeTag =
+    selectedTag !== null && allTags.some((tag) => fold(tag) === selectedTag) ? selectedTag : null;
 
   /**
    * Derived, never stored: a second copy of the library would drift the moment the focus
@@ -74,13 +110,19 @@ export default function LibraryScreen() {
     const needle = fold(query.trim());
     const matched = entries.filter((entry) => {
       if (filter !== 'all' && statusOf(entry) !== filter) return false;
+      const entryTags = tags[entry.document.id] ?? [];
+      if (activeTag !== null && !entryTags.some((tag) => fold(tag) === activeTag)) return false;
       if (!needle) return true;
       const { title, author } = entry.document;
-      return fold(title).includes(needle) || (author !== null && fold(author).includes(needle));
+      return (
+        fold(title).includes(needle) ||
+        (author !== null && fold(author).includes(needle)) ||
+        entryTags.some((tag) => fold(tag).includes(needle))
+      );
     });
     // `filter` already returned a fresh array, so sorting in place leaves `entries` alone.
     return matched.sort(COMPARATORS[sort]);
-  }, [entries, filter, query, sort]);
+  }, [activeTag, entries, filter, query, sort, tags]);
 
   /**
    * Reading progress is written while the player runs, and the list holds the copy it
@@ -91,7 +133,17 @@ export default function LibraryScreen() {
   useFocusEffect(
     useCallback(() => {
       void refresh();
-    }, [refresh]),
+      void loadTags();
+    }, [loadTags, refresh]),
+  );
+
+  const onSaveTags = useCallback(
+    async (documentId: string, next: string[]) => {
+      await store.setTags(documentId, next);
+      setEditing(null);
+      await loadTags();
+    },
+    [loadTags],
   );
 
   const onOpen = useCallback(
@@ -116,13 +168,16 @@ export default function LibraryScreen() {
               // The player would otherwise keep streaming a document that no longer
               // exists, and its next progress save would resurrect the row.
               if (openDocument?.id === entry.document.id) discard();
-              void remove(entry.document.id);
+              // The store drops the document's tags with it, so the screen's copy of the
+              // index has to follow — otherwise the filter row keeps offering a shelf
+              // that nothing stands on.
+              void remove(entry.document.id).then(loadTags);
             },
           },
         ],
       );
     },
-    [alert, discard, openDocument, remove],
+    [alert, discard, loadTags, openDocument, remove],
   );
 
   if (!loading && entries.length === 0) {
@@ -175,6 +230,11 @@ export default function LibraryScreen() {
               onFilter={setFilter}
               open={controlsOpen}
               onToggle={() => setControlsOpen((previous) => !previous)}
+              tags={allTags}
+              activeTag={activeTag}
+              onTag={(tag) =>
+                setSelectedTag((previous) => (previous === fold(tag) ? null : fold(tag)))
+              }
             />
             <T variant="small" tone="faint" style={{ marginTop: theme.space[3] }}>
               {t('library.swipeHint')}
@@ -187,10 +247,25 @@ export default function LibraryScreen() {
         ListEmptyComponent={entries.length > 0 ? <NoMatches /> : null}
         renderItem={({ item }) => (
           <SwipeToDelete onDelete={() => onDelete(item)} label={t('library.delete')}>
-            <LibraryCard entry={item} onPress={() => void onOpen(item.document.id)} />
+            <LibraryCard
+              entry={item}
+              tags={tags[item.document.id] ?? []}
+              onPress={() => void onOpen(item.document.id)}
+              onLongPress={() => setEditing(item.document)}
+            />
           </SwipeToDelete>
         )}
       />
+
+      {editing ? (
+        <TagEditor
+          documentTitle={editing.title}
+          tags={tags[editing.id] ?? []}
+          suggestions={allTags}
+          onCancel={() => setEditing(null)}
+          onSave={(next) => void onSaveTags(editing.id, next)}
+        />
+      ) : null}
     </View>
   );
 }
@@ -212,6 +287,9 @@ function LibraryControls({
   onFilter,
   open,
   onToggle,
+  tags,
+  activeTag,
+  onTag,
 }: {
   query: string;
   onQuery: (next: string) => void;
@@ -221,6 +299,9 @@ function LibraryControls({
   onFilter: (next: FilterKey) => void;
   open: boolean;
   onToggle: () => void;
+  tags: string[];
+  activeTag: string | null;
+  onTag: (tag: string) => void;
 }) {
   const theme = useTheme();
   const tuned = sort !== 'recent' || filter !== 'all';
@@ -291,6 +372,10 @@ function LibraryControls({
           onPress={onToggle}
         />
       </View>
+
+      {/* Outside the panel: tags only exist because the reader created them, so showing
+          them costs no one anything, and a shelf you have to unfold twice is not a shelf. */}
+      <TagFilterBar tags={tags} active={activeTag} onToggle={onTag} />
 
       {open ? (
         <View style={{ gap: theme.space[3] }}>
@@ -378,7 +463,17 @@ function NoMatches() {
   );
 }
 
-function LibraryCard({ entry, onPress }: { entry: LibraryEntry; onPress: () => void }) {
+function LibraryCard({
+  entry,
+  tags,
+  onPress,
+  onLongPress,
+}: {
+  entry: LibraryEntry;
+  tags: string[];
+  onPress: () => void;
+  onLongPress: () => void;
+}) {
   const theme = useTheme();
   const { settings } = useSettings();
   const { document, progress } = entry;
@@ -394,6 +489,8 @@ function LibraryCard({ entry, onPress }: { entry: LibraryEntry; onPress: () => v
   return (
     <Pressable
       onPress={onPress}
+      onLongPress={onLongPress}
+      accessibilityHint={t('library.tags.edit')}
       android_ripple={{ color: theme.colors.surfaceHover }}
       style={({ pressed }) => ({
         flexDirection: 'row',
@@ -434,6 +531,17 @@ function LibraryCard({ entry, onPress }: { entry: LibraryEntry; onPress: () => v
             {t('library.words', { count: formatNumber(document.wordCount) })}
           </T>
         </View>
+
+        {/* One line, not chips: the card already carries four rows, and the shelves are
+            here to be recognised in passing, not tapped. */}
+        {tags.length > 0 ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: theme.space[2] }}>
+            <Ionicons name="pricetags-outline" size={13} color={theme.colors.textFaint} />
+            <T variant="small" tone="faint" numberOfLines={1} style={{ flex: 1 }}>
+              {tags.join(' · ')}
+            </T>
+          </View>
+        ) : null}
 
         <View style={{ gap: theme.space[1], marginTop: theme.space[1] }}>
           <ProgressBar percent={percent} />

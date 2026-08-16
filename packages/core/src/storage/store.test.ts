@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS } from '../settings.js';
 import type { Annotation, Bookmark, LexiDocument, ReadingProgress } from '../types.js';
 import { MemoryDriver } from './driver.js';
-import { LexiStore, SCHEMA_VERSION, computeStreak, dayKey } from './store.js';
+import { LexiStore, SCHEMA_VERSION, computeStreak, dayKey, normalizeTags } from './store.js';
 
 function makeDoc(id: string, title = 'Buch'): LexiDocument {
   return {
@@ -276,7 +276,12 @@ describe('LexiStore', () => {
     });
 
     it('ignores garbage input instead of throwing', async () => {
-      expect(await store.importAll('not json')).toEqual({ documents: 0, bookmarks: 0, annotations: 0 });
+      expect(await store.importAll('not json')).toEqual({
+        documents: 0,
+        bookmarks: 0,
+        annotations: 0,
+        tags: 0,
+      });
     });
 
     it('clearAll removes everything', async () => {
@@ -284,6 +289,91 @@ describe('LexiStore', () => {
       await store.clearAll();
       expect(await store.listDocuments()).toEqual([]);
     });
+  });
+});
+
+describe('normalizeTags', () => {
+  it('trims, collapses whitespace and drops empties', () => {
+    expect(normalizeTags(['  Roman ', '', '   ', 'Sach  buch'])).toEqual(['Roman', 'Sach buch']);
+  });
+
+  it('folds duplicates that differ only in case or accent', () => {
+    expect(normalizeTags(['Sachbuch', 'sachbuch', 'SACHBUCH'])).toEqual(['Sachbuch']);
+    expect(normalizeTags(['Bücher', 'bucher'])).toEqual(['Bücher']);
+  });
+
+  it('sorts umlauts where a reader looks for them', () => {
+    expect(normalizeTags(['Zeit', 'Über', 'Arbeit'])).toEqual(['Arbeit', 'Über', 'Zeit']);
+  });
+
+  it('caps a tag at label length', () => {
+    expect(normalizeTags(['x'.repeat(80)])[0]).toHaveLength(32);
+  });
+
+  it('ignores non-arrays and non-strings instead of throwing', () => {
+    expect(normalizeTags(undefined)).toEqual([]);
+    expect(normalizeTags([1, null, { a: 1 }, 'Ok'])).toEqual(['Ok']);
+  });
+});
+
+describe('tags', () => {
+  let store: LexiStore;
+
+  beforeEach(async () => {
+    store = new LexiStore(new MemoryDriver());
+    await store.init();
+  });
+
+  it('round-trips a normalised tag list', async () => {
+    await store.setTags('doc-a', [' Roman', 'roman', 'Klassiker']);
+    expect(await store.getTags('doc-a')).toEqual(['Klassiker', 'Roman']);
+  });
+
+  it('returns an empty list for a document that was never tagged', async () => {
+    expect(await store.getTags('nope')).toEqual([]);
+  });
+
+  it('removes the record when the last tag goes', async () => {
+    await store.setTags('doc-a', ['Roman']);
+    await store.setTags('doc-a', []);
+    expect(await store.getTags('doc-a')).toEqual([]);
+    expect(await store.listAllTags()).toEqual([]);
+  });
+
+  it('indexes tags by document for the library screen', async () => {
+    await store.setTags('doc-a', ['Roman']);
+    await store.setTags('doc-b', ['Arbeit', 'Roman']);
+    expect(await store.tagIndex()).toEqual({ 'doc-a': ['Roman'], 'doc-b': ['Arbeit', 'Roman'] });
+  });
+
+  it('does not leave orphans behind when the document goes', async () => {
+    await store.saveDocument(makeDoc('doc-a'));
+    await store.setTags('doc-a', ['Roman']);
+
+    await store.deleteDocument('doc-a');
+    expect(await store.getTags('doc-a')).toEqual([]);
+    expect(await store.tagIndex()).toEqual({});
+  });
+
+  it('survives a round trip through export and import', async () => {
+    await store.saveDocument(makeDoc('doc-a'));
+    await store.setTags('doc-a', ['Roman', 'Klassiker']);
+
+    const target = new LexiStore(new MemoryDriver());
+    await target.init();
+    const result = await target.importAll(await store.exportAll());
+
+    expect(result.tags).toBe(1);
+    expect(await target.getTags('doc-a')).toEqual(['Klassiker', 'Roman']);
+  });
+
+  it('survives corrupt storage instead of failing the library', async () => {
+    const driver = new MemoryDriver();
+    const broken = new LexiStore(driver);
+    await broken.init();
+    await driver.set('lexi:tags:doc-a', 'not json');
+    expect(await broken.getTags('doc-a')).toEqual([]);
+    expect(await broken.listAllTags()).toEqual([]);
   });
 });
 

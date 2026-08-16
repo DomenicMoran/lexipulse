@@ -1,7 +1,9 @@
+import { fold } from '../reader.js';
 import { normalizeSettings } from '../settings.js';
 import type {
   Annotation,
   Bookmark,
+  DocumentTags,
   LexiDocument,
   LibraryEntry,
   ReadingProgress,
@@ -26,7 +28,36 @@ const KEY = {
   annotation: (docId: string, id: string) => `lexi:hl:${docId}:${id}`,
   annotationPrefix: (docId: string) => `lexi:hl:${docId}:`,
   allAnnotations: 'lexi:hl:',
+  tags: (docId: string) => `lexi:tags:${docId}`,
+  tagsPrefix: 'lexi:tags:',
 } as const;
+
+/** Longer than this is a note, not a label, and it would break every filter chip. */
+const MAX_TAG_LENGTH = 32;
+
+/**
+ * Clean a user-typed or imported tag list.
+ *
+ * Duplicates are folded case- and accent-insensitively, so "Sachbuch" and "sachbuch" stay
+ * one shelf instead of two that look identical in the filter row. The first spelling the
+ * reader typed is the one that survives.
+ */
+export function normalizeTags(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of input) {
+    if (typeof raw !== 'string') continue;
+    const tag = raw.replace(/\s+/g, ' ').trim().slice(0, MAX_TAG_LENGTH).trim();
+    if (tag.length === 0) continue;
+    const key = fold(tag);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(tag);
+  }
+  out.sort((a, b) => fold(a).localeCompare(fold(b)));
+  return out;
+}
 
 function safeParse<T>(raw: string | null, fallback: T): T {
   if (raw === null) return fallback;
@@ -128,6 +159,9 @@ export class LexiStore {
     // document with the same id and reattach themselves to the wrong text.
     const annotationKeys = await this.driver.keys(KEY.annotationPrefix(id));
     for (const key of annotationKeys) await this.driver.delete(key);
+    // Same orphan problem: a leftover tag record would keep feeding the library's filter
+    // row a shelf that no longer holds anything.
+    await this.driver.delete(KEY.tags(id));
   }
 
   async listDocuments(): Promise<LexiDocument[]> {
@@ -248,6 +282,47 @@ export class LexiStore {
     return out;
   }
 
+  // ---------------------------------------------------------------------- tags
+
+  async getTags(documentId: string): Promise<string[]> {
+    const raw = await this.driver.get(KEY.tags(documentId));
+    return normalizeTags(safeParse<DocumentTags | null>(raw, null)?.tags);
+  }
+
+  /** Replaces the document's tags and returns what was actually stored. */
+  async setTags(documentId: string, tags: string[]): Promise<string[]> {
+    const normalized = normalizeTags(tags);
+    // An empty list is the absence of tags, not a record holding nothing — otherwise the
+    // key survives every "remove the last tag" and the export carries empty shelves.
+    if (normalized.length === 0) {
+      await this.driver.delete(KEY.tags(documentId));
+      return normalized;
+    }
+    const record: DocumentTags = { documentId, tags: normalized, updatedAt: Date.now() };
+    await this.driver.set(KEY.tags(documentId), JSON.stringify(record));
+    return normalized;
+  }
+
+  async listAllTags(): Promise<DocumentTags[]> {
+    const keys = await this.driver.keys(KEY.tagsPrefix);
+    const values = await this.readMany(keys);
+    const out: DocumentTags[] = [];
+    for (const value of values) {
+      const record = safeParse<DocumentTags | null>(value, null);
+      if (!record || typeof record.documentId !== 'string') continue;
+      const tags = normalizeTags(record.tags);
+      if (tags.length > 0) out.push({ ...record, tags });
+    }
+    return out;
+  }
+
+  /** Document id → tags. One read for the whole library screen. */
+  async tagIndex(): Promise<Record<string, string[]>> {
+    const index: Record<string, string[]> = {};
+    for (const record of await this.listAllTags()) index[record.documentId] = record.tags;
+    return index;
+  }
+
   // --------------------------------------------------------------------- stats
 
   async getStats(): Promise<ReadingStats> {
@@ -307,6 +382,7 @@ export class LexiStore {
         progress: await this.listAllProgress(),
         bookmarks: await this.listAllBookmarks(),
         annotations: await this.listAllAnnotations(),
+        tags: await this.listAllTags(),
       },
       null,
       2,
@@ -327,11 +403,12 @@ export class LexiStore {
   /** Restore a backup. Existing entries with the same id are overwritten. */
   async importAll(
     json: string,
-  ): Promise<{ documents: number; bookmarks: number; annotations: number }> {
+  ): Promise<{ documents: number; bookmarks: number; annotations: number; tags: number }> {
     const data = safeParse<Record<string, unknown>>(json, {});
     let documents = 0;
     let bookmarks = 0;
     let annotations = 0;
+    let tags = 0;
 
     if (data.settings) await this.saveSettings(normalizeSettings(data.settings));
     if (Array.isArray(data.documents)) {
@@ -363,10 +440,18 @@ export class LexiStore {
         }
       }
     }
+    if (Array.isArray(data.tags)) {
+      for (const record of data.tags as DocumentTags[]) {
+        if (record && typeof record.documentId === 'string') {
+          const stored = await this.setTags(record.documentId, normalizeTags(record.tags));
+          if (stored.length > 0) tags += 1;
+        }
+      }
+    }
     if (data.stats && typeof data.stats === 'object') {
       await this.driver.set(KEY.stats, JSON.stringify(data.stats));
     }
-    return { documents, bookmarks, annotations };
+    return { documents, bookmarks, annotations, tags };
   }
 
   /** Wipe everything. Backs the "delete all my data" button. */

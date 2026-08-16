@@ -1,54 +1,66 @@
-LexiPulse shows text one word at a time at a fixed position on screen. Your eyes stay still instead of jumping back and forth across every line. The technique is called RSVP, Rapid Serial Visual Presentation.
-
-Each word is aligned so that the letter at the Optimal Recognition Point always sits in the same place and is highlighted in colour. Your gaze gets a fixed anchor.
+LexiPulse is two ways of reading in one app. The word stream shows text one word at a time in a fixed spot, so your eyes stay still instead of jumping back and forth across every line. Page mode shows the same document as ordinary flowing text, in the typeface you choose. The reading position is the same in both: switch whenever you like and never lose your place.
 
 IMPORT
-LexiPulse reads your own files.
+• EPUB, version 2 and 3, with chapter structure and metadata
+• PDF with a smart filter: headers, footers, page numbers and table rows are removed, words split across a line break are put back together
+• Web articles by URL, without menus, banners and comment columns
+• Text and Markdown files, Markdown with chapters
+• Text straight from the clipboard
 
-• EPUB, version 2 and 3, including chapter structure and metadata
-• PDF with a smart filter: headers, footers, page numbers and table rows are detected and removed, and words split across a line break are joined again
-• Web articles by URL, without menus, banners and comment sections
-• Text and Markdown files
-• Text pasted straight from the clipboard
+WORD STREAM
+• 100 to 1200 words per minute, continuously adjustable
+• Every word sits on its Optimal Recognition Point, marked in colour
+• A pacing matrix instead of a fixed beat: long words get 25 percent more time on screen, punctuation 75 percent, and at the end of a paragraph it doubles
+• Warm-up ramp: the stream starts at 40 percent and accelerates to full speed
+• 10-word rewind, jump to sentence, paragraph or chapter
+• Read aloud, in step with the stream
 
-READING
-• Speed from 100 to 1200 words per minute, freely adjustable
-• A dynamic pacing matrix instead of a rigid beat: words longer than 8 characters get 25 percent more time on screen, punctuation gets 75 percent more, and at the end of a paragraph the display time doubles. The rhythm of the text survives.
-• Warm-up ramp: after every start the stream begins at 40 percent of your chosen speed and accelerates to the full value, so getting back in is easier
-• Monospace typography in JetBrains Mono so every word lands exactly on the recognition point
-• 10-word rewind for when your attention slipped
-• Jump to the previous or next sentence, paragraph or chapter
-• Read-aloud: speech output runs in sync with the RSVP stream
+PAGE MODE
+• The whole document as flowing text, not just one chapter
+• Four typefaces: Literata, Inter, the system face and OpenDyslexic
+• Text size, line spacing, margins and justification all adjustable
+• Turn pages with a page number, or scroll continuously
+• Auto-scroll at a speed you set
+• Tap a word to jump there in the word stream
+
+READING AIDS
+• Bionic emphasis: word openings in bold, strength adjustable
+• A reading ruler that follows the line you are on
+• Six colour filters over the page, for readers with visual stress
+• OpenDyslexic ships with the app, nothing is downloaded
+
+SEARCH AND HIGHLIGHTS
+• Full-text search with a hit list and chapter
+• Accent-tolerant: "fur" finds "für", "traumen" finds "Träume"
+• Highlights in five colours, with notes
+• A list of every highlight, one tap jumps to it
 
 CONTROLS
-• Gestures: tap to play and pause, swipe to rewind or move to the next section
-• 4 themes: OLED Black, Graphite, Sepia, Minimal White
-• 3 accent colours for the recognition point: Coral Red, Neon Amber, Cyber Green
-• OLED Black is true black and therefore easy on OLED displays
+• Tap to start and pause, swipe to go back or forward
+• 4 themes: OLED Black, Graphite, Sepia, Minimal White. OLED Black saves power on OLED screens
+• 3 accent colours for the recognition point
 
-LIBRARY AND PROGRESS
-• Offline library holding every imported document
-• Reading progress is remembered per document, so you always continue where you stopped
-• Bookmarks anywhere in a text
-• Statistics with reading streak, words read and effective words per minute
-• Export all of your data as a JSON file at any time, without going through us (Art. 20 GDPR)
+LIBRARY
+• Offline library with search, sorting and filters
+• Reading progress per document, you always start again where you stopped
+• Bookmarks anywhere
+• Statistics with a reading streak, words read and effective speed
+• Export all your own data as JSON, at any time and without going through us (GDPR Art. 20)
 
 PRIVACY
-LexiPulse needs no account and no registration. Your documents are processed and stored exclusively on your device. Nothing is uploaded and we have no access to it. There is no tracking, no analytics, no advertising and no advertising identifiers.
+No account, no registration. Your documents are processed and stored on your device only, nothing is uploaded. No tracking, no analytics, no ads, no advertising identifiers.
 
-The only feature that contacts a server at all is importing a web article by URL. The page is fetched server-side and only the text is returned. The URL is not logged and not stored. If you want to avoid even that, use file or clipboard import, which is fully offline.
-
-Once a document is imported, the app works without an internet connection. On a plane, on the underground, anywhere.
+The only feature that contacts a server at all is importing a web article by URL. The page is fetched server-side, only the text comes back, and the URL is not logged. If you want to avoid even that, import from a file or the clipboard. After import the app works without an internet connection.
 
 PRICE
-EUR 4.99 as a one-time purchase. No subscription, no in-app purchases, no ads, no trial that quietly turns into a bill. Buy once, keep it.
+4.99 euros once. No subscription, no in-app purchases, no ads, no trial that turns into a bill. Buy once, keep it.
 
-There is also a free web version at lexipulse.de that runs in the browser on the same engine.
+There is also a free web version at lexipulse.de.
 
 WHO IT IS FOR
-Anyone who reads a lot and wants to get through it more calmly: students working through course material and papers, professionals facing long PDFs, readers with a queue of ebooks, and anyone who wants to train their reading habits.
+Anyone who reads a lot: students with course material, professionals with long PDFs, and anyone with a stack of e-books waiting. The reading aids also make it useful for people who find ordinary body text hard going.
 
 PLEASE NOTE
-LexiPulse is a tool for displaying text. It is not a medical device and not a therapy. How well and how fast you take in a text depends on the text, your prior knowledge and your condition on the day. Start around 250 to 300 words per minute and increase in small steps. If your eyes tire, take a break and slow down.
+LexiPulse is a tool for displaying text, not a medical device and not a therapy. How well you take a text in depends on the text, on what you already know and on the day. Start at 250 to 300 words per minute and build up slowly.
 
-Legal notice, privacy policy and terms of use: lexipulse.de
+Legal notice, privacy policy and terms: lexipulse.de

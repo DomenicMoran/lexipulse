@@ -742,9 +742,8 @@ const READER_FONT_STACKS: Record<ReaderFontKey, string> = {
   literata: "var(--lx-font-literata), Georgia, 'Times New Roman', serif",
   inter: 'var(--lx-font-inter), -apple-system, BlinkMacSystemFont, sans-serif',
   system: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-  // Deliberately not bundled: a fourth web font would be paid for by every reader on
-  // every visit for an option few pick. An OpenDyslexic installed on the machine is used
-  // when it is there, otherwise the stack falls through to the system face.
+  // Self-hosted via @font-face in globals.css rather than next/font, so the file is only
+  // fetched once a reader actually selects it. A locally installed copy still wins.
   'open-dyslexic':
     "'OpenDyslexic', 'Open Dyslexic', -apple-system, BlinkMacSystemFont, sans-serif",
 };

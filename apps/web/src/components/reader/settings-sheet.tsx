@@ -40,7 +40,7 @@ const READER_FONT_LABELS: Record<ReaderFontKey, string> = {
   // Named as it is, with the caveat: the face is not bundled, so it only takes effect
   // where the reader has it installed. Promising more than that would be a lie to the
   // people who need this option most.
-  'open-dyslexic': 'OpenDyslexic (falls installiert)',
+  'open-dyslexic': 'OpenDyslexic',
 };
 
 const OVERLAY_LABELS: Record<OverlayKey, string> = {

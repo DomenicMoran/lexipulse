@@ -25,16 +25,16 @@ Das Google-Limit von 500 Zeichen für Versionshinweise ist die engste Grenze bei
 Release Notes. `release_notes.txt` bleibt deshalb unter 500 Zeichen, damit derselbe Text
 in beiden Stores funktioniert.
 
-## Aktuelle Zeichenzahl (gemessen 2026-08-16)
+## Aktuelle Zeichenzahl (gemessen 2026-08-17)
 
 | Datei | de-DE | en-US |
 |---|---|---|
 | title | 23 / 30 | 23 / 30 |
-| subtitle | 30 / 30 | 28 / 30 |
-| short_description | 77 / 80 | 76 / 80 |
-| keywords | 99 / 100 | 93 / 100 |
-| full_description | 3964 / 4000 | 3671 / 4000 |
-| release_notes | 470 / 500 | 464 / 500 |
+| subtitle | 30 / 30 | 27 / 30 |
+| short_description | 79 / 80 | 73 / 80 |
+| keywords | 94 / 100 | 94 / 100 |
+| full_description | 3984 / 4000 | 3706 / 4000 |
+| release_notes | 475 / 500 | 453 / 500 |
 
 Nach jeder Textänderung neu messen:
 

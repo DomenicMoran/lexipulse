@@ -260,6 +260,20 @@ export interface LibraryEntry {
   progress: ReadingProgress | null;
 }
 
+/**
+ * The tags a document is filed under.
+ *
+ * Stored next to the document rather than inside it: the import pipeline rewrites the
+ * whole `LexiDocument` record whenever a file is imported again, and re-importing a book
+ * must not silently empty the shelves the reader sorted it onto.
+ */
+export interface DocumentTags {
+  documentId: string;
+  /** Normalised: trimmed, deduplicated case-insensitively, alphabetical. */
+  tags: string[];
+  updatedAt: number;
+}
+
 /** Aggregate reading statistics used by the dashboard. */
 export interface ReadingStats {
   totalMsRead: number;

@@ -1,54 +1,66 @@
-LexiPulse zeigt Texte Wort für Wort an einer festen Stelle auf dem Bildschirm. Ihre Augen bleiben ruhig, statt in jeder Zeile hin und her zu springen. Dieses Verfahren heißt RSVP, Rapid Serial Visual Presentation.
-
-Jedes Wort wird dabei so ausgerichtet, dass der Buchstabe am Erkennungspunkt (Optimal Recognition Point) immer an derselben Position steht und farbig hervorgehoben ist. Der Blick hat damit einen festen Ankerpunkt.
+LexiPulse ist zwei Leseweisen in einer App. Der Wortstrom zeigt Texte Wort für Wort an einer festen Stelle, damit Ihre Augen ruhig bleiben statt in jeder Zeile hin und her zu springen. Der Seitenmodus zeigt dasselbe Dokument als normalen Fließtext, mit Ihrer Schrift. Die Leseposition ist in beiden dieselbe: Sie wechseln jederzeit und verlieren nie Ihre Stelle.
 
 IMPORT
-LexiPulse liest Ihre eigenen Dateien.
-
-• EPUB, Version 2 und 3, inklusive Kapitelstruktur und Metadaten
-• PDF mit Smart-Filter: Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen werden erkannt und entfernt, am Zeilenumbruch getrennte Wörter wieder zusammengesetzt
+• EPUB, Version 2 und 3, mit Kapitelstruktur und Metadaten
+• PDF mit Smart-Filter: Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen werden entfernt, getrennte Wörter wieder zusammengesetzt
 • Web-Artikel per URL, ohne Menüs, Banner und Kommentarspalten
-• Text- und Markdown-Dateien
-• Text direkt aus der Zwischenablage einfügen
+• Text- und Markdown-Dateien, Markdown auch mit Kapiteln
+• Text direkt aus der Zwischenablage
 
-LESEN
-• Geschwindigkeit von 100 bis 1200 Wörtern pro Minute, stufenlos einstellbar
-• Dynamische Pacing-Matrix statt starrem Takt: Wörter mit mehr als 8 Zeichen bekommen 25 Prozent mehr Standzeit, Satzzeichen 75 Prozent mehr, am Absatzende verdoppelt sich die Anzeigedauer. So bleibt der Rhythmus eines Textes erhalten.
-• Warm-up-Rampe: Nach jedem Start beginnt der Stream bei 40 Prozent der eingestellten Geschwindigkeit und beschleunigt auf den vollen Wert. Der Einstieg fällt leichter.
-• Monospace-Typografie in JetBrains Mono, damit jedes Wort exakt auf dem Erkennungspunkt sitzt
-• 10-Wort-Rewind, wenn Sie kurz weg waren
-• Sprung zum vorherigen oder nächsten Satz, Absatz oder Kapitel
-• Vorlesefunktion: Die Sprachausgabe läuft synchron zum RSVP-Stream
+WORTSTROM
+• 100 bis 1200 Wörter pro Minute, stufenlos
+• Jedes Wort sitzt am Erkennungspunkt (Optimal Recognition Point), farbig hervorgehoben
+• Dynamische Pacing-Matrix statt starrem Takt: lange Wörter bekommen 25 Prozent mehr Standzeit, Satzzeichen 75 Prozent, am Absatzende verdoppelt sie sich
+• Warm-up-Rampe: Der Stream startet bei 40 Prozent und beschleunigt auf den vollen Wert
+• 10-Wort-Rewind, Sprung zu Satz, Absatz oder Kapitel
+• Vorlesefunktion synchron zum Stream
+
+SEITENMODUS
+• Das ganze Dokument als Fließtext, nicht nur ein Kapitel
+• Vier Schriften: Literata, Inter, Systemschrift und OpenDyslexic
+• Schriftgröße, Zeilenabstand, Seitenränder und Blocksatz frei einstellbar
+• Blättern mit Seitenzahl oder durchgehend scrollen, wie Sie möchten
+• Auto-Scroll mit einstellbarer Geschwindigkeit
+• Ein Wort antippen springt damit in den Wortstrom
+
+LESEHILFEN
+• Bionic-Hervorhebung: Wortanfänge werden fett gesetzt, Stärke einstellbar
+• Leselineal, das der Zeile folgt, auf der Sie gerade sind
+• Sechs Farbfilter über der Seite für Menschen mit visuellem Stress
+• OpenDyslexic ist vollständig mitgeliefert, nicht nachgeladen
+
+SUCHEN UND MARKIEREN
+• Volltextsuche mit Trefferliste und Kapitelangabe
+• Umlauttolerant: „fur" findet „für", „traumen" findet „Träume"
+• Markierungen in fünf Farben, mit Notiz
+• Liste aller Markierungen, ein Tippen springt zur Stelle
 
 BEDIENUNG
-• Gestensteuerung: Tippen startet und pausiert, Wischen springt zurück oder zum nächsten Abschnitt
-• 4 Themes: OLED Black, Graphite, Sepia, Minimal White
-• 3 Akzentfarben für den Erkennungspunkt: Coral Red, Neon Amber, Cyber Green
-• OLED Black ist tiefschwarz und damit besonders sparsam auf OLED-Displays
+• Tippen startet und pausiert, Wischen springt zurück oder weiter
+• 4 Themes: OLED Black, Graphite, Sepia, Minimal White. OLED Black spart Strom auf OLED-Displays
+• 3 Akzentfarben für den Erkennungspunkt
 
-BIBLIOTHEK UND FORTSCHRITT
-• Offline-Bibliothek mit allen importierten Dokumenten
-• Lesefortschritt wird pro Dokument gemerkt, Sie steigen immer an derselben Stelle wieder ein
+BIBLIOTHEK
+• Offline-Bibliothek mit Suche, Sortierung und Filtern
+• Lesefortschritt pro Dokument, Sie steigen immer an derselben Stelle ein
 • Lesezeichen an beliebigen Stellen
 • Statistik mit Lese-Streak, gelesenen Wörtern und effektiver Geschwindigkeit
-• Export aller eigenen Daten als JSON-Datei, jederzeit und ohne Umweg über uns (Art. 20 DSGVO)
+• Export aller eigenen Daten als JSON, jederzeit und ohne Umweg über uns (Art. 20 DSGVO)
 
 DATENSCHUTZ
-LexiPulse braucht kein Konto und keine Registrierung. Ihre Dokumente werden ausschließlich auf Ihrem Gerät verarbeitet und gespeichert. Nichts davon wird hochgeladen, wir haben keinen Zugriff darauf. Es gibt kein Tracking, keine Analyse-Werkzeuge, keine Werbung und keine Werbe-Identifikatoren.
+Kein Konto, keine Registrierung. Ihre Dokumente werden ausschließlich auf Ihrem Gerät verarbeitet und gespeichert, nichts wird hochgeladen. Kein Tracking, keine Analyse-Werkzeuge, keine Werbung, keine Werbe-Identifikatoren.
 
-Die einzige Funktion, die überhaupt einen Server anspricht, ist der Import eines Web-Artikels über eine URL. Dabei wird die Seite serverseitig abgerufen und nur der Text zurückgegeben. Die URL wird nicht protokolliert und nicht gespeichert. Wer auch das vermeiden möchte, nutzt den Import über Datei oder Zwischenablage. Der ist vollständig offline.
-
-Nach dem Import funktioniert die App ohne Internetverbindung. Im Flugzeug, in der U-Bahn, überall.
+Die einzige Funktion, die überhaupt einen Server anspricht, ist der Import eines Web-Artikels über eine URL. Die Seite wird serverseitig abgerufen, nur der Text kommt zurück, die URL wird nicht protokolliert. Wer auch das vermeiden will, importiert über Datei oder Zwischenablage. Nach dem Import läuft die App ohne Internetverbindung.
 
 PREIS
 4,99 Euro einmalig. Kein Abo, keine In-App-Käufe, keine Werbung, keine Testphase mit Kostenfalle. Einmal kaufen, dauerhaft nutzen.
 
-Es gibt zusätzlich eine kostenlose Web-Version unter lexipulse.de, die im Browser läuft und dieselbe Engine nutzt.
+Zusätzlich gibt es eine kostenlose Web-Version unter lexipulse.de.
 
 FÜR WEN
-Für alle, die viel lesen und dabei ruhiger vorankommen wollen: Studierende mit Skripten und Fachartikeln, Berufstätige mit langen PDFs und alle, die eine Reihe von E-Books vor sich haben.
+Für alle, die viel lesen: Studierende mit Skripten, Berufstätige mit langen PDFs, und alle, die eine Reihe von E-Books vor sich haben. Durch die Lesehilfen auch für Menschen, denen normaler Fließtext schwerfällt.
 
 HINWEIS
-LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt und keine Therapie. Wie gut und wie schnell Sie einen Text erfassen, hängt vom Text, von Ihrer Vorkenntnis und von Ihrer Tagesform ab. Beginnen Sie ruhig bei 250 bis 300 Wörtern pro Minute und steigern Sie in kleinen Schritten. Wenn die Augen ermüden, machen Sie eine Pause und reduzieren Sie das Tempo.
+LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt und keine Therapie. Wie gut Sie einen Text erfassen, hängt vom Text, Ihrer Vorkenntnis und Ihrer Tagesform ab. Beginnen Sie bei 250 bis 300 Wörtern pro Minute und steigern Sie langsam.
 
 Impressum, Datenschutzerklärung und Nutzungsbedingungen: lexipulse.de

@@ -1,1 +1,1 @@
-Read EPUB & PDF word by word
+EPUB & PDF reader with RSVP

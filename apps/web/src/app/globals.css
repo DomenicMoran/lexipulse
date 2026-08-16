@@ -7,6 +7,33 @@
  */
 @source '../../../../packages/ui/src';
 
+/*
+ * OpenDyslexic, self-hosted.
+ *
+ * A browser only fetches a webfont once rendered text actually matches it, so this costs
+ * nothing for the readers who never pick it — which is why it can be shipped now even
+ * though it is a large face. `swap` keeps the page readable while it arrives, and the
+ * weight range is declared so the bold cut is used instead of a synthesised smear.
+ *
+ * SIL Open Font License 1.1, full text in /fonts/LICENSE-OpenDyslexic.txt. The name is a
+ * Reserved Font Name, so the files are served unmodified and under their own name.
+ */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Bold.woff2') format('woff2');
+  font-weight: 700 800;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme inline {
   --font-sans: var(--lx-font-sans);
   --font-mono: var(--lx-font-mono-ui);
