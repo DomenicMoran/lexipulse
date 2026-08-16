@@ -50,12 +50,39 @@ kostenpflichtige App — das kann Vercel als kommerziell werten. Pro kostet 20 $
 
 ---
 
-## Bekannte, bewusst offene Kleinigkeit
+## Ein fertiger Stand wartet auf deine Entscheidung
 
-Play warnt beim Bundle: „Mit diesem App Bundle ist keine Offenlegungsdatei
-verknüpft." Das betrifft nur die Lesbarkeit von Absturzberichten bei verschleiertem
-Code, nicht die Prüfung oder die Veröffentlichung. Die Mapping-Datei entsteht beim
-EAS-Build und kann bei einem späteren Release nachgereicht werden.
+Die Play-Warnung „keine Offenlegungsdatei verknüpft" ist behoben, und bei der Prüfung
+kamen zwei Fehler heraus, die schwerer wiegen als die Warnung selbst. Alles ist
+committet, getestet und auf einem Gerät nachgewiesen — aber es wirkt erst mit einem
+neuen Build.
+
+**Was drin ist**
+
+1. **R8 eingeschaltet.** Damit liegt die Mapping-Datei im Bundle
+   (`BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map`), die Warnung
+   entfällt, und aus fünf dex-Dateien werden drei (48,1 → 18,8 MB).
+2. **Seitennavigation landete im Lesetext.** Der Wikipedia-Artikel über Schnelllesen —
+   genau die Adresse, auf die Apples Prüfteam hingewiesen wird — begann mit 31
+   Sprachnamen und enthielt achtmal „[Bearbeiten | Quelltext bearbeiten]".
+3. **Satzzeichen wurden zu eigenen Wörtern.** `<a>Fähigkeit</a>,` kam als „Fähigkeit ,"
+   an; 87 der 1832 Tokens waren ein alleinstehendes Komma oder ein Punkt, die der
+   Player als eigenes Wort zeigt.
+
+Auf derselben Seite: 1832 Tokens auf 1680, kein Marker mehr, Textbeginn beim ersten
+echten Satz. Auf lexipulse.de ist das bereits live, weil die Web-App denselben Parser
+benutzt.
+
+**Die Entscheidung:** Ein neuer Build (versionCode 3) bricht die laufende
+Google-Prüfung ab, und die Wartezeit beginnt von vorn. Zwei Wege:
+
+- **Jetzt einreichen** — die Prüfung startet neu, dafür geht die bessere Fassung als
+  erste in den Laden.
+- **Nach der Freigabe als 1.0.1 nachschieben** — 1.0.0 erscheint wie eingereicht, das
+  Update folgt ohne Zeitverlust.
+
+Bei Apple stellt sich dieselbe Frage: Version 1.0 wartet auf die Prüfung, und ein
+neuer Build würde sie ebenfalls zurückwerfen.
 
 ---
 
