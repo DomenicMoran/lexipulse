@@ -74,6 +74,59 @@ const DROP_TAGS = new Set([
   'header',
 ]);
 
+/**
+ * Elements that never have a closing tag. A subtree skip must not be attempted on
+ * these: there is no `</img>` to stop at, so the skip would swallow the rest of the
+ * document.
+ */
+const VOID_TAGS = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
+
+/**
+ * Class names that mark chrome regardless of which element carries them.
+ *
+ * The tag alone is not always enough: MediaWiki puts its per-section edit links in a
+ * plain `<span>`, and a reader who imports a Wikipedia article should not be shown
+ * "Bearbeiten Quelltext bearbeiten" eight times. `noprint` is the general form of the
+ * same idea — a publishing system marking what does not belong in the text.
+ */
+const DROP_CLASSES = new Set([
+  'noprint',
+  'mw-editsection',
+  'mw-jump-link',
+  'mw-indicators',
+  'hatnote',
+  'navbox',
+  'sistersitebox',
+  'toc',
+  'skip-link',
+]);
+
+/** True when a start tag carries one of the chrome class names. */
+function hasDropClass(tagBody: string): boolean {
+  const attr = /\sclass\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'>]+))/i.exec(tagBody);
+  const value = attr?.[2] ?? attr?.[3] ?? attr?.[4];
+  if (!value) return false;
+  for (const token of value.split(/\s+/)) {
+    if (token && DROP_CLASSES.has(token.toLowerCase())) return true;
+  }
+  return false;
+}
+
 const NAMED_ENTITIES: Record<string, string> = {
   amp: '&',
   lt: '<',
@@ -174,7 +227,14 @@ export function htmlToText(html: string, options: HtmlTextOptions = {}): string 
     const nameMatch = /^\/?\s*([a-zA-Z][a-zA-Z0-9:-]*)/.exec(tagBody);
     const name = (nameMatch?.[1] ?? '').toLowerCase();
 
-    if (!closing && dropChrome && DROP_TAGS.has(name) && !tagBody.endsWith('/')) {
+    const dropSubtree =
+      !closing &&
+      dropChrome &&
+      !tagBody.endsWith('/') &&
+      !VOID_TAGS.has(name) &&
+      (DROP_TAGS.has(name) || hasDropClass(tagBody));
+
+    if (dropSubtree) {
       // Skip the whole subtree, counting depth. Stopping at the first closing tag would
       // be wrong wherever these elements nest — and they do: Wikipedia puts a <nav> for
       // the language menu inside the <nav> that holds the sidebar, so a naive skip ends

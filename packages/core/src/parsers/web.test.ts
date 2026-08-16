@@ -78,6 +78,29 @@ describe('htmlToText', () => {
     );
   });
 
+  it('drops chrome identified by class, whatever element carries it', () => {
+    const text = htmlToText(
+      '<h2>Leseprozess</h2><span class="mw-editsection">[Bearbeiten | Quelltext bearbeiten]</span><p>Der Absatz.</p>',
+    );
+    expect(text).not.toContain('Bearbeiten');
+    expect(text).toContain('Der Absatz.');
+  });
+
+  it('matches whole class tokens, not substrings', () => {
+    // `tocsin` and `notoc` must not be mistaken for `toc`.
+    expect(htmlToText('<div class="tocsin">Sturmglocke</div>')).toContain('Sturmglocke');
+    expect(htmlToText('<div class="notoc">Bleibt</div>')).toContain('Bleibt');
+    expect(htmlToText('<div class="lead toc">Weg</div>')).not.toContain('Weg');
+  });
+
+  it('never starts a subtree skip on a void element', () => {
+    // <img> has no closing tag, so a skip would run to the end of the document and
+    // silently drop the entire article.
+    const text = htmlToText('<p>Davor.</p><img class="noprint" src="x.png"><p>Danach.</p>');
+    expect(text).toContain('Davor.');
+    expect(text).toContain('Danach.');
+  });
+
   it('leaves quotation marks alone, because an apostrophe looks the same', () => {
     expect(htmlToText("<p>Annas <i>Buch</i> ’s Titel</p>")).toContain('’s');
   });
