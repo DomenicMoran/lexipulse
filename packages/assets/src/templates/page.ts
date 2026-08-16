@@ -224,6 +224,12 @@ export interface FramePageOptions {
   appHtml: string;
   /** Data URI of a real capture from the dev server; replaces `appHtml` when present. */
   screenImage?: string;
+  /**
+   * Width divided by height of `screenImage`. The frame is shaped to match, so a device
+   * capture is shown whole instead of being cropped to the default 19.5:9 — losing the
+   * tab bar off the bottom edge, which is exactly the part that proves it is the app.
+   */
+  screenRatio?: number;
 }
 
 /**
@@ -231,13 +237,13 @@ export interface FramePageOptions {
  * 16:9 Android frame stay optically identical instead of one of them looking cramped.
  */
 export function framePage(options: FramePageOptions): string {
-  const { spec, headline, sub, appHtml, screenImage } = options;
+  const { spec, headline, sub, appHtml, screenImage, screenRatio } = options;
   const w = spec.width / spec.scale;
   const h = spec.height / spec.scale;
   const device = DEVICE[spec.kind];
 
   const deviceW = Math.round(w * device.widthFraction);
-  const deviceH = Math.round(deviceW / device.ratio);
+  const deviceH = Math.round(deviceW / (screenRatio ?? device.ratio));
   const bezel = Math.max(Math.round(deviceW * 0.028), 6);
   const screenW = deviceW - bezel * 2;
   const screenH = deviceH - bezel * 2;

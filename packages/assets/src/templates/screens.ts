@@ -427,17 +427,14 @@ export const SCREENS: readonly ScreenDef[] = [
     body: importScreen,
   },
   {
-    id: '03-smart-filter',
-    headline: t(
-      'PDFs ohne Kopfzeilen, Seitenzahlen und Tabellenchaos.',
-      'PDFs without headers, page numbers and table chaos.',
-    ),
+    id: '03-page',
+    headline: t('Anhalten und die ganze Seite sehen.', 'Stop, and see the whole page.'),
     sub: t(
-      'Der Smart-Filter räumt auf, bevor das erste Wort erscheint.',
-      'The smart filter cleans up before the first word appears.',
+      'Das aktuelle Wort bleibt markiert — tippe ein anderes an, um dort weiterzulesen.',
+      'The current word stays marked — tap another one to carry on from there.',
     ),
-    // No route reaches the import report without actually importing a PDF, so this one
-    // stays a rebuilt screen.
+    // No route reaches this without a document open and the view expanded, so the capture
+    // comes from a device.
     devPath: null,
     tablet: false,
     body: smartFilter,

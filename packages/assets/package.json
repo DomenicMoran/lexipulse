@@ -6,6 +6,7 @@
   "scripts": {
     "generate": "tsx src/generate.ts",
     "screenshots": "tsx src/store-screenshots.ts",
+    "device-screenshots": "tsx src/device-screenshots.ts",
     "build": "tsx src/generate.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests",
