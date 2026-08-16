@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { Modal, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { contextAround, formatDuration, type RsvpToken } from '@lexipulse/core';
+import { contextAround, formatDuration, type Annotation } from '@lexipulse/core';
 import { computeStageGeometry, fitFontSize } from '@lexipulse/ui/geometry';
 
 import {
@@ -22,9 +22,12 @@ import {
 } from '../../src/player/feedback';
 import { PlayerGestureArea, type PlayerGestureHandlers } from '../../src/player/gestures';
 import { OnboardingOverlay, useOnboarding } from '../../src/player/onboarding';
+import { HighlightBar } from '../../src/reader/highlight-bar';
 import { PageView } from '../../src/reader/page-view';
+import { SearchSheet } from '../../src/reader/search-sheet';
 import { RsvpStage } from '../../src/player/stage';
 import { Scrubber } from '../../src/player/scrubber';
+import { useAnnotations } from '../../src/state/annotations';
 import { useReader } from '../../src/state/reader';
 import { useSettings, useTheme } from '../../src/state/settings';
 
@@ -55,7 +58,11 @@ export default function ReadScreen() {
     removeBookmark,
   } = useReader();
 
-  const [sheet, setSheet] = useState<'none' | 'chapters' | 'bookmarks' | 'text'>('none');
+  const [sheet, setSheet] = useState<'none' | 'chapters' | 'bookmarks' | 'search'>('none');
+  const { annotations, add: addAnnotation, update: updateAnnotation, remove: removeAnnotation } =
+    useAnnotations();
+  const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
+  const [openAnnotation, setOpenAnnotation] = useState<Annotation | null>(null);
   const onboarding = useOnboarding();
 
   useSentenceClick(settings.soundEnabled && document !== null);
@@ -109,19 +116,6 @@ export default function ReadScreen() {
     if (snapshot.status === 'playing') toggle();
     void update({ readerMode: pageMode ? 'rsvp' : 'page' });
   }, [pageMode, snapshot.status, toggle, update]);
-
-  /** Tokens of the chapter on screen, grouped into the paragraphs they came from. */
-  const paragraphs = useMemo(() => {
-    if (sheet !== 'text') return [];
-    const groups: { key: number; tokens: RsvpToken[] }[] = [];
-    for (const token of tokens) {
-      if (token.chapterIndex !== snapshot.chapterIndex) continue;
-      const last = groups[groups.length - 1];
-      if (last && last.key === token.paragraphIndex) last.tokens.push(token);
-      else groups.push({ key: token.paragraphIndex, tokens: [token] });
-    }
-    return groups;
-  }, [sheet, snapshot.chapterIndex, tokens]);
 
   if (!document) {
     return (
@@ -187,6 +181,11 @@ export default function ReadScreen() {
           onPress={toggleMode}
         />
         <IconButton
+          icon="search-outline"
+          label={t('search.title')}
+          onPress={() => setSheet('search')}
+        />
+        <IconButton
           icon="list-outline"
           label={t('player.chapters')}
           onPress={() => setSheet('chapters')}
@@ -199,15 +198,59 @@ export default function ReadScreen() {
       </View>
 
       {pageMode ? (
-        <PageView
-          tokens={tokens}
-          activeIndex={snapshot.index}
-          onSelectToken={(index) => {
-            seek(index);
-            void update({ readerMode: 'rsvp' });
-          }}
-          onPositionChange={seek}
-        />
+        <>
+          <PageView
+            tokens={tokens}
+            activeIndex={snapshot.index}
+            annotations={annotations}
+            onSelectToken={(index) => {
+              seek(index);
+              void update({ readerMode: 'rsvp' });
+            }}
+            onPositionChange={seek}
+            selection={selection}
+            onSelectionChange={setSelection}
+            onOpenAnnotation={setOpenAnnotation}
+          />
+          {selection || openAnnotation ? (
+            <HighlightBar
+              key={openAnnotation?.id ?? 'new'}
+              selection={selection}
+              existing={openAnnotation}
+              onColor={(color) => {
+                if (openAnnotation) {
+                  void updateAnnotation({ ...openAnnotation, color });
+                  setOpenAnnotation({ ...openAnnotation, color });
+                  return;
+                }
+                if (!selection) return;
+                void addAnnotation({
+                  documentId: document.id,
+                  startToken: selection.start,
+                  endToken: selection.end,
+                  chapterIndex: snapshot.chapterIndex,
+                  color,
+                  tokens,
+                });
+                setSelection(null);
+              }}
+              onNote={(note) => {
+                if (!openAnnotation) return;
+                void updateAnnotation({ ...openAnnotation, note: note.length > 0 ? note : null });
+                setOpenAnnotation({ ...openAnnotation, note: note.length > 0 ? note : null });
+              }}
+              onRemove={() => {
+                if (!openAnnotation) return;
+                void removeAnnotation(openAnnotation.documentId, openAnnotation.id);
+                setOpenAnnotation(null);
+              }}
+              onCancel={() => {
+                setSelection(null);
+                setOpenAnnotation(null);
+              }}
+            />
+          ) : null}
+        </>
       ) : null}
 
       {/* The stage. Everything in this block is the gesture surface. */}
@@ -303,6 +346,16 @@ export default function ReadScreen() {
       </View>
       )}
 
+      <SearchSheet
+        visible={sheet === 'search'}
+        tokens={tokens}
+        onClose={() => setSheet('none')}
+        onSelect={(index) => {
+          seek(index);
+          setSheet('none');
+        }}
+      />
+
       <ChapterSheet
         visible={sheet === 'chapters'}
         onClose={() => setSheet('none')}
@@ -313,18 +366,6 @@ export default function ReadScreen() {
         activeIndex={snapshot.chapterIndex}
         onSelect={(index) => {
           seekChapter(index);
-          setSheet('none');
-        }}
-      />
-
-      <TextSheet
-        visible={sheet === 'text'}
-        onClose={() => setSheet('none')}
-        paragraphs={paragraphs}
-        activeIndex={snapshot.index}
-        fontSize={settings.fontSize}
-        onSelect={(index) => {
-          seek(index);
           setSheet('none');
         }}
       />
@@ -442,135 +483,6 @@ function ChapterSheet({
         />
       ))}
     </Sheet>
-  );
-}
-
-/**
- * The document as a page, with the current word marked.
- *
- * RSVP shows one word at a time, which is the point, but it also means the reader has no
- * page to look back at. Losing the thread costs the whole passage: you cannot re-read the
- * sentence, only rewind and watch it stream past again. This is that page — the chapter as
- * flowing text, the current word highlighted, and every word a way back into the stream.
- *
- * Only the current chapter is rendered. A whole book of tappable words would cost far more
- * than it buys, and the chapter list is right next door.
- */
-function TextSheet({
-  visible,
-  onClose,
-  paragraphs,
-  activeIndex,
-  fontSize,
-  onSelect,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  paragraphs: { key: number; tokens: RsvpToken[] }[];
-  activeIndex: number;
-  fontSize: number;
-  onSelect: (index: number) => void;
-}) {
-  const theme = useTheme();
-  const insets = useSafeAreaInsets();
-  const scroller = useRef<ScrollView | null>(null);
-  const activeY = useRef<number | null>(null);
-
-  // The offset is known only after the active paragraph has been laid out, and that
-  // happens after this render. Scrolling from the layout callback would fight the sheet's
-  // slide-in, so it waits for the animation to be over.
-  const scrollToActive = useCallback(() => {
-    const y = activeY.current;
-    if (y === null) return;
-    scroller.current?.scrollTo({ y: Math.max(0, y - 120), animated: false });
-  }, []);
-
-  const body = fontSize * 0.34;
-
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable
-        style={{ height: insets.top + theme.space[4], backgroundColor: theme.colors.overlay }}
-        onPress={onClose}
-      />
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: theme.colors.surface,
-          borderTopLeftRadius: theme.radius.xl,
-          borderTopRightRadius: theme.radius.xl,
-          borderTopWidth: theme.hairline,
-          borderColor: theme.colors.border,
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: theme.space[4],
-          }}
-        >
-          <View style={{ flex: 1 }}>
-            <T variant="title">{t('player.text')}</T>
-            <T variant="small" tone="faint">
-              {t('player.text.hint')}
-            </T>
-          </View>
-          <IconButton icon="close" label={t('common.close')} onPress={onClose} />
-        </View>
-        <Divider />
-        <ScrollView
-          ref={scroller}
-          onLayout={scrollToActive}
-          contentContainerStyle={{
-            padding: theme.space[5],
-            paddingBottom: insets.bottom + theme.space[6],
-          }}
-        >
-          {paragraphs.map((paragraph) => {
-            const holdsActive = paragraph.tokens.some((token) => token.index === activeIndex);
-            return (
-              <Text
-                key={paragraph.key}
-                onLayout={
-                  holdsActive
-                    ? (event) => {
-                        activeY.current = event.nativeEvent.layout.y;
-                        scrollToActive();
-                      }
-                    : undefined
-                }
-                style={{
-                  fontSize: body,
-                  lineHeight: body * 1.6,
-                  marginBottom: theme.space[4],
-                  color: theme.colors.text,
-                }}
-              >
-                {paragraph.tokens.map((token, position) => {
-                  const active = token.index === activeIndex;
-                  return (
-                    <Text
-                      key={token.index}
-                      accessibilityRole="button"
-                      accessibilityLabel={active ? t('player.text.here') : token.text}
-                      onPress={() => onSelect(token.index)}
-                      style={{
-                        color: active ? theme.accent.on : theme.colors.text,
-                        backgroundColor: active ? theme.accent.base : 'transparent',
-                      }}
-                    >
-                      {position === 0 ? token.text : ` ${token.text}`}
-                    </Text>
-                  );
-                })}
-              </Text>
-            );
-          })}
-        </ScrollView>
-      </View>
-    </Modal>
   );
 }
 
