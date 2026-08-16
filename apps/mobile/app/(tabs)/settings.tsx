@@ -215,16 +215,22 @@ export default function SettingsScreen() {
             />
           }
         />
-        <Divider />
-        <SliderRow
-          label={t('settings.reader.autoScroll')}
-          hint={t('settings.reader.autoScroll.hint')}
-          value={settings.readerAutoScroll}
-          min={0}
-          max={200}
-          step={5}
-          onChange={(readerAutoScroll) => update({ readerAutoScroll })}
-        />
+        {/* Hidden rather than disabled while page turning is on: the two are alternatives,
+            and a greyed-out speed still reads as something that ought to apply. */}
+        {settings.readerPaged ? null : (
+          <>
+            <Divider />
+            <SliderRow
+              label={t('settings.reader.autoScroll')}
+              hint={t('settings.reader.autoScroll.hint')}
+              value={settings.readerAutoScroll}
+              min={0}
+              max={200}
+              step={5}
+              onChange={(readerAutoScroll) => update({ readerAutoScroll })}
+            />
+          </>
+        )}
       </Section>
 
       {/* ----------------------------------------------------------- reading aids */}

@@ -35,10 +35,10 @@ import { OVERLAY_TINTS, readerFontFamily, readerFontFamilyBold } from './typogra
 
 /** Width of the page-turn strips beside the text, in points. */
 const PAGE_EDGE = 36;
-/** Breathing room above the first line of a page, so it never touches the top edge. */
-const PAGE_TOP_PAD = 6;
-/** A scroll offset this close under a break still counts as being on that page. */
-const PAGE_SNAP = PAGE_TOP_PAD + 4;
+/** Height of the strip the page counter sits in, below the text rather than over it. */
+const PAGE_FOOTER = 26;
+/** A scroll offset within this much of a break still counts as being on that page. */
+const PAGE_SNAP = 4;
 
 /** Before anything is measured there is exactly one page, and it starts at the top. */
 const FIRST_PAGE: readonly number[] = [0];
@@ -78,17 +78,23 @@ export function PageView({
   const { settings } = useSettings();
   const scroller = useRef<ScrollView | null>(null);
   const offsets = useRef(new Map<number, number>());
-  const didInitialScroll = useRef(false);
+  /** True once this view's own scrolling has decided the reading position at least once. */
+  const reported = useRef(false);
   const [ruler, setRuler] = useState<{ y: number; height: number; token: number } | null>(null);
   const [viewport, setViewport] = useState(0);
+  const [content, setContent] = useState(0);
   const [breaks, setBreaks] = useState<readonly number[]>(FIRST_PAGE);
   const [page, setPage] = useState(0);
 
   const paged = settings.readerPaged;
   const paragraphs = useMemo(() => paragraphsOf(tokens), [tokens]);
 
-  /** What a page may fill: the window, less the strip the page counter sits on. */
-  const usable = viewport > 0 ? Math.max(120, viewport - PAGE_TOP_PAD - theme.space[8]) : 0;
+  /**
+   * What a page may fill: exactly the window the text is drawn in, since the counter has
+   * its own strip below it. Not one point less — lines sit flush against each other, so
+   * any slack left here is where the first line of the next page peeks through.
+   */
+  const usable = viewport > 0 ? Math.max(120, viewport) : 0;
 
   /**
    * Pagination is built from the lines the text engine actually produced, because nothing
@@ -118,14 +124,6 @@ export function PageView({
     [paragraphs, usable],
   );
 
-  const scrollToActive = useCallback(() => {
-    if (didInitialScroll.current) return;
-    const y = offsets.current.get(activeIndex);
-    if (y === undefined) return;
-    didInitialScroll.current = true;
-    scroller.current?.scrollTo({ y: Math.max(0, y - 80), animated: false });
-  }, [activeIndex]);
-
   /**
    * The topmost visible paragraph becomes the position. Reporting on every frame would
    * write to the database sixty times a second, so this only fires when the paragraph
@@ -133,12 +131,19 @@ export function PageView({
    */
   const lastReported = useRef(activeIndex);
   const scrollY = useRef(0);
+  /** The page the last programmatic scroll aimed at; null once a finger has taken over. */
+  const turning = useRef<number | null>(null);
   const onScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const y = event.nativeEvent.contentOffset.y;
       scrollY.current = y;
-      // Scrolling by hand stays possible in paged mode; the page number follows the finger.
-      if (paged) setPage(pageAt(breaks, y));
+      if (paged) {
+        // Scrolling by hand stays possible in paged mode, and the counter follows the
+        // finger. While a turn is in flight, though, the offsets passing by still belong
+        // to the page being left, and only the one that matches the destination counts.
+        const at = pageAt(breaks, y);
+        if (turning.current === null || turning.current === at) setPage(at);
+      }
       if (!onPositionChange) return;
       let best: { token: number; distance: number } | null = null;
       for (const [token, top] of offsets.current) {
@@ -147,6 +152,7 @@ export function PageView({
       }
       if (best && best.token !== lastReported.current) {
         lastReported.current = best.token;
+        reported.current = true;
         onPositionChange(best.token);
       }
     },
@@ -155,15 +161,15 @@ export function PageView({
 
   const turnPage = useCallback(
     (delta: number) => {
-      const next = Math.min(
-        breaks.length - 1,
-        Math.max(0, pageAt(breaks, scrollY.current) + delta),
-      );
-      scroller.current?.scrollTo({
-        y: Math.max(0, (breaks[next] ?? 0) - PAGE_TOP_PAD),
-        animated: !settings.reduceMotion,
-      });
+      // Where the last turn was headed outranks what the scroll stream last reported: a
+      // throttled stream can stop arriving mid-animation, and two taps in a row would
+      // then both be counted from the same page.
+      const from = turning.current ?? pageAt(breaks, scrollY.current);
+      const next = Math.min(breaks.length - 1, Math.max(0, from + delta));
+      const y = breaks[next] ?? 0;
+      turning.current = next;
       setPage(next);
+      scroller.current?.scrollTo({ y, animated: !settings.reduceMotion });
     },
     [breaks, settings.reduceMotion],
   );
@@ -173,22 +179,35 @@ export function PageView({
    *
    * Only once its line has actually left the window — following every word would make the
    * text crawl under the reader instead of moving when it has to.
+   *
+   * The same jump opens the view on the word the stream left off at. It has to happen
+   * here and not on the scroll view's own layout: a token only has a position once the
+   * paragraph holding it has reported its lines, which is later.
    */
   useEffect(() => {
     if (ruler === null || viewport <= 0) return;
+    // Before the content is measured a scroll would be clamped to the top, and the line
+    // positions of a text that has not finished laying out are not worth acting on.
+    if (content <= 0) return;
     // A position this view derived from its own scrolling must not scroll it again: that
     // is the loop where the page chases the word it just read off the page.
-    if (ruler.token === lastReported.current) return;
+    if (reported.current && ruler.token === lastReported.current) return;
     const top = scrollY.current;
-    if (ruler.y >= top + PAGE_TOP_PAD && ruler.y + ruler.height <= top + usable) return;
-    const target = paged
-      ? (breaks[pageAt(breaks, ruler.y)] ?? 0) - PAGE_TOP_PAD
-      : ruler.y - usable / 3;
+    if (ruler.y >= top && ruler.y + ruler.height <= top + usable) return;
+    // Paged mode moves in pages, never to a spot halfway down one. The counter is left to
+    // the scroll stream here rather than set outright: state set from an effect body is a
+    // cascading render, and the offset that lands is the one that decides anyway.
+    const target = paged ? pageAt(breaks, ruler.y) : null;
+    const y = Math.max(0, target === null ? ruler.y - usable / 3 : (breaks[target] ?? 0));
+    turning.current = target;
+    scrollY.current = y;
+    // Opening the view is a jump, not a journey: animating it would run the reader past
+    // every page between the top and where they stopped.
     scroller.current?.scrollTo({
-      y: Math.max(0, target),
-      animated: !settings.reduceMotion,
+      y,
+      animated: reported.current && !settings.reduceMotion,
     });
-  }, [breaks, paged, ruler, settings.reduceMotion, usable, viewport]);
+  }, [breaks, content, paged, ruler, settings.reduceMotion, usable, viewport]);
 
   /**
    * Auto-scroll, in points per second.
@@ -199,14 +218,20 @@ export function PageView({
    */
   useEffect(() => {
     const speed = settings.readerAutoScroll;
-    if (speed <= 0) return;
+    // Page turning is the opposite of scrolling, which is what its own setting says:
+    // "turn pages instead of scrolling". Letting both run would drift the page out from
+    // under the reader while a page number counts along, so paged mode wins.
+    if (speed <= 0 || paged) return;
+    // Auto-scroll moves without a finger and without a destination page, so the counter
+    // has to go back to reading the offsets it is given.
+    turning.current = null;
     const step = 120;
     const timer = setInterval(() => {
       scrollY.current += (speed * step) / 1000;
       scroller.current?.scrollTo({ y: scrollY.current, animated: false });
     }, step);
     return () => clearInterval(timer);
-  }, [settings.readerAutoScroll]);
+  }, [paged, settings.readerAutoScroll]);
 
   const tint = OVERLAY_TINTS[settings.readerOverlay];
 
@@ -237,20 +262,28 @@ export function PageView({
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.colors.bg }}>
-      <View style={{ flex: 1, flexDirection: 'row' }}>
+      <View
+        style={{ flex: 1, flexDirection: 'row', marginBottom: paged ? PAGE_FOOTER : 0 }}
+      >
         {paged ? <PageEdge label={t('player.page.prev')} onPress={() => turnPage(-1)} /> : null}
         <ScrollView
           ref={scroller}
           style={{ flex: 1 }}
-          onLayout={(event) => {
-            setViewport(event.nativeEvent.layout.height);
-            scrollToActive();
-          }}
+          onLayout={(event) => setViewport(event.nativeEvent.layout.height)}
+          onContentSizeChange={(_width, height) => setContent(height)}
           onScroll={onScroll}
+          // A finger on the glass outranks a turn that is still animating; where the scroll
+          // finally comes to rest is the offset the next turn has to count from.
+          onScrollBeginDrag={() => {
+            turning.current = null;
+          }}
+          onMomentumScrollEnd={(event) => {
+            scrollY.current = event.nativeEvent.contentOffset.y;
+          }}
           scrollEventThrottle={120}
           contentContainerStyle={{
-            // The turn strips take their width out of the margin rather than out of the
-            // text, so switching to paged mode does not reflow the column.
+            // The turn strips take their width out of the margin before they take any of
+            // the text, so the column keeps as much of its measure as it can.
             paddingHorizontal: paged
               ? Math.max(0, settings.readerMargin - PAGE_EDGE)
               : settings.readerMargin,
@@ -307,8 +340,10 @@ export function PageView({
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: theme.space[1],
+            bottom: 0,
+            height: PAGE_FOOTER,
             alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
           <T variant="small" tone="faint">
