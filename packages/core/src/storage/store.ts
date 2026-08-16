@@ -1,5 +1,6 @@
 import { normalizeSettings } from '../settings.js';
 import type {
+  Annotation,
   Bookmark,
   LexiDocument,
   LibraryEntry,
@@ -22,6 +23,9 @@ const KEY = {
   bookmark: (docId: string, id: string) => `lexi:bm:${docId}:${id}`,
   bookmarkPrefix: (docId: string) => `lexi:bm:${docId}:`,
   allBookmarks: 'lexi:bm:',
+  annotation: (docId: string, id: string) => `lexi:hl:${docId}:${id}`,
+  annotationPrefix: (docId: string) => `lexi:hl:${docId}:`,
+  allAnnotations: 'lexi:hl:',
 } as const;
 
 function safeParse<T>(raw: string | null, fallback: T): T {
@@ -120,6 +124,10 @@ export class LexiStore {
     await this.driver.delete(KEY.progress(id));
     const bookmarkKeys = await this.driver.keys(KEY.bookmarkPrefix(id));
     for (const key of bookmarkKeys) await this.driver.delete(key);
+    // Highlights are keyed by document too, and orphans would survive a re-import of a
+    // document with the same id and reattach themselves to the wrong text.
+    const annotationKeys = await this.driver.keys(KEY.annotationPrefix(id));
+    for (const key of annotationKeys) await this.driver.delete(key);
   }
 
   async listDocuments(): Promise<LexiDocument[]> {
@@ -202,6 +210,44 @@ export class LexiStore {
     return marks;
   }
 
+  // --------------------------------------------------------------- annotations
+
+  async saveAnnotation(annotation: Annotation): Promise<void> {
+    await this.driver.set(
+      KEY.annotation(annotation.documentId, annotation.id),
+      JSON.stringify(annotation),
+    );
+  }
+
+  async deleteAnnotation(documentId: string, id: string): Promise<void> {
+    await this.driver.delete(KEY.annotation(documentId, id));
+  }
+
+  /** Ordered by position in the text, which is the order a reader looks for them in. */
+  async listAnnotations(documentId: string): Promise<Annotation[]> {
+    const keys = await this.driver.keys(KEY.annotationPrefix(documentId));
+    const values = await this.readMany(keys);
+    const out: Annotation[] = [];
+    for (const value of values) {
+      const item = safeParse<Annotation | null>(value, null);
+      if (item && typeof item.id === 'string') out.push(item);
+    }
+    out.sort((a, b) => a.startToken - b.startToken);
+    return out;
+  }
+
+  async listAllAnnotations(): Promise<Annotation[]> {
+    const keys = await this.driver.keys(KEY.allAnnotations);
+    const values = await this.readMany(keys);
+    const out: Annotation[] = [];
+    for (const value of values) {
+      const item = safeParse<Annotation | null>(value, null);
+      if (item && typeof item.id === 'string') out.push(item);
+    }
+    out.sort((a, b) => b.createdAt - a.createdAt);
+    return out;
+  }
+
   // --------------------------------------------------------------------- stats
 
   async getStats(): Promise<ReadingStats> {
@@ -260,6 +306,7 @@ export class LexiStore {
         documents: await this.listDocuments(),
         progress: await this.listAllProgress(),
         bookmarks: await this.listAllBookmarks(),
+        annotations: await this.listAllAnnotations(),
       },
       null,
       2,
@@ -278,10 +325,13 @@ export class LexiStore {
   }
 
   /** Restore a backup. Existing entries with the same id are overwritten. */
-  async importAll(json: string): Promise<{ documents: number; bookmarks: number }> {
+  async importAll(
+    json: string,
+  ): Promise<{ documents: number; bookmarks: number; annotations: number }> {
     const data = safeParse<Record<string, unknown>>(json, {});
     let documents = 0;
     let bookmarks = 0;
+    let annotations = 0;
 
     if (data.settings) await this.saveSettings(normalizeSettings(data.settings));
     if (Array.isArray(data.documents)) {
@@ -305,10 +355,18 @@ export class LexiStore {
         }
       }
     }
+    if (Array.isArray(data.annotations)) {
+      for (const a of data.annotations as Annotation[]) {
+        if (a && typeof a.id === 'string' && typeof a.documentId === 'string') {
+          await this.saveAnnotation(a);
+          annotations += 1;
+        }
+      }
+    }
     if (data.stats && typeof data.stats === 'object') {
       await this.driver.set(KEY.stats, JSON.stringify(data.stats));
     }
-    return { documents, bookmarks };
+    return { documents, bookmarks, annotations };
   }
 
   /** Wipe everything. Backs the "delete all my data" button. */

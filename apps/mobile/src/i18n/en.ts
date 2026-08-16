@@ -59,6 +59,8 @@ export const en: Record<keyof typeof de, string> = {
   'player.bookmarks.empty': 'No bookmarks yet. Long-press to add one.',
   'player.chapters': 'Chapters',
   'player.text': 'Full text',
+  'player.toPage': 'Read as a page',
+  'player.toRsvp': 'Back to the stream',
   'player.text.hint': 'Tap a word to carry on from there.',
   'player.text.here': 'You are here',
   'player.loading': 'Loading…',

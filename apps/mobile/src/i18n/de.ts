@@ -62,6 +62,8 @@ export const de = {
   'player.bookmarks.empty': 'Noch keine Lesezeichen. Lange drücken setzt eins.',
   'player.chapters': 'Kapitel',
   'player.text': 'Fließtext',
+  'player.toPage': 'Als Seite lesen',
+  'player.toRsvp': 'Zum Wortstrom',
   'player.text.hint': 'Tippe ein Wort an, um dort weiterzulesen.',
   'player.text.here': 'Hier bist du',
   'player.loading': 'Wird geladen…',

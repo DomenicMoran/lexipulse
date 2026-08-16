@@ -62,7 +62,24 @@ export const DEFAULT_SETTINGS: RsvpSettings = {
   ttsVoice: null,
   keepAwake: true,
   reduceMotion: false,
+
+  readerMode: 'rsvp',
+  readerFontSize: 19,
+  readerLineHeight: 1.65,
+  readerMargin: 22,
+  readerJustify: false,
+  readerFont: 'literata',
+  readerPaged: false,
+  readerAutoScroll: 0,
+  readerBionic: 0,
+  readerRuler: 0,
+  readerOverlay: 'none',
 };
+
+export const READER_MODES = ['rsvp', 'page'] as const;
+export const READER_FONTS = ['literata', 'inter', 'system', 'open-dyslexic'] as const;
+export const OVERLAYS = ['none', 'cream', 'peach', 'rose', 'mint', 'sky', 'lilac'] as const;
+export const HIGHLIGHT_COLORS = ['yellow', 'green', 'blue', 'pink', 'purple'] as const;
 
 function pick<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
   return typeof value === 'string' && (allowed as readonly string[]).includes(value)
@@ -123,6 +140,18 @@ export function normalizeSettings(input: unknown): RsvpSettings {
     ttsVoice: typeof s.ttsVoice === 'string' ? s.ttsVoice : null,
     keepAwake: bool(s.keepAwake, DEFAULT_SETTINGS.keepAwake),
     reduceMotion: bool(s.reduceMotion, DEFAULT_SETTINGS.reduceMotion),
+
+    readerMode: pick(s.readerMode, READER_MODES, DEFAULT_SETTINGS.readerMode),
+    readerFontSize: num(s.readerFontSize, DEFAULT_SETTINGS.readerFontSize, 12, 42),
+    readerLineHeight: num(s.readerLineHeight, DEFAULT_SETTINGS.readerLineHeight, 1.1, 2.6),
+    readerMargin: num(s.readerMargin, DEFAULT_SETTINGS.readerMargin, 0, 72),
+    readerJustify: bool(s.readerJustify, DEFAULT_SETTINGS.readerJustify),
+    readerFont: pick(s.readerFont, READER_FONTS, DEFAULT_SETTINGS.readerFont),
+    readerPaged: bool(s.readerPaged, DEFAULT_SETTINGS.readerPaged),
+    readerAutoScroll: num(s.readerAutoScroll, DEFAULT_SETTINGS.readerAutoScroll, 0, 200),
+    readerBionic: Math.round(num(s.readerBionic, DEFAULT_SETTINGS.readerBionic, 0, 5)),
+    readerRuler: Math.round(num(s.readerRuler, DEFAULT_SETTINGS.readerRuler, 0, 3)),
+    readerOverlay: pick(s.readerOverlay, OVERLAYS, DEFAULT_SETTINGS.readerOverlay),
   };
 }
 

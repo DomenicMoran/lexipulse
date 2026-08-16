@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS } from '../settings.js';
-import type { Bookmark, LexiDocument, ReadingProgress } from '../types.js';
+import type { Annotation, Bookmark, LexiDocument, ReadingProgress } from '../types.js';
 import { MemoryDriver } from './driver.js';
 import { LexiStore, SCHEMA_VERSION, computeStreak, dayKey } from './store.js';
 
@@ -276,7 +276,7 @@ describe('LexiStore', () => {
     });
 
     it('ignores garbage input instead of throwing', async () => {
-      expect(await store.importAll('not json')).toEqual({ documents: 0, bookmarks: 0 });
+      expect(await store.importAll('not json')).toEqual({ documents: 0, bookmarks: 0, annotations: 0 });
     });
 
     it('clearAll removes everything', async () => {
@@ -284,5 +284,57 @@ describe('LexiStore', () => {
       await store.clearAll();
       expect(await store.listDocuments()).toEqual([]);
     });
+  });
+});
+
+describe('annotations', () => {
+  const make = (id: string, start: number): Annotation => ({
+    id,
+    documentId: 'doc-a',
+    startToken: start,
+    endToken: start + 4,
+    chapterIndex: 0,
+    color: 'yellow',
+    text: 'ein markierter Satz',
+    note: null,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  });
+
+  it('stores, lists in reading order, and deletes', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.saveAnnotation(make('b', 90));
+    await store.saveAnnotation(make('a', 10));
+
+    const list = await store.listAnnotations('doc-a');
+    expect(list.map((a) => a.id)).toEqual(['a', 'b']);
+
+    await store.deleteAnnotation('doc-a', 'a');
+    expect((await store.listAnnotations('doc-a')).map((a) => a.id)).toEqual(['b']);
+  });
+
+  it('does not leave orphans behind when the document goes', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.saveDocument(makeDoc('doc-a'));
+    await store.saveAnnotation(make('a', 10));
+
+    await store.deleteDocument('doc-a');
+    expect(await store.listAnnotations('doc-a')).toEqual([]);
+  });
+
+  it('survives a round trip through export and import', async () => {
+    const source = new LexiStore(new MemoryDriver());
+    await source.init();
+    await source.saveDocument(makeDoc('doc-a'));
+    await source.saveAnnotation(make('a', 10));
+
+    const target = new LexiStore(new MemoryDriver());
+    await target.init();
+    const result = await target.importAll(await source.exportAll());
+
+    expect(result.annotations).toBe(1);
+    expect((await target.listAnnotations('doc-a')).map((a) => a.id)).toEqual(['a']);
   });
 });

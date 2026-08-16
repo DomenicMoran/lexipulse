@@ -4,5 +4,6 @@ export * from './pacing.js';
 export * from './tokenizer.js';
 export * from './engine.js';
 export * from './settings.js';
+export * from './reader.js';
 export * from './parsers/index.js';
 export * from './storage/index.js';

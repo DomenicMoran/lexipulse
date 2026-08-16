@@ -22,6 +22,7 @@ import {
 } from '../../src/player/feedback';
 import { PlayerGestureArea, type PlayerGestureHandlers } from '../../src/player/gestures';
 import { OnboardingOverlay, useOnboarding } from '../../src/player/onboarding';
+import { PageView } from '../../src/reader/page-view';
 import { RsvpStage } from '../../src/player/stage';
 import { Scrubber } from '../../src/player/scrubber';
 import { useReader } from '../../src/state/reader';
@@ -35,7 +36,7 @@ export default function ReadScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const { settings } = useSettings();
+  const { settings, update } = useSettings();
   const {
     document,
     tokens,
@@ -94,15 +95,20 @@ export default function ReadScreen() {
 
   const onScrub = useCallback((percent: number) => seekPercent(percent), [seekPercent]);
 
+  const pageMode = settings.readerMode === 'page';
+
   /**
-   * Reading the page and running the stream are two different things, and doing both at
-   * once means the highlight runs away while you are still looking for your line. So
-   * opening the full text pauses first.
+   * Switch between the stream and the page. Both sit on the same token, so the reader
+   * lands on the word they were at either way — that is the whole point of having one
+   * position rather than two.
+   *
+   * Leaving the stream running behind the page would move that position out from under
+   * them, so it stops first.
    */
-  const openText = useCallback(() => {
+  const toggleMode = useCallback(() => {
     if (snapshot.status === 'playing') toggle();
-    setSheet('text');
-  }, [snapshot.status, toggle]);
+    void update({ readerMode: pageMode ? 'rsvp' : 'page' });
+  }, [pageMode, snapshot.status, toggle, update]);
 
   /** Tokens of the chapter on screen, grouped into the paragraphs they came from. */
   const paragraphs = useMemo(() => {
@@ -176,9 +182,9 @@ export default function ReadScreen() {
           ) : null}
         </View>
         <IconButton
-          icon="reader-outline"
-          label={t('player.text')}
-          onPress={openText}
+          icon={pageMode ? 'flash-outline' : 'reader-outline'}
+          label={pageMode ? t('player.toRsvp') : t('player.toPage')}
+          onPress={toggleMode}
         />
         <IconButton
           icon="list-outline"
@@ -192,7 +198,20 @@ export default function ReadScreen() {
         />
       </View>
 
+      {pageMode ? (
+        <PageView
+          tokens={tokens}
+          activeIndex={snapshot.index}
+          onSelectToken={(index) => {
+            seek(index);
+            void update({ readerMode: 'rsvp' });
+          }}
+          onPositionChange={seek}
+        />
+      ) : null}
+
       {/* The stage. Everything in this block is the gesture surface. */}
+      {pageMode ? null : (
       <PlayerGestureArea
         handlers={handlers}
         style={{
@@ -218,8 +237,10 @@ export default function ReadScreen() {
           </View>
         ) : null}
       </PlayerGestureArea>
+      )}
 
-      {/* Transport */}
+      {/* Transport. Page mode has no stream to drive, so it has no transport either. */}
+      {pageMode ? null : (
       <View
         style={{
           paddingHorizontal: theme.space[5],
@@ -280,6 +301,7 @@ export default function ReadScreen() {
           <Button label={t('player.restart')} variant="secondary" onPress={() => seek(0)} />
         ) : null}
       </View>
+      )}
 
       <ChapterSheet
         visible={sheet === 'chapters'}

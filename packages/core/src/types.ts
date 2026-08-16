@@ -163,7 +163,47 @@ export interface RsvpSettings {
   keepAwake: boolean;
   /** Respect prefers-reduced-motion / disable non-essential animation. */
   reduceMotion: boolean;
+
+  /* ------------------------------------------------------------------ page mode */
+
+  /**
+   * Which surface a document opens in. RSVP is what the app is for; page mode is what
+   * makes it a reader you can actually live in. Both share one position, so switching
+   * never costs the reader their place.
+   */
+  readerMode: ReaderMode;
+  /** Body size in page mode, in points. Separate from the RSVP stage size. */
+  readerFontSize: number;
+  /** Multiplier on the body size. 1.6 is comfortable for continuous prose. */
+  readerLineHeight: number;
+  /** Horizontal padding in page mode, in points. */
+  readerMargin: number;
+  /** Justified rather than ragged right. */
+  readerJustify: boolean;
+  /** Typeface for page mode. `open-dyslexic` is the accessibility option. */
+  readerFont: ReaderFontKey;
+  /** Turn pages instead of scrolling continuously. */
+  readerPaged: boolean;
+  /** Auto-scroll speed in points per second. 0 is off. */
+  readerAutoScroll: number;
+  /** Bold the leading letters of every word — "bionic" reading. 0 is off, 1–5 is strength. */
+  readerBionic: number;
+  /** A band that follows the current line. 0 is off. */
+  readerRuler: number;
+  /** Tint laid over the page for readers who need one. */
+  readerOverlay: OverlayKey;
 }
+
+export type ReaderMode = 'rsvp' | 'page';
+
+/**
+ * Page-mode typefaces. Serif for long prose, sans for screens, and OpenDyslexic —
+ * bottom-weighted letters that stop b/d and p/q from flipping.
+ */
+export type ReaderFontKey = 'literata' | 'inter' | 'system' | 'open-dyslexic';
+
+/** Irlen-style tints. Named by hue because that is how readers pick them. */
+export type OverlayKey = 'none' | 'cream' | 'peach' | 'rose' | 'mint' | 'sky' | 'lilac';
 
 export type FontKey = 'jetbrains-mono' | 'ibm-plex-mono' | 'system-mono' | 'inter' | 'literata';
 
@@ -178,6 +218,30 @@ export interface ReadingProgress {
   /** Total milliseconds actually spent reading this document. */
   msRead: number;
 }
+
+/**
+ * A highlighted passage, optionally with a note.
+ *
+ * Anchored to a token range rather than a character offset: tokens survive a re-parse of
+ * the same document, character offsets do not once the cleaner changes by a byte.
+ */
+export interface Annotation {
+  id: string;
+  documentId: string;
+  /** Inclusive. */
+  startToken: number;
+  /** Inclusive. */
+  endToken: number;
+  chapterIndex: number;
+  color: HighlightColor;
+  /** The highlighted text itself, for the list and the export. */
+  text: string;
+  note: string | null;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'purple';
 
 /** A user highlight/bookmark anchored to a token range. */
 export interface Bookmark {
