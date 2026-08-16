@@ -28,7 +28,7 @@ import {
 
 import { useSettings, useTheme } from '../state/settings';
 import { HIGHLIGHT_TINTS } from './highlight-bar';
-import { OVERLAY_TINTS, readerFontFamily } from './typography';
+import { OVERLAY_TINTS, readerFontFamily, readerFontFamilyBold } from './typography';
 
 export interface PageViewProps {
   /** Readonly: the reader state owns this array and page mode only reads it. */
@@ -60,7 +60,7 @@ export function PageView({
   const scroller = useRef<ScrollView | null>(null);
   const offsets = useRef(new Map<number, number>());
   const didInitialScroll = useRef(false);
-  const [rulerY, setRulerY] = useState<number | null>(null);
+  const [ruler, setRuler] = useState<{ y: number; height: number } | null>(null);
 
   const paragraphs = useMemo(() => paragraphsOf(tokens), [tokens]);
 
@@ -116,7 +116,6 @@ export function PageView({
   }, [settings.readerAutoScroll]);
 
   const tint = OVERLAY_TINTS[settings.readerOverlay];
-  const lineHeight = settings.readerFontSize * settings.readerLineHeight;
 
   const onWordPress = useCallback(
     (token: RsvpToken) => {
@@ -158,16 +157,19 @@ export function PageView({
       >
         {/* The ruler lives inside the scrolled content, not over the viewport: pinned to
             the viewport it would need the live scroll offset, which is a ref read during
-            render — and a band that only moves when React re-renders lags the page. */}
-        {settings.readerRuler > 0 && rulerY !== null ? (
+            render — and a band that only moves when React re-renders lags the page.
+            Drawn before the paragraphs so the text paints on top of it. */}
+        {settings.readerRuler > 0 && ruler !== null ? (
           <View
             pointerEvents="none"
             style={{
               position: 'absolute',
               left: 0,
               right: 0,
-              top: rulerY,
-              height: lineHeight * (0.9 + settings.readerRuler * 0.35),
+              // Grown symmetrically around the line, so stronger settings give a wider
+              // band without shifting it off the words it is meant to mark.
+              top: ruler.y - (settings.readerRuler - 1) * 2,
+              height: ruler.height + (settings.readerRuler - 1) * 4,
               backgroundColor: theme.accent.soft,
             }}
           />
@@ -186,10 +188,8 @@ export function PageView({
             selection={selection}
             onPress={onWordPress}
             onLongPress={onWordLongPress}
-            onMeasure={(token, y) => {
-              offsets.current.set(token, y);
-              if (token === activeIndex) setRulerY(y);
-            }}
+            onMeasure={(token, y) => offsets.current.set(token, y)}
+            onRuler={setRuler}
           />
         ))}
       </ScrollView>
@@ -219,6 +219,8 @@ interface ParagraphProps {
   onPress: (token: RsvpToken) => void;
   onLongPress: (token: RsvpToken) => void;
   onMeasure: (firstToken: number, y: number) => void;
+  /** Reports where the reading position's line sits, in content coordinates. */
+  onRuler: (band: { y: number; height: number }) => void;
 }
 
 const Paragraph = memo(function Paragraph({
@@ -229,9 +231,46 @@ const Paragraph = memo(function Paragraph({
   onPress,
   onLongPress,
   onMeasure,
+  onRuler,
 }: ParagraphProps) {
   const theme = useTheme();
   const { settings } = useSettings();
+
+  /**
+   * Which rendered line the reading position falls on.
+   *
+   * `onTextLayout` hands back one entry per line after wrapping, so the line the reader is
+   * on is only knowable here — the parent sees paragraphs, not lines. Lines are matched by
+   * counting words rather than characters: Android drops the trailing space at a wrap, so
+   * character offsets drift by a space per line while word counts stay exact.
+   *
+   * Layout and text layout arrive in no fixed order, so both are kept and the band is
+   * computed from whichever pair is complete.
+   */
+  const selfY = useRef<number | null>(null);
+  const lines = useRef<{ y: number; height: number; words: number }[] | null>(null);
+
+  const ordinal = paragraph.tokens.findIndex((token) => token.index === activeIndex);
+
+  const publish = useCallback(() => {
+    const top = selfY.current;
+    const rendered = lines.current;
+    if (top === null || rendered === null || ordinal < 0) return;
+    let seen = 0;
+    for (const line of rendered) {
+      if (ordinal < seen + line.words) {
+        onRuler({ y: top + line.y, height: line.height });
+        return;
+      }
+      seen += line.words;
+    }
+    // The position sits past the last counted word — mark the closing line rather than
+    // leaving the band wherever it was.
+    const last = rendered[rendered.length - 1];
+    if (last) onRuler({ y: top + last.y, height: last.height });
+  }, [onRuler, ordinal]);
+
+  useEffect(publish, [publish]);
 
   const size = settings.readerFontSize;
   const style = {
@@ -246,7 +285,22 @@ const Paragraph = memo(function Paragraph({
   return (
     <Text
       style={style}
-      onLayout={(event) => onMeasure(paragraph.firstToken, event.nativeEvent.layout.y)}
+      onLayout={(event) => {
+        selfY.current = event.nativeEvent.layout.y;
+        onMeasure(paragraph.firstToken, event.nativeEvent.layout.y);
+        publish();
+      }}
+      onTextLayout={(event) => {
+        lines.current = event.nativeEvent.lines.map((line) => {
+          const text = line.text.trim();
+          return {
+            y: line.y,
+            height: line.height,
+            words: text === '' ? 0 : text.split(/\s+/).length,
+          };
+        });
+        publish();
+      }}
     >
       {paragraph.tokens.map((token, position) => (
         <Word
@@ -261,6 +315,7 @@ const Paragraph = memo(function Paragraph({
             token.index <= Math.max(selection.start, selection.end)
           }
           bionic={settings.readerBionic}
+          boldFamily={readerFontFamilyBold(settings.readerFont)}
           onPress={onPress}
           onLongPress={onLongPress}
         />
@@ -288,6 +343,7 @@ const Word = memo(function Word({
   highlight,
   selected,
   bionic,
+  boldFamily,
   onPress,
   onLongPress,
 }: {
@@ -297,6 +353,8 @@ const Word = memo(function Word({
   highlight: HighlightColor | null;
   selected: boolean;
   bionic: number;
+  /** Undefined for the system face, which does have real weights. */
+  boldFamily: string | undefined;
   onPress: (token: RsvpToken) => void;
   onLongPress: (token: RsvpToken) => void;
 }) {
@@ -306,7 +364,12 @@ const Word = memo(function Word({
   const body =
     cut > 0 ? (
       <>
-        <Text style={{ fontWeight: '700' }}>{token.text.slice(0, cut)}</Text>
+        {/* Naming the bold family rather than setting fontWeight: an embedded family
+            holds one weight, and Android ignores fontWeight beside a custom family
+            outright — the emphasis would simply not appear. */}
+        <Text style={boldFamily ? { fontFamily: boldFamily } : { fontWeight: '700' }}>
+          {token.text.slice(0, cut)}
+        </Text>
         {token.text.slice(cut)}
       </>
     ) : (

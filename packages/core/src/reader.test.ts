@@ -64,6 +64,30 @@ describe('searchTokens', () => {
     expect(hit?.preview).not.toContain('pelzhut');
   });
 
+  it('points previewOffset at the match itself, not a few letters before it', () => {
+    // The preview snaps outwards to whole words, so an offset measured from the raw
+    // context window lands on the tail of the word before — the marker looked misplaced
+    // on screen while the token index was right.
+    for (const hit of searchTokens(tokens, 'Beine')) {
+      expect(hit.preview.slice(hit.previewOffset, hit.previewOffset + hit.matchLength)).toBe(
+        'Beine',
+      );
+    }
+  });
+
+  it('keeps previewOffset exact for every hit in a long text', () => {
+    const long = tokenize(Array.from({ length: 60 }, (_, i) => `wort${i} ziel füllsel`).join(' '), {
+      wpm: 350,
+    }).tokens;
+    const hits = searchTokens(long, 'ziel');
+    expect(hits).toHaveLength(60);
+    for (const hit of hits) {
+      expect(fold(hit.preview).slice(hit.previewOffset, hit.previewOffset + hit.matchLength)).toBe(
+        'ziel',
+      );
+    }
+  });
+
   it('finds every occurrence rather than stopping at the first', () => {
     const many = tokenize('rot blau rot grün rot', { wpm: 350 }).tokens;
     expect(searchTokens(many, 'rot')).toHaveLength(3);

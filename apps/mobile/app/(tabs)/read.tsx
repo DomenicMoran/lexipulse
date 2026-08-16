@@ -23,6 +23,7 @@ import {
 import { PlayerGestureArea, type PlayerGestureHandlers } from '../../src/player/gestures';
 import { OnboardingOverlay, useOnboarding } from '../../src/player/onboarding';
 import { HighlightBar } from '../../src/reader/highlight-bar';
+import { HighlightsSheet } from '../../src/reader/highlights-sheet';
 import { PageView } from '../../src/reader/page-view';
 import { SearchSheet } from '../../src/reader/search-sheet';
 import { RsvpStage } from '../../src/player/stage';
@@ -58,7 +59,9 @@ export default function ReadScreen() {
     removeBookmark,
   } = useReader();
 
-  const [sheet, setSheet] = useState<'none' | 'chapters' | 'bookmarks' | 'search'>('none');
+  const [sheet, setSheet] = useState<
+    'none' | 'chapters' | 'bookmarks' | 'search' | 'highlights'
+  >('none');
   const { annotations, add: addAnnotation, update: updateAnnotation, remove: removeAnnotation } =
     useAnnotations();
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
@@ -189,6 +192,11 @@ export default function ReadScreen() {
           icon="list-outline"
           label={t('player.chapters')}
           onPress={() => setSheet('chapters')}
+        />
+        <IconButton
+          icon="color-wand-outline"
+          label={t('highlight.title')}
+          onPress={() => setSheet('highlights')}
         />
         <IconButton
           icon="bookmark-outline"
@@ -345,6 +353,18 @@ export default function ReadScreen() {
         ) : null}
       </View>
       )}
+
+      <HighlightsSheet
+        visible={sheet === 'highlights'}
+        annotations={annotations}
+        onClose={() => setSheet('none')}
+        onSelect={(index) => {
+          seek(index);
+          setSheet('none');
+          if (!pageMode) void update({ readerMode: 'page' });
+        }}
+        onRemove={(id) => void removeAnnotation(document.id, id)}
+      />
 
       <SearchSheet
         visible={sheet === 'search'}

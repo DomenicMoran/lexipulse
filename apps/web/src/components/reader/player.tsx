@@ -5,6 +5,7 @@ import {
   WPM_MAX,
   WPM_MIN,
   WPM_STEP,
+  annotationsAt,
   bionicPrefix,
   contextAround,
   effectiveWpmFor,
@@ -12,7 +13,10 @@ import {
   paragraphsOf,
   sentenceText,
   sentenceTextAt,
+  textOfRange,
+  type Annotation,
   type EngineStatus,
+  type HighlightColor,
   type LexiDocument,
   type OverlayKey,
   type ReaderFontKey,
@@ -30,6 +34,19 @@ import {
   RewindIcon,
   SettingsIcon,
 } from '@/components/icons';
+import {
+  AnnotationList,
+  HIGHLIGHT_WASHES,
+  HighlightBar,
+  HighlightIcon,
+} from '@/components/reader/highlights';
+import { SearchDialog, SearchIcon } from '@/components/reader/search-dialog';
+import {
+  clearSelection,
+  hasTextSelection,
+  selectedTokenRange,
+  type TokenRange,
+} from '@/components/reader/text-selection';
 import { useSettings } from '@/components/settings-provider';
 import { formatNumber } from '@/lib/format';
 import { playTick } from '@/lib/sound';
@@ -79,12 +96,28 @@ export function Player({
   const [index, setIndex] = React.useState(startIndex);
   const [status, setStatus] = React.useState<EngineStatus>('idle');
   const [showPage, setShowPage] = React.useState(false);
+  const [showSearch, setShowSearch] = React.useState(false);
+  const [showMarks, setShowMarks] = React.useState(false);
+  const [annotations, setAnnotations] = React.useState<Annotation[]>([]);
 
   // Stable identity, or the memo on each paragraph never holds and the whole chapter
   // re-renders on every word.
   const seekFromPage = React.useCallback(
     (target: number) => {
+      // A click that ends a drag over the text is a marking gesture, not a jump — moving
+      // the stream there would throw away the selection the reader just made.
+      if (hasTextSelection()) return;
       cancelSpeech();
+      engine.seek(target);
+    },
+    [engine],
+  );
+
+  /** Jumping in from search or the mark list: pause, so the reader lands on a still page. */
+  const seekAndPause = React.useCallback(
+    (target: number) => {
+      cancelSpeech();
+      if (engine.getStatus() === 'playing') engine.pause();
       engine.seek(target);
     },
     [engine],
@@ -319,6 +352,85 @@ export function Player({
       .catch(() => undefined);
   }, [engine, tokens, lexiDocument.id, onBookmarked]);
 
+  /* ----------------------------------------------------------------- annotations */
+
+  /*
+   * Reading the marks is a subscription to an external system, so the state is written
+   * from the promise callback rather than from the effect body — a synchronous setState
+   * in an effect is a cascading render, and the compiler rightly refuses it.
+   */
+  const loadAnnotations = React.useCallback(
+    () =>
+      getStore()
+        .then((store) => store.listAnnotations(lexiDocument.id))
+        .then(setAnnotations)
+        .catch(() => undefined),
+    [lexiDocument.id],
+  );
+
+  React.useEffect(() => {
+    void loadAnnotations();
+  }, [loadAnnotations]);
+
+  const addHighlight = React.useCallback(
+    (range: TokenRange, color: HighlightColor) => {
+      const now = Date.now();
+      const annotation: Annotation = {
+        id: `hl_${now.toString(36)}_${Math.floor(Math.random() * 1e6).toString(36)}`,
+        documentId: lexiDocument.id,
+        startToken: range.start,
+        endToken: range.end,
+        chapterIndex: tokens[range.start]?.chapterIndex ?? 0,
+        color,
+        text: textOfRange(tokens, range.start, range.end),
+        note: null,
+        createdAt: now,
+        updatedAt: now,
+      };
+      void getStore()
+        .then((store) => store.saveAnnotation(annotation))
+        .then(loadAnnotations)
+        .catch(() => undefined);
+    },
+    [lexiDocument.id, tokens, loadAnnotations],
+  );
+
+  const saveAnnotation = React.useCallback(
+    (annotation: Annotation) => {
+      void getStore()
+        .then((store) => store.saveAnnotation({ ...annotation, updatedAt: Date.now() }))
+        .then(loadAnnotations)
+        .catch(() => undefined);
+    },
+    [loadAnnotations],
+  );
+
+  const recolorAnnotation = React.useCallback(
+    (annotation: Annotation, color: HighlightColor) => saveAnnotation({ ...annotation, color }),
+    [saveAnnotation],
+  );
+
+  const noteAnnotation = React.useCallback(
+    (annotation: Annotation, note: string) =>
+      saveAnnotation({ ...annotation, note: note.length > 0 ? note : null }),
+    [saveAnnotation],
+  );
+
+  const removeAnnotation = React.useCallback(
+    (annotation: Annotation) => {
+      void getStore()
+        .then((store) => store.deleteAnnotation(lexiDocument.id, annotation.id))
+        .then(loadAnnotations)
+        .catch(() => undefined);
+    },
+    [lexiDocument.id, loadAnnotations],
+  );
+
+  const chapterTitles = React.useMemo(
+    () => lexiDocument.chapters.map((chapter) => chapter.title),
+    [lexiDocument.chapters],
+  );
+
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       // `instanceof HTMLElement` rather than a cast: a key event can be dispatched at
@@ -522,6 +634,26 @@ export function Player({
         >
           <PageIcon />
         </IconButton>
+        <IconButton
+          label="Im Dokument suchen"
+          variant="secondary"
+          aria-expanded={showSearch}
+          onClick={() => setShowSearch(true)}
+        >
+          <SearchIcon />
+        </IconButton>
+        <IconButton
+          label={
+            showMarks
+              ? 'Markierungen schließen'
+              : `Markierungen anzeigen (${formatNumber(annotations.length)})`
+          }
+          variant="secondary"
+          aria-expanded={showMarks}
+          onClick={() => setShowMarks((open) => !open)}
+        >
+          <HighlightIcon />
+        </IconButton>
         <IconButton label="Einstellungen" variant="secondary" onClick={onOpenSettings}>
           <SettingsIcon />
         </IconButton>
@@ -531,7 +663,36 @@ export function Player({
       </div>
 
       {showPage ? (
-        <PageView tokens={tokens} activeIndex={index} onSelect={seekFromPage} />
+        <PageView
+          tokens={tokens}
+          activeIndex={index}
+          annotations={annotations}
+          onSelect={seekFromPage}
+          onHighlight={addHighlight}
+        />
+      ) : null}
+
+      {showMarks ? (
+        <AnnotationList
+          annotations={annotations}
+          chapterTitles={chapterTitles}
+          onJump={seekAndPause}
+          onColor={recolorAnnotation}
+          onNote={noteAnnotation}
+          onDelete={removeAnnotation}
+        />
+      ) : null}
+
+      {showSearch ? (
+        <SearchDialog
+          tokens={tokens}
+          chapters={lexiDocument.chapters}
+          onSelect={(target) => {
+            seekAndPause(target);
+            setShowSearch(false);
+          }}
+          onClose={() => setShowSearch(false)}
+        />
       ) : null}
 
       <div className="flex flex-col gap-3">
@@ -620,18 +781,41 @@ const OVERLAY_TINTS: Record<OverlayKey, string | null> = {
 function PageView({
   tokens,
   activeIndex,
+  annotations,
   onSelect,
+  onHighlight,
 }: {
   tokens: RsvpToken[];
   activeIndex: number;
+  annotations: Annotation[];
   onSelect: (index: number) => void;
+  onHighlight: (range: TokenRange, color: HighlightColor) => void;
 }) {
   const { settings } = useSettings();
   const active = React.useRef<HTMLButtonElement | null>(null);
+  const page = React.useRef<HTMLDivElement>(null);
+  const [selection, setSelection] = React.useState<TokenRange | null>(null);
 
   // Grouping depends on the token stream, nothing else. Keying this on `activeIndex`
   // walked the whole array again for every word the stream advanced.
   const paragraphs = React.useMemo(() => paragraphsOf(tokens), [tokens]);
+
+  /*
+   * One array per marked paragraph, and the same frozen empty array for all the others.
+   * Adding a highlight rebuilds this map, but only the paragraphs that actually carry a
+   * mark get a new array — everyone else keeps an identical prop and memo skips them.
+   */
+  const marksByParagraph = React.useMemo(() => {
+    const map = new Map<number, Annotation[]>();
+    if (annotations.length === 0) return map;
+    for (const paragraph of paragraphs) {
+      const covering = annotations.filter(
+        (mark) => mark.startToken <= paragraph.lastToken && mark.endToken >= paragraph.firstToken,
+      );
+      if (covering.length > 0) map.set(paragraph.key, covering);
+    }
+    return map;
+  }, [paragraphs, annotations]);
 
   // `block: 'nearest'` keeps the page still while the stream is paused on a word that is
   // already visible; without it every re-render would yank the scroll position.
@@ -639,60 +823,103 @@ function PageView({
     active.current?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex]);
 
+  // Stable, because the paragraphs below must not see a new handler on every render.
+  const readSelection = React.useCallback(() => {
+    const container = page.current;
+    setSelection(container ? selectedTokenRange(container) : null);
+  }, []);
+
+  const mark = React.useCallback(
+    (color: HighlightColor) => {
+      if (selection === null) return;
+      onHighlight(selection, color);
+      clearSelection();
+      setSelection(null);
+    },
+    [selection, onHighlight],
+  );
+
+  const dropSelection = React.useCallback(() => {
+    clearSelection();
+    setSelection(null);
+  }, []);
+
+  const preview = React.useMemo(
+    () =>
+      selection === null ? '' : textOfRange(tokens, selection.start, selection.end).slice(0, 160),
+    [selection, tokens],
+  );
+
   const tint = OVERLAY_TINTS[settings.readerOverlay];
 
   return (
-    <div className="relative">
-      <div
-        role="region"
-        aria-label="Fließtext"
-        className="max-h-[46vh] overflow-y-auto rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] py-4 text-[var(--lx-text)]"
-        style={{
-          fontFamily: READER_FONT_STACKS[settings.readerFont],
-          fontSize: `${settings.readerFontSize}px`,
-          lineHeight: settings.readerLineHeight,
-          paddingInline: `${settings.readerMargin}px`,
-          textAlign: settings.readerJustify ? 'justify' : 'left',
-        }}
-      >
-        <p className="mb-3 text-left text-[12px] leading-normal text-[var(--lx-text-muted)]">
-          Ein Wort anklicken, um dort weiterzulesen.
-        </p>
-        {paragraphs.map((paragraph) => (
-          <PageParagraph
-            key={paragraph.key}
-            tokens={paragraph.tokens}
-            // Every other paragraph gets the same `-1` on every word the stream
-            // advances, so memo sees no change and skips it. Without this the whole
-            // document re-rendered several times a second — thousands of buttons at
-            // 350 words per minute, which froze the tab outright.
-            activeIndex={
-              activeIndex >= paragraph.firstToken && activeIndex <= paragraph.lastToken
-                ? activeIndex
-                : -1
-            }
-            activeRef={active}
-            bionic={settings.readerBionic}
-            onSelect={onSelect}
-          />
-        ))}
-      </div>
-      {tint !== null && (
+    <div>
+      <div className="relative">
         <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[14px]"
-          style={{ backgroundColor: tint }}
-        />
+          ref={page}
+          role="region"
+          aria-label="Fließtext"
+          onMouseUp={readSelection}
+          onKeyUp={readSelection}
+          onTouchEnd={readSelection}
+          className="max-h-[46vh] select-text overflow-y-auto rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] py-4 text-[var(--lx-text)]"
+          style={{
+            fontFamily: READER_FONT_STACKS[settings.readerFont],
+            fontSize: `${settings.readerFontSize}px`,
+            lineHeight: settings.readerLineHeight,
+            paddingInline: `${settings.readerMargin}px`,
+            textAlign: settings.readerJustify ? 'justify' : 'left',
+          }}
+        >
+          <p className="mb-3 text-left text-[12px] leading-normal text-[var(--lx-text-muted)]">
+            Ein Wort anklicken, um dort weiterzulesen. Eine Passage mit der Maus auswählen, um
+            sie zu markieren.
+          </p>
+          {paragraphs.map((paragraph) => (
+            <PageParagraph
+              key={paragraph.key}
+              tokens={paragraph.tokens}
+              // Every other paragraph gets the same `-1` on every word the stream
+              // advances, so memo sees no change and skips it. Without this the whole
+              // document re-rendered several times a second — thousands of buttons at
+              // 350 words per minute, which froze the tab outright.
+              activeIndex={
+                activeIndex >= paragraph.firstToken && activeIndex <= paragraph.lastToken
+                  ? activeIndex
+                  : -1
+              }
+              activeRef={active}
+              bionic={settings.readerBionic}
+              marks={marksByParagraph.get(paragraph.key) ?? NO_MARKS}
+              onSelect={onSelect}
+            />
+          ))}
+        </div>
+        {tint !== null && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-[14px]"
+            style={{ backgroundColor: tint }}
+          />
+        )}
+      </div>
+
+      {selection !== null && (
+        <HighlightBar preview={preview} onColor={mark} onCancel={dropSelection} />
       )}
     </div>
   );
 }
+
+/** One frozen instance: an unmarked paragraph must keep the prop it had last render. */
+const NO_MARKS: Annotation[] = [];
 
 const PageParagraph = React.memo(function PageParagraph({
   tokens,
   activeIndex,
   activeRef,
   bionic,
+  marks,
   onSelect,
 }: {
   tokens: RsvpToken[];
@@ -700,6 +927,8 @@ const PageParagraph = React.memo(function PageParagraph({
   activeRef: React.RefObject<HTMLButtonElement | null>;
   /** 0 is off, 1–5 how much of each word opening is emboldened. */
   bionic: number;
+  /** Only the highlights that reach into this paragraph, empty for almost all of them. */
+  marks: Annotation[];
   onSelect: (index: number) => void;
 }) {
   return (
@@ -713,18 +942,29 @@ const PageParagraph = React.memo(function PageParagraph({
         // Bionic reading fixes the eye on word openings; core decides how far in the
         // bold runs, this only draws it.
         const cut = bionic > 0 ? bionicPrefix(token.text, bionic) : 0;
+        // Innermost last, so the mark made most recently is the one that shows.
+        const covering = marks.length > 0 ? annotationsAt(marks, token.index) : marks;
+        const mark = covering.length > 0 ? covering[covering.length - 1] : undefined;
         return (
           <React.Fragment key={token.index}>
             {position === 0 ? '' : ' '}
             <button
               ref={isActive ? activeRef : undefined}
               type="button"
+              data-token={token.index}
               onClick={() => onSelect(token.index)}
               aria-current={isActive ? 'true' : undefined}
+              title={mark?.note ?? undefined}
+              style={
+                mark && !isActive ? { backgroundColor: HIGHLIGHT_WASHES[mark.color] } : undefined
+              }
+              // `select-text`: the browsers' own stylesheet switches selection off inside
+              // form controls, which would make marking impossible on the one surface it
+              // is meant for.
               className={
                 isActive
-                  ? 'rounded-[3px] bg-[var(--lx-accent)] px-[2px] text-[var(--lx-accent-on)]'
-                  : 'rounded-[3px] px-[2px] hover:bg-[var(--lx-accent-soft)]'
+                  ? 'select-text rounded-[3px] bg-[var(--lx-accent)] px-[2px] text-[var(--lx-accent-on)]'
+                  : 'select-text rounded-[3px] px-[2px] hover:bg-[var(--lx-accent-soft)]'
               }
             >
               {cut > 0 ? (

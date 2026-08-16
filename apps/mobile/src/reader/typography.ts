@@ -7,10 +7,27 @@
  */
 import type { OverlayKey, ReaderFontKey } from '@lexipulse/core';
 
-/** Registered in `app/_layout.tsx` alongside the mono faces. */
+/**
+ * Registered in `app/_layout.tsx` alongside the mono faces.
+ *
+ * The names are ours, not the vendors': the same alias then resolves on both platforms.
+ * iOS would otherwise want the PostScript name baked into the file and Android the file
+ * name, and the two disagree for every one of these families.
+ */
 export const READER_SERIF = 'LexiReadSerif';
 export const READER_SANS = 'LexiReadSans';
 export const READER_DYSLEXIC = 'LexiReadDyslexic';
+
+/**
+ * Bold is its own family, mirroring `MONO_BOLD`.
+ *
+ * An embedded family holds exactly one weight, and React Native does not pick a sibling
+ * face for it: on Android `fontWeight` next to a custom `fontFamily` is ignored outright,
+ * on iOS it produces a synthesised smear. So bold text has to name the bold family.
+ */
+export const READER_SERIF_BOLD = 'LexiReadSerif-Bold';
+export const READER_SANS_BOLD = 'LexiReadSans-Bold';
+export const READER_DYSLEXIC_BOLD = 'LexiReadDyslexic-Bold';
 
 export function readerFontFamily(key: ReaderFontKey): string | undefined {
   switch (key) {
@@ -23,6 +40,28 @@ export function readerFontFamily(key: ReaderFontKey): string | undefined {
     case 'system':
     default:
       // Undefined means the platform's own UI face, which is what "system" should be.
+      return undefined;
+  }
+}
+
+/**
+ * The bold companion of {@link readerFontFamily}.
+ *
+ * Use this wherever page text is emphasised instead of setting `fontWeight` on top of the
+ * regular family — that combination silently renders as regular on Android. `system`
+ * keeps returning `undefined`, because the platform face does have real weights and
+ * `fontWeight` works for it.
+ */
+export function readerFontFamilyBold(key: ReaderFontKey): string | undefined {
+  switch (key) {
+    case 'literata':
+      return READER_SERIF_BOLD;
+    case 'inter':
+      return READER_SANS_BOLD;
+    case 'open-dyslexic':
+      return READER_DYSLEXIC_BOLD;
+    case 'system':
+    default:
       return undefined;
   }
 }

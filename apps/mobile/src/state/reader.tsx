@@ -101,6 +101,20 @@ export function ReaderProvider({ children }: { children: React.ReactNode }) {
     s.startedAt = 0;
   }, []);
 
+  /**
+   * Pending debounced position write, see `saveSoon`.
+   *
+   * Declared here rather than beside `saveSoon` because `teardown` has to be able to
+   * cancel it: a timer that fires after the document was closed — or deleted — would
+   * write a progress row for a document that is no longer there.
+   */
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelSave = useCallback(() => {
+    if (saveTimer.current === null) return;
+    clearTimeout(saveTimer.current);
+    saveTimer.current = null;
+  }, []);
+
   const flush = useCallback(async () => {
     const engine = engineRef.current;
     const doc = documentRef.current;
@@ -245,6 +259,7 @@ export function ReaderProvider({ children }: { children: React.ReactNode }) {
 
   /** Tear down the player. `save: false` is for a document that is about to be deleted. */
   const teardown = useCallback((save: boolean) => {
+    cancelSave();
     engineRef.current?.pause();
     // `flush` reads both refs synchronously before its first `await`, so clearing them on
     // the next line cannot cut the save short — and clearing them immediately is what
@@ -258,7 +273,7 @@ export function ReaderProvider({ children }: { children: React.ReactNode }) {
     setTokens([]);
     setBookmarks([]);
     setSnapshot(EMPTY_SNAPSHOT);
-  }, []);
+  }, [cancelSave]);
 
   const close = useCallback(() => teardown(true), [teardown]);
 
@@ -272,6 +287,38 @@ export function ReaderProvider({ children }: { children: React.ReactNode }) {
   const discard = useCallback(() => teardown(false), [teardown]);
 
   // ----------------------------------------------------------------------- controls
+
+  /**
+   * Write the position after a jump, debounced.
+   *
+   * `flush` is the wrong tool here: it also banks a reading session, and jumping around
+   * a document is not reading — doing both would split one session into a dozen records
+   * and light up the activity heatmap for a day nobody read on. This writes the progress
+   * row and nothing else.
+   *
+   * Debounced because page mode reports a new position for every paragraph that scrolls
+   * past, and a database write per paragraph is a write per flick of the thumb.
+   */
+  const saveSoon = useCallback(() => {
+    cancelSave();
+    saveTimer.current = setTimeout(() => {
+      saveTimer.current = null;
+      const engine = engineRef.current;
+      const doc = documentRef.current;
+      if (!engine || !doc) return;
+      const snap = engine.getSnapshot();
+      void store.saveProgress({
+        documentId: doc.id,
+        tokenIndex: snap.index,
+        chapterIndex: snap.chapterIndex,
+        percent: snap.percent,
+        updatedAt: Date.now(),
+        msRead: snap.elapsedMs,
+      });
+    }, 900);
+  }, [cancelSave]);
+
+  useEffect(() => cancelSave, [cancelSave]);
 
   const play = useCallback(() => {
     engineRef.current?.play();
@@ -296,42 +343,48 @@ export function ReaderProvider({ children }: { children: React.ReactNode }) {
     (index: number) => {
       engineRef.current?.seek(index);
       sync();
+      saveSoon();
     },
-    [sync],
+    [saveSoon, sync],
   );
 
   const seekPercent = useCallback(
     (percent: number) => {
       engineRef.current?.seekPercent(percent);
       sync();
+      saveSoon();
     },
-    [sync],
+    [saveSoon, sync],
   );
 
   const rewind = useCallback(() => {
     engineRef.current?.rewind();
     sync();
-  }, [sync]);
+    saveSoon();
+  }, [saveSoon, sync]);
 
   const forward = useCallback(() => {
     engineRef.current?.forward();
     sync();
-  }, [sync]);
+    saveSoon();
+  }, [saveSoon, sync]);
 
   const seekSentence = useCallback(
     (direction: -1 | 1) => {
       engineRef.current?.seekSentence(direction);
       sync();
+      saveSoon();
     },
-    [sync],
+    [saveSoon, sync],
   );
 
   const seekChapter = useCallback(
     (chapterIndex: number) => {
       engineRef.current?.seekChapter(chapterIndex);
       sync();
+      saveSoon();
     },
-    [sync],
+    [saveSoon, sync],
   );
 
   /** Swipe up/down. Routed through settings so the change is persisted, not just applied. */

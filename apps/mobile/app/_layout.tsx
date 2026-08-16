@@ -12,6 +12,14 @@ import { AlertProvider } from '../src/components/alert';
 import { AnnotationsGate } from '../src/state/annotations-gate';
 import { t } from '../src/i18n';
 import { PdfBridgeProvider } from '../src/pdf/bridge';
+import {
+  READER_DYSLEXIC,
+  READER_DYSLEXIC_BOLD,
+  READER_SANS,
+  READER_SANS_BOLD,
+  READER_SERIF,
+  READER_SERIF_BOLD,
+} from '../src/reader/typography';
 import { LibraryProvider } from '../src/state/library';
 import { ReaderProvider } from '../src/state/reader';
 import { SettingsProvider, useSettings } from '../src/state/settings';
@@ -29,6 +37,16 @@ export default function RootLayout() {
     // and the ORP column depends on actually getting the monospace face.
     [MONO_REGULAR]: require('../assets/fonts/JetBrainsMono-Regular.ttf') as number,
     [MONO_BOLD]: require('../assets/fonts/JetBrainsMono-Bold.ttf') as number,
+    // Page mode's three reading faces. Static instances on purpose: a variable font's
+    // weight axis is not applied reliably on Android, so the regular cut would come out
+    // at whatever default the file carries. Bold is a separate family for the same
+    // reason — see `src/reader/typography.ts`.
+    [READER_SERIF]: require('../assets/fonts/Literata-Regular.ttf') as number,
+    [READER_SERIF_BOLD]: require('../assets/fonts/Literata-Bold.ttf') as number,
+    [READER_SANS]: require('../assets/fonts/Inter-Regular.ttf') as number,
+    [READER_SANS_BOLD]: require('../assets/fonts/Inter-Bold.ttf') as number,
+    [READER_DYSLEXIC]: require('../assets/fonts/OpenDyslexic-Regular.otf') as number,
+    [READER_DYSLEXIC_BOLD]: require('../assets/fonts/OpenDyslexic-Bold.otf') as number,
   });
 
   return (

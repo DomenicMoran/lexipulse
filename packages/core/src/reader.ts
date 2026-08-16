@@ -112,11 +112,16 @@ export function searchTokens(
     if (token) {
       const start = Math.max(0, at - contextChars);
       const end = Math.min(haystack.length, at + needle.length + contextChars);
+      // The preview begins at a word boundary, not at `start`: `rebuild` snaps outwards to
+      // whole tokens rather than cutting a word in half. So the offset has to be measured
+      // from that same boundary — measuring it from `start` puts the marker a few letters
+      // early, on the tail of the preceding word.
+      const previewStart = starts[tokenAtOffset(starts, start)] ?? 0;
       hits.push({
         tokenIndex: token.index,
         chapterIndex: token.chapterIndex,
         preview: rebuild(tokens, starts, start, end),
-        previewOffset: at - start,
+        previewOffset: at - previewStart,
         matchLength: needle.length,
       });
     }
