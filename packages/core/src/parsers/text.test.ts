@@ -190,6 +190,23 @@ describe('Markdown structure', () => {
     expect(doc.chapters).toHaveLength(1);
   });
 
+  it('lets the document heading win over the file name', async () => {
+    // A file name is the weakest source of a title: `der-prozess.md` reads "der prozess",
+    // while the document says "Der Prozess" in its own first line.
+    const doc = await importDocument(
+      encode(['# Der Prozess', '', 'Jemand musste Josef K. verleumdet haben.'].join('\n')),
+      { fileName: 'der-prozess.md' },
+    );
+    expect(doc.title).toBe('Der Prozess');
+  });
+
+  it('falls back to the file name when the text carries no title', async () => {
+    const doc = await importDocument(encode('Ein Absatz, der mit einem Punkt endet und keine Überschrift ist.'), {
+      fileName: 'meine-notizen.txt',
+    });
+    expect(doc.title).toBe('meine notizen');
+  });
+
   it('counts sections in the singular when there is one', () => {
     const doc = parseText('Ein einzelner Absatz.', { title: 'X' });
     expect(doc.importReport.notes).toContain('1 section');

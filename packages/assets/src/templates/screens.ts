@@ -443,8 +443,8 @@ export const SCREENS: readonly ScreenDef[] = [
     id: '04-settings',
     headline: t('Lesehilfen, die wirklich helfen.', 'Reading aids that actually help.'),
     sub: t(
-      'Fette Wortanfänge, ein Lineal für die Zeile, sechs Farbfilter, OpenDyslexic.',
-      'Bold word openings, a ruler for your line, six colour filters, OpenDyslexic.',
+      'Fette Wortanfänge, ein Lineal für die Zeile, sechs Farbfilter.',
+      'Bold word openings, a ruler for your line, six colour filters.',
     ),
     devPath: '/reader?doc=epub_die-verwandlung_seed01',
     tablet: true,

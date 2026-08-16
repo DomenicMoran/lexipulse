@@ -4,6 +4,14 @@ import { chunkIntoChapters, createDocumentId, finalizeDocument } from './shared.
 
 export interface TextParseOptions {
   title?: string;
+  /**
+   * Used only when the text carries no title of its own.
+   *
+   * A file name is the weakest source there is: `der-prozess.md` says "der prozess",
+   * while the document's own first heading says "Der Prozess". Passing it as a fallback
+   * rather than as the title lets the heading win where there is one.
+   */
+  fallbackTitle?: string;
   author?: string | null;
   origin?: string | null;
   language?: string | null;
@@ -101,7 +109,9 @@ export function parseText(input: string, options: TextParseOptions = {}): LexiDo
     throw new Error('There is no readable text in this input.');
   }
 
-  const title = options.title ?? inferTitle(input, source === 'clipboard' ? 'Clipboard' : 'Document');
+  const title =
+    options.title ??
+    inferTitle(input, options.fallbackTitle ?? (source === 'clipboard' ? 'Clipboard' : 'Document'));
   const structured = source === 'markdown' ? splitMarkdownChapters(input) : null;
   const chapters = structured
     ? structured.map((chapter, index) => ({

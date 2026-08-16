@@ -94,14 +94,14 @@ export async function importDocument(
     case 'markdown':
       return parseText(decode(bytes), {
         source: 'markdown',
-        title: stripExtension(fileName),
+        fallbackTitle: stripExtension(fileName),
         origin: fileName,
         ...options.text,
       });
     default:
       return parseText(decode(bytes), {
         source: 'text',
-        title: stripExtension(fileName),
+        fallbackTitle: stripExtension(fileName),
         origin: fileName,
         ...options.text,
       });
