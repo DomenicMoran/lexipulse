@@ -56,12 +56,13 @@
       /*
        * The App Store Connect API key is deliberately absent. `eas submit` wants
        * `ascApiKeyPath`, `ascApiKeyId` and `ascApiKeyIssuerId` here, and this repository
-       * is public — the key id and issuer id identify the account even though the .p8
-       * itself lives outside the tree. Pass them on the command line instead:
+       * is public: the key id and the issuer id identify the account even though the .p8
+       * itself lives outside the tree.
        *
-       *   eas submit --platform ios --profile production \
-       *     --asc-api-key-path <path to .p8> --asc-api-key-id <id> \
-       *     --asc-api-key-issuer-id <issuer>
+       * There is no command-line flag for them, and the EXPO_ASC_* environment variables
+       * are not read either; both were tried against eas-cli and rejected. The working
+       * route is to add the three fields here for the length of one submission and take
+       * them straight back out, then confirm with `git status` that nothing stayed.
        */
       "ios": {
         "ascAppId": "6801979644"
