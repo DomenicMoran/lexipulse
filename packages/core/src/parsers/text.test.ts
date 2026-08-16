@@ -159,3 +159,39 @@ describe('importDocument', () => {
     expect(doc.chapters[0]?.text).toContain('Grüße');
   });
 });
+
+describe('Markdown structure', () => {
+  const BOOK = [
+    '# Die Verwandlung',
+    '',
+    '## Kapitel 1',
+    '',
+    'Als Gregor Samsa eines Morgens erwachte, fand er sich verwandelt.',
+    '',
+    '## Kapitel 2',
+    '',
+    'Erst in der Dämmerung erwachte Gregor aus seinem Schlaf.',
+    '',
+    '## Kapitel 3',
+    '',
+    'Die schwere Verwundung Gregors dauerte über einen Monat.',
+  ].join('\n');
+
+  it('cuts a Markdown document at its headings', () => {
+    const doc = parseText(BOOK, { source: 'markdown' });
+    expect(doc.title).toBe('Die Verwandlung');
+    expect(doc.chapters.map((c) => c.title)).toEqual(['Kapitel 1', 'Kapitel 2', 'Kapitel 3']);
+    expect(doc.chapters[1]?.text).toContain('Dämmerung');
+  });
+
+  it('ignores a level that occurs once, so the title is not the only chapter', () => {
+    const single = '# Nur ein Titel\n\nEin Absatz ohne weitere Überschriften, nur Fließtext.';
+    const doc = parseText(single, { source: 'markdown' });
+    expect(doc.chapters).toHaveLength(1);
+  });
+
+  it('counts sections in the singular when there is one', () => {
+    const doc = parseText('Ein einzelner Absatz.', { title: 'X' });
+    expect(doc.importReport.notes).toContain('1 section');
+  });
+});

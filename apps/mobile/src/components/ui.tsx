@@ -382,6 +382,12 @@ export function Segmented<T extends string>({
           >
             <Text
               numberOfLines={1}
+              // Four themes share one row, and the longest name does not fit at the
+              // normal size: "Minimal White" was rendering as "Minimal Wh…". Shrinking
+              // the label keeps the option readable, which is the whole point of showing
+              // its name; the floor stops it from turning into fine print.
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
               style={{
                 color: selected ? theme.accent.base : theme.colors.textMuted,
                 fontSize: theme.font.size.sm,

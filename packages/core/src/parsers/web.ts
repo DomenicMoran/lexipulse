@@ -44,7 +44,10 @@ export function parseArticleHtml(
       rawSections: chapters.length,
       removed: cleaned.removed,
       dehyphenated: cleaned.dehyphenated,
-      notes: [`${chapters.length} sections extracted`, url ? `Source: ${url}` : ''].filter(
+      notes: [
+        `${chapters.length} ${chapters.length === 1 ? 'section' : 'sections'} extracted`,
+        url ? `Source: ${url}` : '',
+      ].filter(
         (n) => n.length > 0,
       ),
       durationMs: Date.now() - started,

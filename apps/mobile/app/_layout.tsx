@@ -8,6 +8,7 @@ import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AlertProvider } from '../src/components/alert';
 import { t } from '../src/i18n';
 import { PdfBridgeProvider } from '../src/pdf/bridge';
 import { LibraryProvider } from '../src/state/library';
@@ -36,7 +37,9 @@ export default function RootLayout() {
           <LibraryProvider>
             <ReaderProvider>
               <PdfBridgeProvider>
-                <Shell ready={fontsLoaded || fontError !== null} />
+                <AlertProvider>
+                  <Shell ready={fontsLoaded || fontError !== null} />
+                </AlertProvider>
               </PdfBridgeProvider>
             </ReaderProvider>
           </LibraryProvider>

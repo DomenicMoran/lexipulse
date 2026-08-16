@@ -1,11 +1,12 @@
 import * as Clipboard from 'expo-clipboard';
 import { useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, TextInput, View } from 'react-native';
+import { ActivityIndicator, TextInput, View } from 'react-native';
 
 import type { LexiDocument } from '@lexipulse/core';
 
 import { Button, Card, Divider, Row, Screen, T } from '../src/components/ui';
+import { useAlert } from '../src/components/alert';
 import { formatNumber, t } from '../src/i18n';
 import { importFromPicker, importFromText, importFromUrl, isProbablyUrl } from '../src/lib/import';
 import { usePdfBridge } from '../src/pdf/bridge';
@@ -16,6 +17,7 @@ import { useTheme } from '../src/state/settings';
 type Busy = { kind: 'idle' } | { kind: 'working'; detail: string };
 
 export default function ImportScreen() {
+  const alert = useAlert();
   const theme = useTheme();
   const router = useRouter();
   const { add } = useLibrary();
@@ -35,7 +37,7 @@ export default function ImportScreen() {
       await add(document);
       await open(document.id);
       router.dismissTo('/read');
-      Alert.alert(
+      alert(
         t('import.done', {
           title: document.title,
           count: formatNumber(document.wordCount),
@@ -43,12 +45,12 @@ export default function ImportScreen() {
         document.importReport.notes.join('\n'),
       );
     },
-    [add, open, router],
+    [add, alert, open, router],
   );
 
   const fail = useCallback((error: unknown) => {
-    Alert.alert(t('import.failed'), error instanceof Error ? error.message : String(error));
-  }, []);
+    alert(t('import.failed'), error instanceof Error ? error.message : String(error));
+  }, [alert]);
 
   const onPickFile = useCallback(() => {
     setBusy({ kind: 'working', detail: t('import.busy') });
@@ -70,7 +72,7 @@ export default function ImportScreen() {
 
   const onImportUrl = useCallback(() => {
     if (!isProbablyUrl(url)) {
-      Alert.alert(t('import.failed'), t('import.invalidUrl'));
+      alert(t('import.failed'), t('import.invalidUrl'));
       return;
     }
     setBusy({ kind: 'working', detail: t('import.busy') });
@@ -83,7 +85,7 @@ export default function ImportScreen() {
         setBusy({ kind: 'idle' });
       }
     })();
-  }, [fail, finish, url]);
+  }, [alert, fail, finish, url]);
 
   const onPaste = useCallback(() => {
     setBusy({ kind: 'working', detail: t('import.busy') });
@@ -91,7 +93,7 @@ export default function ImportScreen() {
       try {
         const text = await Clipboard.getStringAsync();
         if (!text.trim()) {
-          Alert.alert(t('import.failed'), t('import.paste.empty'));
+          alert(t('import.failed'), t('import.paste.empty'));
           return;
         }
         // Someone who copied a link almost certainly means "read that page", not "read
@@ -107,7 +109,7 @@ export default function ImportScreen() {
         setBusy({ kind: 'idle' });
       }
     })();
-  }, [fail, finish]);
+  }, [alert, fail, finish]);
 
   if (busy.kind === 'working') {
     return (

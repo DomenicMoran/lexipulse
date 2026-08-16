@@ -34,6 +34,46 @@ export function markdownToText(markdown: string): string {
   );
 }
 
+/**
+ * Split Markdown at its headings, so a document that says where its chapters are gets
+ * them.
+ *
+ * Without this a Markdown file falls back to word-count chunking, and a short book with
+ * three `##` chapters arrives as one undivided "Section 1" — the chapter list empty, the
+ * jump controls pointless, and the format advertised on the import screen only half kept.
+ *
+ * The deepest heading level that occurs more than once wins: `#` is usually the document
+ * title, and cutting there would produce a single chapter again. Returns null when the
+ * file has no usable structure, and the caller falls back to word count.
+ */
+export function splitMarkdownChapters(markdown: string): { title: string; text: string }[] | null {
+  const lines = markdown.split(/\r?\n/);
+  const headings = lines
+    .map((line, index) => {
+      const match = /^\s{0,3}(#{1,6})\s+(.+?)\s*#*\s*$/.exec(line);
+      return match ? { level: match[1]!.length, title: match[2]!.trim(), index } : null;
+    })
+    .filter((h): h is { level: number; title: string; index: number } => h !== null);
+
+  if (headings.length === 0) return null;
+
+  const counts = new Map<number, number>();
+  for (const h of headings) counts.set(h.level, (counts.get(h.level) ?? 0) + 1);
+  const repeated = [...counts.entries()].filter(([, count]) => count > 1).map(([level]) => level);
+  if (repeated.length === 0) return null;
+  const level = Math.min(...repeated);
+
+  const cuts = headings.filter((h) => h.level === level);
+  const chapters: { title: string; text: string }[] = [];
+  for (let i = 0; i < cuts.length; i += 1) {
+    const from = cuts[i]!;
+    const to = cuts[i + 1]?.index ?? lines.length;
+    const body = markdownToText(lines.slice(from.index + 1, to).join('\n')).trim();
+    if (body.length > 0) chapters.push({ title: from.title, text: body });
+  }
+  return chapters.length > 1 ? chapters : null;
+}
+
 /** Guess a title from the first heading or the first short line. */
 export function inferTitle(text: string, fallback = 'Pasted Text'): string {
   const heading = /^\s{0,3}#{1,6}\s+(.+)$/m.exec(text)?.[1];
@@ -62,7 +102,16 @@ export function parseText(input: string, options: TextParseOptions = {}): LexiDo
   }
 
   const title = options.title ?? inferTitle(input, source === 'clipboard' ? 'Clipboard' : 'Document');
-  const chapters = chunkIntoChapters(cleaned.text, chapterWords, 'Section');
+  const structured = source === 'markdown' ? splitMarkdownChapters(input) : null;
+  const chapters = structured
+    ? structured.map((chapter, index) => ({
+        id: `chunk-${index}`,
+        title: chapter.title,
+        text: cleanFlowText(chapter.text).text,
+        startToken: 0,
+        tokenCount: 0,
+      }))
+    : chunkIntoChapters(cleaned.text, chapterWords, 'Section');
 
   return finalizeDocument({
     id: createDocumentId(source, title),
@@ -78,7 +127,7 @@ export function parseText(input: string, options: TextParseOptions = {}): LexiDo
       rawSections: 1,
       removed: cleaned.removed,
       dehyphenated: cleaned.dehyphenated,
-      notes: [`${chapters.length} sections`],
+      notes: [`${chapters.length} ${chapters.length === 1 ? 'section' : 'sections'}`],
       durationMs: Date.now() - started,
     },
   });

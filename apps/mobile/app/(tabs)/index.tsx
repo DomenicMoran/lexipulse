@@ -1,18 +1,20 @@
 import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
-import { Alert, FlatList, Image, Pressable, View } from 'react-native';
+import { FlatList, Image, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { formatDuration, type LibraryEntry } from '@lexipulse/core';
 
 import { SwipeToDelete } from '../../src/components/swipe';
 import { Button, EmptyState, ProgressBar, Screen, ScreenTitle, T } from '../../src/components/ui';
+import { useAlert } from '../../src/components/alert';
 import { formatNumber, t, type MessageKey } from '../../src/i18n';
 import { useLibrary } from '../../src/state/library';
 import { useReader } from '../../src/state/reader';
 import { useSettings, useTheme } from '../../src/state/settings';
 
 export default function LibraryScreen() {
+  const alert = useAlert();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
@@ -29,7 +31,7 @@ export default function LibraryScreen() {
 
   const onDelete = useCallback(
     (entry: LibraryEntry) => {
-      Alert.alert(
+      alert(
         t('library.deleteConfirm.title', { title: entry.document.title }),
         t('library.deleteConfirm.body'),
         [
@@ -47,7 +49,7 @@ export default function LibraryScreen() {
         ],
       );
     },
-    [discard, openDocument, remove],
+    [alert, discard, openDocument, remove],
   );
 
   if (!loading && entries.length === 0) {

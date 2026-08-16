@@ -4,7 +4,7 @@ import * as Speech from 'expo-speech';
 import * as WebBrowser from 'expo-web-browser';
 import Constants from 'expo-constants';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -30,6 +30,7 @@ import {
   Switch,
   T,
 } from '../../src/components/ui';
+import { useAlert } from '../../src/components/alert';
 import { t } from '../../src/i18n';
 import { store } from '../../src/lib/store';
 import { useLibrary } from '../../src/state/library';
@@ -37,6 +38,7 @@ import { useReader } from '../../src/state/reader';
 import { useSettings, useTheme } from '../../src/state/settings';
 
 export default function SettingsScreen() {
+  const alert = useAlert();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const { settings, update, replace, reset } = useSettings();
@@ -255,7 +257,7 @@ export default function SettingsScreen() {
           icon="trash-outline"
           danger
           onPress={() => {
-            Alert.alert(t('settings.wipe.confirm.title'), t('settings.wipe.confirm.body'), [
+            alert(t('settings.wipe.confirm.title'), t('settings.wipe.confirm.body'), [
               { text: t('common.cancel'), style: 'cancel' },
               {
                 text: t('common.delete'),
@@ -266,7 +268,7 @@ export default function SettingsScreen() {
                     await store.clearAll();
                     reset();
                     await refresh();
-                    Alert.alert(t('settings.wipe.done'));
+                    alert(t('settings.wipe.done'));
                   })();
                 },
               },
@@ -422,6 +424,7 @@ function VoicePicker({
 
 /** GDPR Art. 20: the whole library, progress and stats as one JSON file. */
 function ExportRow() {
+  const alert = useAlert();
   const [busy, setBusy] = useState(false);
 
   const onExport = useCallback(() => {
@@ -445,12 +448,12 @@ function ExportRow() {
           });
         }
       } catch (error) {
-        Alert.alert(t('settings.export.failed'), String(error));
+        alert(t('settings.export.failed'), String(error));
       } finally {
         setBusy(false);
       }
     })();
-  }, []);
+  }, [alert]);
 
   return (
     <Row
