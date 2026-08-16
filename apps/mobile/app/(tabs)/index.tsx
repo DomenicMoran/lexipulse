@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { FlatList, Image, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,8 +18,20 @@ export default function LibraryScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { entries, loading, remove } = useLibrary();
+  const { entries, loading, refresh, remove } = useLibrary();
   const { open, discard, document: openDocument } = useReader();
+
+  /**
+   * Reading progress is written while the player runs, and the list holds the copy it
+   * loaded when the app started. Without this, finishing a document and walking back to
+   * the library showed it as "Not started" until the next cold start — the list quietly
+   * contradicting the player.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      void refresh();
+    }, [refresh]),
+  );
 
   const onOpen = useCallback(
     async (documentId: string) => {
