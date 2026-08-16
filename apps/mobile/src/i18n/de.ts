@@ -42,7 +42,7 @@ export const de = {
   'import.busy': 'Wird verarbeitet…',
   'import.busy.pdf': 'Seite {page} von {total}',
   'import.failed': 'Import fehlgeschlagen',
-  'import.done': '„{title}" importiert — {count} Wörter',
+  'import.done': '„{title}" importiert, {count} Wörter',
   'import.report.title': 'Import-Bericht',
   'import.invalidUrl': 'Das sieht nicht nach einer gültigen Adresse aus.',
 
@@ -144,7 +144,7 @@ export const de = {
   'settings.export.hint': 'Vollständige JSON-Sicherung (Art. 20 DSGVO)',
   'settings.export.failed': 'Export fehlgeschlagen',
   'settings.wipe': 'Alle Daten löschen',
-  'settings.wipe.hint': 'Bibliothek, Fortschritt, Statistik — unwiderruflich',
+  'settings.wipe.hint': 'Bibliothek, Fortschritt und Statistik. Unwiderruflich.',
   'settings.wipe.confirm.title': 'Wirklich alles löschen?',
   'settings.wipe.confirm.body':
     'Bibliothek, Lesefortschritt, Lesezeichen und Statistik werden entfernt. Das lässt sich nicht rückgängig machen.',
@@ -178,9 +178,9 @@ export const de = {
   'settings.reader.autoScroll.hint': '0 = aus',
   'settings.section.reading-aids': 'Lesehilfen',
   'settings.reader.bionic': 'Wortanfänge betonen',
-  'settings.reader.bionic.hint': 'Fetter Wortbeginn führt das Auge — 0 = aus',
+  'settings.reader.bionic.hint': 'Fetter Wortbeginn führt das Auge. 0 schaltet ihn aus.',
   'settings.reader.ruler': 'Leselineal',
-  'settings.reader.ruler.hint': 'Hebt die Zeile hervor, in der du bist — 0 = aus',
+  'settings.reader.ruler.hint': 'Hebt die Zeile hervor, in der du bist. 0 schaltet es aus.',
   'settings.reader.overlay': 'Farbfilter',
   'settings.reader.overlay.hint': 'Getönte Ebene über der Seite',
 

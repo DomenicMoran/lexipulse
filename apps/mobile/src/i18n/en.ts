@@ -40,7 +40,7 @@ export const en: Record<keyof typeof de, string> = {
   'import.busy': 'Processing…',
   'import.busy.pdf': 'Page {page} of {total}',
   'import.failed': 'Import failed',
-  'import.done': '“{title}” imported — {count} words',
+  'import.done': '“{title}” imported, {count} words',
   'import.report.title': 'Import report',
   'import.invalidUrl': 'That does not look like a valid address.',
 
@@ -138,7 +138,7 @@ export const en: Record<keyof typeof de, string> = {
   'settings.export.hint': 'Complete JSON backup (GDPR Art. 20)',
   'settings.export.failed': 'Export failed',
   'settings.wipe': 'Delete all data',
-  'settings.wipe.hint': 'Library, progress, stats — permanently',
+  'settings.wipe.hint': 'Library, progress and stats. Permanently.',
   'settings.wipe.confirm.title': 'Delete everything?',
   'settings.wipe.confirm.body':
     'Library, reading progress, bookmarks and stats will be removed. This cannot be undone.',
@@ -170,9 +170,9 @@ export const en: Record<keyof typeof de, string> = {
   'settings.reader.autoScroll.hint': '0 = off',
   'settings.section.reading-aids': 'Reading aids',
   'settings.reader.bionic': 'Emphasise word openings',
-  'settings.reader.bionic.hint': 'Bold word starts guide the eye — 0 = off',
+  'settings.reader.bionic.hint': 'Bold word starts guide the eye. 0 turns it off.',
   'settings.reader.ruler': 'Reading ruler',
-  'settings.reader.ruler.hint': 'Marks the line you are on — 0 = off',
+  'settings.reader.ruler.hint': 'Marks the line you are on. 0 turns it off.',
   'settings.reader.overlay': 'Colour filter',
   'settings.reader.overlay.hint': 'A tinted layer over the page',
 
