@@ -61,6 +61,9 @@ export const de = {
   'player.bookmarks': 'Lesezeichen',
   'player.bookmarks.empty': 'Noch keine Lesezeichen. Lange drücken setzt eins.',
   'player.chapters': 'Kapitel',
+  'player.text': 'Fließtext',
+  'player.text.hint': 'Tippe ein Wort an, um dort weiterzulesen.',
+  'player.text.here': 'Hier bist du',
   'player.loading': 'Wird geladen…',
 
   // Onboarding

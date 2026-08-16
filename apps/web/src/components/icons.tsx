@@ -71,6 +71,14 @@ export const KeyboardIcon = (props: IconProps) => (
   </Icon>
 );
 
+/** The document as a page, for the view that shows where the stream currently is. */
+export const PageIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <rect x="4" y="3" width="16" height="18" rx="2" />
+    <path d="M8 8h8M8 12h8M8 16h5" />
+  </Icon>
+);
+
 export const CloseIcon = (props: IconProps) => (
   <Icon {...props}>
     <path d="M6 6l12 12M18 6L6 18" />

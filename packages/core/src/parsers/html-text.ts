@@ -114,6 +114,12 @@ const DROP_CLASSES = new Set([
   'sistersitebox',
   'toc',
   'skip-link',
+  // The apparatus at the foot of a wiki page: the category lists and the "retrieved
+  // from <url>" line. Both sit inside the content container and read, in the stream,
+  // like a sentence that has lost its way.
+  'catlinks',
+  'mw-hidden-catlinks',
+  'printfooter',
 ]);
 
 /** True when a start tag carries one of the chrome class names. */

@@ -20,6 +20,7 @@ import {
   BookmarkIcon,
   ForwardIcon,
   KeyboardIcon,
+  PageIcon,
   PauseIcon,
   PlayIcon,
   RewindIcon,
@@ -73,6 +74,7 @@ export function Player({
 
   const [index, setIndex] = React.useState(startIndex);
   const [status, setStatus] = React.useState<EngineStatus>('idle');
+  const [showPage, setShowPage] = React.useState(false);
   // Derived, not stored: `effectiveWpmFor` computes the rate the stream would run at
   // without touching the tokens, so there is no effect-then-setState round trip and no
   // window in which the number on screen belongs to the previous speed.
@@ -492,6 +494,19 @@ export function Player({
         <IconButton label="Lesezeichen setzen" variant="secondary" onClick={bookmark}>
           <BookmarkIcon />
         </IconButton>
+        <IconButton
+          label={showPage ? 'Fließtext schließen' : 'Fließtext anzeigen'}
+          variant="secondary"
+          aria-expanded={showPage}
+          onClick={() => {
+            // Reading the page and running the stream at once means the highlight walks
+            // away while you are still finding your line, so opening it pauses.
+            if (!showPage && playing) engine.pause();
+            setShowPage((open) => !open);
+          }}
+        >
+          <PageIcon />
+        </IconButton>
         <IconButton label="Einstellungen" variant="secondary" onClick={onOpenSettings}>
           <SettingsIcon />
         </IconButton>
@@ -499,6 +514,17 @@ export function Player({
           <KeyboardIcon />
         </IconButton>
       </div>
+
+      {showPage ? (
+        <PageView
+          tokens={tokens}
+          activeIndex={index}
+          onSelect={(target) => {
+            cancelSpeech();
+            engine.seek(target);
+          }}
+        />
+      ) : null}
 
       <div className="flex flex-col gap-3">
         <label htmlFor="lx-wpm" className="sr-only">
@@ -532,6 +558,82 @@ export function Player({
           </dl>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * The chapter as a page, with the current word marked.
+ *
+ * RSVP takes the page away, which is what makes it fast and also what makes losing the
+ * thread expensive: there is nothing to look back at, only a rewind and another pass. This
+ * gives the page back — and every word in it is a way into the stream.
+ *
+ * Only the chapter the reader is in gets rendered. A whole book of clickable words would
+ * cost more than it buys, and chapters are one control away.
+ */
+function PageView({
+  tokens,
+  activeIndex,
+  onSelect,
+}: {
+  tokens: RsvpToken[];
+  activeIndex: number;
+  onSelect: (index: number) => void;
+}) {
+  const active = React.useRef<HTMLButtonElement | null>(null);
+
+  const paragraphs = React.useMemo(() => {
+    const chapter = tokens[activeIndex]?.chapterIndex ?? 0;
+    const groups: { key: number; tokens: RsvpToken[] }[] = [];
+    for (const token of tokens) {
+      if (token.chapterIndex !== chapter) continue;
+      const last = groups[groups.length - 1];
+      if (last && last.key === token.paragraphIndex) last.tokens.push(token);
+      else groups.push({ key: token.paragraphIndex, tokens: [token] });
+    }
+    return groups;
+  }, [tokens, activeIndex]);
+
+  // `block: 'nearest'` keeps the page still while the stream is paused on a word that is
+  // already visible; without it every re-render would yank the scroll position.
+  React.useEffect(() => {
+    active.current?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex]);
+
+  return (
+    <div
+      className="max-h-[46vh] overflow-y-auto rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] px-4 py-4 sm:px-6"
+      aria-label="Fließtext"
+    >
+      <p className="mb-3 text-[12px] text-[var(--lx-text-muted)]">
+        Ein Wort anklicken, um dort weiterzulesen.
+      </p>
+      {paragraphs.map((paragraph) => (
+        <p key={paragraph.key} className="mb-4 text-[16px] leading-[1.75] text-[var(--lx-text)]">
+          {paragraph.tokens.map((token, position) => {
+            const isActive = token.index === activeIndex;
+            return (
+              <React.Fragment key={token.index}>
+                {position === 0 ? '' : ' '}
+                <button
+                  ref={isActive ? active : undefined}
+                  type="button"
+                  onClick={() => onSelect(token.index)}
+                  aria-current={isActive ? 'true' : undefined}
+                  className={
+                    isActive
+                      ? 'rounded-[3px] bg-[var(--lx-accent)] px-[2px] text-[var(--lx-accent-on)]'
+                      : 'rounded-[3px] px-[2px] hover:bg-[var(--lx-accent-soft)]'
+                  }
+                >
+                  {token.text}
+                </button>
+              </React.Fragment>
+            );
+          })}
+        </p>
+      ))}
     </div>
   );
 }

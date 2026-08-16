@@ -86,6 +86,14 @@ describe('htmlToText', () => {
     expect(text).toContain('Der Absatz.');
   });
 
+  it('drops the apparatus at the foot of a wiki page', () => {
+    const text = htmlToText(
+      '<p>Der Schluss.</p><div class="printfooter">Abgerufen von „https://example.org"</div>' +
+        '<div class="catlinks"><p>Kategorien: Lesen</p></div>',
+    );
+    expect(text).toBe('Der Schluss.');
+  });
+
   it('matches whole class tokens, not substrings', () => {
     // `tocsin` and `notoc` must not be mistaken for `toc`.
     expect(htmlToText('<div class="tocsin">Sturmglocke</div>')).toContain('Sturmglocke');
