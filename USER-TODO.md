@@ -25,12 +25,17 @@ gegenüber Käufern schlicht falsch.
 | Store | Stand | Was danach passiert |
 |---|---|---|
 | **Google Play** | Produktion auf **versionCode 6**, neuer Ladentext und 12 neue Bilder, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
-| **Apple App Store** | Version 1.0 wartet noch mit Build 2 auf Prüfung; der Ersatz-Build wird gerade gebaut | Sobald der Build bei Apple steht: Prüfung zurückziehen, Texte und Bilder tauschen, neuen Build anhängen, neu einreichen |
+| **Apple App Store** | Version 1.0 mit **Build 7**, neuen Texten und 24 neuen Bildern, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
 
-Die laufende Play-Prüfung wurde dabei bewusst abgebrochen und neu gestartet. Das
-kostet Wartezeit, aber die Alternative wäre gewesen, den alten Stand
-freizugeben und daneben eine Beschreibung zu zeigen, die Funktionen nennt, die
-er nicht hat.
+In beiden Läden wurde die laufende Prüfung dafür bewusst abgebrochen und neu
+gestartet. Das kostet Wartezeit, aber die Alternative wäre gewesen, den alten
+Stand freizugeben und daneben eine Beschreibung zu zeigen, die Funktionen
+nennt, die er nicht hat.
+
+Bei Apple lief das über: Einreichung zurückziehen (Version geht dabei auf
+`DEVELOPER_REJECTED`, den bearbeitbaren Zustand), Beschreibung, Keywords und
+Untertitel setzen, alle 24 Bilder ersetzen, Build 7 anhängen, neu einreichen.
+Zurückgelesen: `WAITING_FOR_REVIEW`, Build 7, Bilder im Status `COMPLETE`.
 
 ---
 
