@@ -32,12 +32,33 @@ Alles andere steht:
   („keine Datenerfassung"), Altersfreigabe 3+
 - AAB als versionCode 2 im internen Testkanal
 
-## 2. Apple: nichts zu tun, wartet auf Prüfung
+## 2. Apple: Vertrag für kostenpflichtige Apps abschließen
 
-**Version 1.0, Build 2 — „Warten auf Prüfung".**
+**Version 1.0, Build 2 steht auf „Warten auf Prüfung"** — inhaltlich ist alles gesetzt.
+Aber verkaufen lässt sich die App noch nicht.
 
-Die Freigabe steht auf **manuell**: wenn Apple genehmigt, passiert nichts, bis du in
-App Store Connect auf „Diese Version veröffentlichen" drückst.
+App Store Connect → **Geschäftliches → Verträge** zeigt:
+
+| Vertrag | Status |
+|---|---|
+| Vertrag für kostenlose Apps | Aktiv (16.07.2026 – 15.04.2027) |
+| **Vertrag für gebührenpflichtige Apps** | **„Benutzerinfos ausstehend"** |
+
+Es fehlen zwei Dinge, und beide brauchen deine Daten:
+
+1. **Bankkonto hinzufügen** — IBAN des Geschäftskontos
+2. **Steuerformular** — der „Steuerfragebogen für die USA" ist nicht übermittelt
+   (für eine deutsche Firma das W-8BEN-E, wird im Formular abgefragt)
+
+Solange dieser Vertrag nicht aktiv ist, kann Apple die App zwar **prüfen und genehmigen**,
+sie lässt sich aber **nicht zum Verkauf freigeben**. Der Preis von 4,99 € ist gesetzt und
+wartet nur darauf.
+
+Die Prüfung dauert meist ein bis zwei Tage — am besten erledigst du den Vertrag in diesem
+Fenster, dann kannst du direkt nach der Genehmigung veröffentlichen.
+
+**Danach:** Die Freigabe steht auf **manuell**. Wenn Apple genehmigt, passiert nichts, bis
+du in App Store Connect auf „Diese Version veröffentlichen" drückst.
 
 Gesetzt sind: Bundle-ID `de.lexipulse.app`, App-Eintrag `6801979644`, Kategorien
 Produktivität und Bücher, Titel und Untertitel DE+EN, Beschreibungen, Keywords,
