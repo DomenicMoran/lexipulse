@@ -52,6 +52,35 @@ describe('htmlToText', () => {
     expect(htmlToText('<p>Text ohne Ende')).toBe('Text ohne Ende');
     expect(htmlToText('Text mit <b kaputt')).toContain('Text mit');
   });
+
+  it('skips a whole chrome subtree even when the element nests inside itself', () => {
+    // Wikipedia nests the language menu's <nav> inside the sidebar <nav>. Stopping at
+    // the first closing tag let everything after it through as article text.
+    const text = htmlToText(
+      '<nav><div><nav><a>Menü</a></nav><a>Español</a><a>한국어</a></div></nav><p>Echter Text.</p>',
+    );
+    expect(text).toBe('Echter Text.');
+  });
+
+  it('treats <header> as chrome, not as content', () => {
+    const text = htmlToText('<header><a>Sprache wählen</a></header><p>Der Artikel.</p>');
+    expect(text).toBe('Der Artikel.');
+  });
+
+  it('does not leave a space in front of punctuation', () => {
+    // `<a>Fähigkeit</a>,` used to arrive as "Fähigkeit ," because every inline tag
+    // becomes a space — and the tokenizer then shows the comma as its own word.
+    expect(htmlToText('<p>die <a href="#">Fähigkeit</a>, schnell zu lesen.</p>')).toBe(
+      'die Fähigkeit, schnell zu lesen.',
+    );
+    expect(htmlToText('<p>Klammern <b>(</b>so<b>)</b> bleiben eng.</p>')).toBe(
+      'Klammern (so) bleiben eng.',
+    );
+  });
+
+  it('leaves quotation marks alone, because an apostrophe looks the same', () => {
+    expect(htmlToText("<p>Annas <i>Buch</i> ’s Titel</p>")).toContain('’s');
+  });
 });
 
 describe('extractArticle', () => {

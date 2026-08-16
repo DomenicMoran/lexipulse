@@ -66,6 +66,12 @@ const DROP_TAGS = new Set([
   'nav',
   'aside',
   'footer',
+  // `header` belongs with the other three and was simply missing. It is where a page
+  // puts its title bar, and a title bar is where site chrome hides inside the content
+  // container: Wikipedia's language menu sits in <main><header>, so extraction picked
+  // the article and still opened with 31 language names. Headings survive because they
+  // are read from <title>/<h1> separately, not from the body text.
+  'header',
 ]);
 
 const NAMED_ENTITIES: Record<string, string> = {
@@ -169,11 +175,28 @@ export function htmlToText(html: string, options: HtmlTextOptions = {}): string 
     const name = (nameMatch?.[1] ?? '').toLowerCase();
 
     if (!closing && dropChrome && DROP_TAGS.has(name) && !tagBody.endsWith('/')) {
-      // Skip the whole subtree.
-      const closeRe = new RegExp(`</\\s*${name}\\s*>`, 'i');
-      const rest = src.slice(gt + 1);
-      const closeMatch = closeRe.exec(rest);
-      i = closeMatch ? gt + 1 + closeMatch.index + closeMatch[0].length : srcLength;
+      // Skip the whole subtree, counting depth. Stopping at the first closing tag would
+      // be wrong wherever these elements nest — and they do: Wikipedia puts a <nav> for
+      // the language menu inside the <nav> that holds the sidebar, so a naive skip ends
+      // at the inner </nav> and lets the outer element's remaining children through.
+      // That is how 31 language names ended up as the opening words of an article.
+      const tagRe = new RegExp(`<(/?)\\s*${name}\\b[^>]*>`, 'gi');
+      tagRe.lastIndex = gt + 1;
+      let depth = 1;
+      let end = srcLength;
+      let tag: RegExpExecArray | null;
+      while ((tag = tagRe.exec(src)) !== null) {
+        if (tag[1]) {
+          depth -= 1;
+          if (depth === 0) {
+            end = tag.index + tag[0].length;
+            break;
+          }
+        } else if (!tag[0].endsWith('/>')) {
+          depth += 1;
+        }
+      }
+      i = end;
       out.push('\n\n');
       continue;
     }
@@ -188,6 +211,13 @@ export function htmlToText(html: string, options: HtmlTextOptions = {}): string 
     .replace(/­/g, '') // soft hyphens
     .replace(/\r\n?/g, '\n')
     .replace(/[ \t\u00A0]+/g, ' ')
+    // Inline markup becomes a space, so `<a>ability</a>,` arrives as "ability ,". In
+    // flowing text that is a typo; in RSVP it is worse, because the tokenizer then
+    // shows a lone comma as its own word. Wikipedia's lead paragraph alone produced 87
+    // such tokens out of 1832. Quotes are left alone: an apostrophe and a closing quote
+    // are the same character, and the spacing rules differ by language.
+    .replace(/ +([,.;:!?\u2026)\]}])/g, '$1')
+    .replace(/([([{]) +/g, '$1')
     .replace(/ *\n */g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
