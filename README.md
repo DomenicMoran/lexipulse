@@ -89,4 +89,12 @@ in (Art. 20 GDPR).
 
 ## Licence
 
-MIT.
+[PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0).
+
+Read it, audit it, change it, build it and run it for yourself — that is the point of
+keeping the repository public: an app that promises your documents never leave the device
+should let you check. What the licence does not allow is selling it or publishing it to
+an app store, which is why LexiPulse is source-available rather than open source.
+
+Commits made before 2026-08-16 were published under the MIT licence and stay available
+under it; the change applies from that point on.

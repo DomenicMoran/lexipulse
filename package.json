@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "LexiPulse — Ultimate RSVP & Document Reader",
-  "license": "MIT",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=20.11.0"

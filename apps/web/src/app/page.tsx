@@ -14,7 +14,13 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
 };
 
-const TRUST = ['Kein Konto', 'Keine Datenerhebung', 'Offline nutzbar', 'Quelloffen'];
+/*
+ * "Quelltext einsehbar", not "Quelloffen". The repository is public and anyone can read
+ * it or build it for themselves, but the licence is PolyForm Noncommercial — selling it
+ * or shipping it to a store is not allowed. Calling that open source would be a claim
+ * the licence does not back (UWG § 5).
+ */
+const TRUST = ['Kein Konto', 'Keine Datenerhebung', 'Offline nutzbar', 'Quelltext einsehbar'];
 
 export default function LandingPage() {
   return (
