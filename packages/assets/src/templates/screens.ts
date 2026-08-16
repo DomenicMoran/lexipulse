@@ -20,7 +20,11 @@ export interface ScreenDef {
   headline: Record<Locale, string>;
   sub: Record<Locale, string>;
   /** Route to grab from the web dev server when it happens to be running. */
-  devPath: string;
+  /**
+   * Route of the running web app that renders this screen, or `null` when no route can
+   * reach it without a user action the capture cannot fake.
+   */
+  devPath: string | null;
   /** Also used for the iPad set, which is a subset. */
   tablet: boolean;
   body: (locale: Locale) => string;
@@ -407,7 +411,7 @@ export const SCREENS: readonly ScreenDef[] = [
       'Der Fixierpunkt bleibt stehen — dein Auge muss nicht mehr springen.',
       'The fixation point holds still — your eye stops jumping.',
     ),
-    devPath: '/reader',
+    devPath: '/reader?doc=epub_die-verwandlung_seed01',
     tablet: true,
     body: player,
   },
@@ -418,7 +422,7 @@ export const SCREENS: readonly ScreenDef[] = [
       'Datei ablegen oder Link einfügen — der Rest passiert lokal.',
       'Drop a file or paste a link — the rest happens locally.',
     ),
-    devPath: '/reader/import',
+    devPath: '/reader',
     tablet: true,
     body: importScreen,
   },
@@ -432,7 +436,9 @@ export const SCREENS: readonly ScreenDef[] = [
       'Der Smart-Filter räumt auf, bevor das erste Wort erscheint.',
       'The smart filter cleans up before the first word appears.',
     ),
-    devPath: '/reader/import',
+    // No route reaches the import report without actually importing a PDF, so this one
+    // stays a rebuilt screen.
+    devPath: null,
     tablet: false,
     body: smartFilter,
   },
@@ -443,7 +449,7 @@ export const SCREENS: readonly ScreenDef[] = [
       'Tempo, Pausen und Farben stellst du so ein, wie du liest.',
       'Set pace, pauses and colours the way you actually read.',
     ),
-    devPath: '/reader/settings',
+    devPath: '/reader?doc=epub_die-verwandlung_seed01',
     tablet: true,
     body: settings,
   },

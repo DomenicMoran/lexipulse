@@ -238,7 +238,20 @@ async function seedLibrary(page: Page, origin: string): Promise<void> {
   }
 }
 
-async function openScreen(browser: Browser, url: string, locale: Locale) {
+/**
+ * Screens that need one interaction after the route has loaded.
+ * Anything more elaborate than this belongs in a rebuilt template — a capture that has
+ * to drive a five-step flow will silently photograph the wrong state the day the flow
+ * changes.
+ */
+const AFTER_LOAD: Record<string, (page: Page) => Promise<void>> = {
+  '04-settings': async (page) => {
+    await page.getByRole('button', { name: 'Einstellungen öffnen' }).click();
+    await page.waitForSelector('[data-lexipulse-screen="04-settings"]', { timeout: 5_000 });
+  },
+};
+
+async function openScreen(browser: Browser, url: string, locale: Locale, screenId?: string) {
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 3,
@@ -249,6 +262,8 @@ async function openScreen(browser: Browser, url: string, locale: Locale) {
   const page = await context.newPage();
   await seedLibrary(page, new URL(url).origin);
   await page.goto(url, { waitUntil: 'networkidle', timeout: 20_000 });
+  const after = screenId ? AFTER_LOAD[screenId] : undefined;
+  if (after) await after(page);
   await page.addStyleTag({ content: HIDE_DEV_CHROME });
   return { context, page };
 }
@@ -259,14 +274,15 @@ async function probeDevServer(browser: Browser): Promise<Map<string, string>> {
   if (!(await reachable(DEV_URL))) return available;
 
   for (const screen of SCREENS) {
+    if (screen.devPath === null) continue;
     const url = new URL(screen.devPath, DEV_URL).toString();
     if (!(await reachable(url))) continue;
     try {
-      const { context, page } = await openScreen(browser, url, 'de');
+      const { context, page } = await openScreen(browser, url, 'de', screen.id);
       const marked =
         FORCE_LIVE || (await page.locator(`[data-lexipulse-screen="${screen.id}"]`).count()) > 0;
       await context.close();
-      if (marked) available.set(screen.id, url);
+      if (marked) available.set(screen.id, `${url}#${screen.id}`);
     } catch {
       // A route that throws while loading is not a route we ship a screenshot of.
     }
@@ -276,12 +292,16 @@ async function probeDevServer(browser: Browser): Promise<Map<string, string>> {
 
 const captureCache = new Map<string, string>();
 
-async function captureRoute(browser: Browser, url: string, locale: Locale): Promise<string> {
-  const key = `${url}|${locale}`;
+/** `url#screenId` — the fragment carries which post-load interaction to replay. */
+async function captureRoute(browser: Browser, tagged: string, locale: Locale): Promise<string> {
+  const key = `${tagged}|${locale}`;
   const cached = captureCache.get(key);
   if (cached) return cached;
 
-  const { context, page } = await openScreen(browser, url, locale);
+  const hash = tagged.lastIndexOf('#');
+  const url = hash === -1 ? tagged : tagged.slice(0, hash);
+  const screenId = hash === -1 ? undefined : tagged.slice(hash + 1);
+  const { context, page } = await openScreen(browser, url, locale, screenId);
   try {
     const shot = await page.screenshot({ type: 'png' });
     const uri = `data:image/png;base64,${shot.toString('base64')}`;

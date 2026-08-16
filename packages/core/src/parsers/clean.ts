@@ -19,7 +19,13 @@ export interface CleanOptions {
    * 0.5 catches alternating recto/verso heads without eating real repeated sentences.
    */
   repeatThreshold: number;
-  /** Below this page count, repetition analysis is unreliable and is skipped. */
+  /**
+   * Below this page count, repetition analysis is skipped.
+   *
+   * Three is the floor because `minCount` never drops below 3: on a three-page document
+   * a line must appear on *every* page to count as boilerplate, which no real sentence
+   * does. Going lower would start eating body text on two-page exports.
+   */
   minPagesForRepetition: number;
   /**
    * A running head is short by construction. Capping the candidate length keeps the
@@ -36,7 +42,7 @@ export const DEFAULT_CLEAN_OPTIONS: CleanOptions = {
   headerLines: 3,
   footerLines: 3,
   repeatThreshold: 0.5,
-  minPagesForRepetition: 4,
+  minPagesForRepetition: 3,
   maxBoilerplateChars: 80,
   stripTables: true,
   dehyphenate: true,

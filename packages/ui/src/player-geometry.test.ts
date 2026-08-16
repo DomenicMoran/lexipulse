@@ -102,9 +102,11 @@ describe('tokens', () => {
     expect(vars['--lx-accent']).toBe('#FF4D4D');
   });
 
-  it('resolves a theme into colours and accent together', () => {
-    const resolved = resolveTheme('sepia', 'cyber');
-    expect(resolved.colors.scheme).toBe('light');
-    expect(resolved.accent.base).toBe('#22E584');
+  it('resolves a theme into colours and the scheme-appropriate accent', () => {
+    expect(resolveTheme('oled', 'cyber').accent.base).toBe(ACCENTS.cyber.base);
+    // Sepia is a light theme, so it gets the darkened accent, not the neon one.
+    const sepia = resolveTheme('sepia', 'cyber');
+    expect(sepia.colors.scheme).toBe('light');
+    expect(sepia.accent.base).not.toBe(ACCENTS.cyber.base);
   });
 });

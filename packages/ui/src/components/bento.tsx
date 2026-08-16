@@ -122,7 +122,8 @@ export function StatTile({ value, caption, hint, className, ...props }: StatTile
       </span>
       <div className="flex flex-col gap-0.5">
         <span className="text-[13px] text-[var(--lx-text-muted)]">{caption}</span>
-        {hint && <span className="text-[12px] text-[var(--lx-text-faint)]">{hint}</span>}
+        {/* `hint` carries real information, so it uses the muted tier, not a fainter one. */}
+        {hint && <span className="text-[12px] text-[var(--lx-text-muted)] opacity-80">{hint}</span>}
       </div>
     </div>
   );

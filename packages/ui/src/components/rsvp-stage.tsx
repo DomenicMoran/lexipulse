@@ -125,7 +125,7 @@ export function RsvpStage({
       {contextBefore !== undefined && (
         <div
           aria-hidden="true"
-          className="absolute right-0 left-0 truncate text-center text-[var(--lx-text-faint)]"
+          className="absolute right-0 left-0 truncate text-center text-[var(--lx-text-faint)] opacity-90"
           style={{ top: `-${fontSize * 1.6}px`, fontSize: `${Math.round(fontSize * 0.32)}px` }}
         >
           {contextBefore}
@@ -137,7 +137,7 @@ export function RsvpStage({
       {contextAfter !== undefined && (
         <div
           aria-hidden="true"
-          className="absolute right-0 left-0 truncate text-center text-[var(--lx-text-faint)]"
+          className="absolute right-0 left-0 truncate text-center text-[var(--lx-text-faint)] opacity-90"
           style={{ bottom: `-${fontSize * 1.6}px`, fontSize: `${Math.round(fontSize * 0.32)}px` }}
         >
           {contextAfter}

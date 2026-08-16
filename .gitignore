@@ -44,6 +44,11 @@ Thumbs.db
 # test
 coverage/
 
+# Local verification artefacts: browser screenshots and sample documents produced while
+# checking a change. Regenerated on demand, never referenced by the product.
+.verify/
+.playwright-mcp/
+
 # logs
 *.log
 npm-debug.log*

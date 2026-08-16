@@ -28,27 +28,34 @@ interface SeedBook {
   source: 'epub' | 'pdf' | 'html';
   language: string;
   chapters: { title: string; text: string }[];
-  /**
-   * Length of the real work. The excerpt below is only what the reader would show on
-   * screen; a library card that says "188 Wörter · noch ca. unter 1 Min." next to
-   * "Die Verwandlung" would look broken, because no reader has a 188-word novella.
-   */
-  words: number;
   /** Fraction read. */
   percent: number;
+  /**
+   * Word the player should be sitting on in the screenshot, resolved by searching the
+   * text rather than guessing a fraction. A three-letter word leaves the stage looking
+   * empty and hides the very thing the headline is about, and a hand-tuned percentage
+   * silently lands somewhere else the moment the excerpt is edited.
+   */
+  startWord?: string;
   /** Days ago the book was last opened. */
   lastOpenedDaysAgo: number;
 }
 
+/** The book the player screenshot opens. Exported so the capture can deep-link to it. */
+export const SEED_PLAYER_DOCUMENT_ID = 'epub_die-verwandlung_seed01';
+
 const BOOKS: SeedBook[] = [
   {
     id: 'epub_die-verwandlung_seed01',
-    title: 'Die Verwandlung',
+    // Labelled as the excerpt it is: the word count and the remaining time the library
+    // shows are computed from the text stored here, so a title promising a whole novella
+    // next to "190 Wörter" would be the app contradicting itself in a store listing.
+    title: 'Die Verwandlung (Auszug)',
     author: 'Franz Kafka',
     source: 'epub',
     language: 'de',
-    words: 19_340,
-    percent: 0.23,
+    percent: 0.3,
+    startWord: 'flimmerten',
     lastOpenedDaysAgo: 0,
     chapters: [
       {
@@ -70,11 +77,10 @@ const BOOKS: SeedBook[] = [
   },
   {
     id: 'epub_effi-briest_seed02',
-    title: 'Effi Briest',
+    title: 'Effi Briest (Auszug)',
     author: 'Theodor Fontane',
     source: 'epub',
     language: 'de',
-    words: 118_450,
     percent: 0.61,
     lastOpenedDaysAgo: 1,
     chapters: [
@@ -94,7 +100,6 @@ const BOOKS: SeedBook[] = [
     author: null as unknown as string,
     source: 'pdf',
     language: 'de',
-    words: 32_780,
     percent: 0.08,
     lastOpenedDaysAgo: 3,
     chapters: [
@@ -113,7 +118,6 @@ const BOOKS: SeedBook[] = [
     author: 'Anna Berg',
     source: 'html',
     language: 'de',
-    words: 1_240,
     percent: 1,
     lastOpenedDaysAgo: 6,
     chapters: [
@@ -127,6 +131,11 @@ const BOOKS: SeedBook[] = [
     ],
   },
 ];
+
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  return trimmed.length === 0 ? 0 : trimmed.split(/\s+/).length;
+}
 
 /**
  * Key/value pairs for the `kv` object store of the `lexipulse` IndexedDB database,
@@ -145,8 +154,7 @@ export function seedEntries(now = Date.now()): [string, string][] {
       startToken: 0,
       tokenCount: 0,
     }));
-    // The excerpt is what the reader renders; words is what the library reports.
-    const wordCount = book.words;
+    const wordCount = chapters.reduce((sum, c) => sum + countWords(c.text), 0);
     const updatedAt = now - book.lastOpenedDaysAgo * DAY;
 
     entries.push([
@@ -181,17 +189,26 @@ export function seedEntries(now = Date.now()): [string, string][] {
       }),
     ]);
 
-    const tokenIndex = Math.round(wordCount * book.percent);
+    const words = chapters
+      .map((c) => c.text)
+      .join(' ')
+      .trim()
+      .split(/\s+/);
+    const wordIndex = book.startWord
+      ? words.findIndex((w) => w.replace(/[^\p{L}\p{N}]/gu, '') === book.startWord)
+      : -1;
+    if (book.startWord && wordIndex === -1) {
+      throw new Error(`Seed word "${book.startWord}" is not in "${book.title}" any more.`);
+    }
+    const tokenIndex = wordIndex >= 0 ? wordIndex : Math.round(wordCount * book.percent);
+    const percent = wordCount > 0 ? tokenIndex / wordCount : 0;
     entries.push([
       `lexi:progress:${book.id}`,
       JSON.stringify({
         documentId: book.id,
         tokenIndex,
-        chapterIndex: Math.min(
-          chapters.length - 1,
-          Math.floor(book.percent * chapters.length),
-        ),
-        percent: book.percent,
+        chapterIndex: Math.min(chapters.length - 1, Math.floor(percent * chapters.length)),
+        percent,
         updatedAt,
         msRead: Math.round((tokenIndex / 380) * 60_000),
       }),

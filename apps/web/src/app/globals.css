@@ -1,0 +1,286 @@
+@import 'tailwindcss';
+
+/*
+ * The shared component package lives outside this app directory, so Tailwind's
+ * automatic source detection never sees it. Without this line every utility used by
+ * @lexipulse/ui would be missing from the stylesheet.
+ */
+@source '../../../../packages/ui/src';
+
+@theme inline {
+  --font-sans: var(--lx-font-sans);
+  --font-mono: var(--lx-font-mono-ui);
+}
+
+/*
+ * Default theme: OLED black with the coral accent. Written literally so the very first
+ * paint is already correct — the settings provider only has to touch these when the
+ * user has chosen something else.
+ */
+:root {
+  --lx-bg: #000000;
+  --lx-surface: #0a0a0b;
+  --lx-surface-hover: #141416;
+  --lx-border: #1c1c1f;
+  --lx-border-strong: #2a2a2e;
+  --lx-text: #ededef;
+  --lx-text-muted: #9c9ca5;
+  --lx-text-faint: #7c7c85;
+  --lx-stage: #000000;
+  --lx-rail: #2a2a2e;
+  --lx-overlay: rgba(0, 0, 0, 0.72);
+  --lx-accent: #ff4d4d;
+  --lx-accent-strong: #ff6b6b;
+  --lx-accent-soft: rgba(255, 77, 77, 0.12);
+  --lx-accent-on: #1a0505;
+  --lx-accent-glow: rgba(255, 77, 77, 0.35);
+
+  /*
+   * Accent colour for small text. `@lexipulse/ui` resolves the accent per colour scheme,
+   * so on the two light themes this is already the darkened variant; the alias only
+   * spares components from having to know which theme is active.
+   */
+  --lx-accent-text: #ff4d4d;
+  --lx-danger: #ff6b6b;
+  --lx-danger-soft: rgba(255, 107, 107, 0.12);
+
+  --lx-font-sans:
+    var(--lx-font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --lx-font-mono-ui:
+    var(--lx-font-jetbrains), ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* The player face. Follows the user's font setting. */
+  --lx-font-mono: var(--lx-font-mono-ui);
+
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--lx-bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--lx-bg);
+  color: var(--lx-text);
+  font-family: var(--lx-font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--lx-accent-soft);
+  color: var(--lx-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--lx-accent);
+  outline-offset: 2px;
+}
+
+/*
+ * Containers that are focused programmatically — dialogs, sheets — carry
+ * `tabindex="-1"` so focus can be moved into them. They are not controls, so the ring
+ * would only frame the whole panel without telling anyone anything.
+ */
+[tabindex='-1']:focus-visible {
+  outline: none;
+}
+
+/* ------------------------------------------------------------------ range input */
+
+.lx-slider {
+  --lx-slider-fill: 0%;
+}
+
+.lx-slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background:
+    linear-gradient(
+      to right,
+      var(--lx-accent) 0,
+      var(--lx-accent) var(--lx-slider-fill),
+      var(--lx-border) var(--lx-slider-fill),
+      var(--lx-border) 100%
+    );
+}
+
+.lx-slider::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background:
+    linear-gradient(
+      to right,
+      var(--lx-accent) 0,
+      var(--lx-accent) var(--lx-slider-fill),
+      var(--lx-border) var(--lx-slider-fill),
+      var(--lx-border) 100%
+    );
+}
+
+.lx-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  margin-top: -6px;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: var(--lx-text);
+  border: 1px solid var(--lx-border-strong);
+}
+
+.lx-slider::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border: 1px solid var(--lx-border-strong);
+  border-radius: 9999px;
+  background: var(--lx-text);
+}
+
+.lx-slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--lx-accent);
+  outline-offset: 2px;
+}
+
+.lx-slider:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--lx-accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------- long form */
+
+/*
+ * Legal pages. Measure capped near 70 characters, which is where German prose with its
+ * long compounds still scans in one eye movement.
+ */
+.lx-prose {
+  /*
+   * 58ch, not 70ch: `ch` is the advance of the digit zero, which in Inter is wider than
+   * the average letter. Measured on the running page, 70ch produced 85 characters a
+   * line; 58ch lands at roughly 70, which is where German prose stops needing a second
+   * eye movement per line.
+   */
+  max-width: 58ch;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--lx-text);
+}
+
+.lx-prose h1 {
+  font-size: 39px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  margin-bottom: 32px;
+}
+
+.lx-prose h2 {
+  font-size: 25px;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  margin-top: 48px;
+  margin-bottom: 12px;
+}
+
+.lx-prose h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
+.lx-prose p {
+  margin-bottom: 20px;
+}
+
+.lx-prose ul {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  list-style: none;
+}
+
+.lx-prose li {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.lx-prose li::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 12px;
+  width: 5px;
+  height: 1px;
+  background: var(--lx-text-faint);
+}
+
+.lx-prose a {
+  color: var(--lx-accent-text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.lx-prose strong {
+  font-weight: 600;
+}
+
+.lx-prose hr {
+  border: 0;
+  border-top: 1px solid var(--lx-border);
+  margin: 40px 0;
+}
+
+.lx-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.lx-prose th,
+.lx-prose td {
+  border-bottom: 1px solid var(--lx-border);
+  padding: 8px 12px 8px 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.lx-prose th {
+  color: var(--lx-text-muted);
+  font-weight: 500;
+}
+
+.lx-prose code {
+  font-family: var(--lx-font-mono-ui);
+  font-size: 0.9em;
+  background: var(--lx-surface);
+  border: 1px solid var(--lx-border);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+/* --------------------------------------------------------------------- motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Explicit user opt-out, independent of the OS setting. */
+[data-lx-reduce-motion='true'] *,
+[data-lx-reduce-motion='true'] *::before,
+[data-lx-reduce-motion='true'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

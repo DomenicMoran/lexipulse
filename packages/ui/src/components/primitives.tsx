@@ -21,9 +21,10 @@ const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
     'bg-[var(--lx-surface)] text-[var(--lx-text)] border border-[var(--lx-border)] ' +
     'hover:bg-[var(--lx-surface-hover)] hover:border-[var(--lx-border-strong)]',
   ghost: 'text-[var(--lx-text-muted)] hover:text-[var(--lx-text)] hover:bg-[var(--lx-surface)]',
+  // Theme-scoped: a red tuned for an OLED panel measures about 3:1 on paper.
   danger:
-    'bg-transparent text-[#FF6B6B] border border-[var(--lx-border)] hover:bg-[rgba(255,77,77,0.1)] ' +
-    'hover:border-[#FF6B6B]',
+    'bg-transparent text-[var(--lx-danger)] border border-[var(--lx-border)] ' +
+    'hover:bg-[var(--lx-danger-soft)] hover:border-[var(--lx-danger)]',
 };
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {

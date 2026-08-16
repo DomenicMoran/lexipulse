@@ -118,8 +118,23 @@ describe('findRepeatedBoilerplate', () => {
     expect(footers.has(lineSignature('Drei Handlungsoptionen stehen zur Auswahl.'))).toBe(false);
   });
 
-  it('skips the analysis for very short documents', () => {
+  it('still catches the running head on a three-page export', () => {
+    const { headers } = findRepeatedBoilerplate(pages.slice(0, 3), DEFAULT_CLEAN_OPTIONS);
+    expect(headers.has(lineSignature('Handbuch der Statistik'))).toBe(true);
+  });
+
+  it('skips the analysis below three pages, where one repeat proves nothing', () => {
     const { headers } = findRepeatedBoilerplate(pages.slice(0, 2), DEFAULT_CLEAN_OPTIONS);
+    expect(headers.size).toBe(0);
+  });
+
+  it('does not flag a line that appears on only two of three pages', () => {
+    const partial = [
+      ['Handbuch der Statistik', 'Erster eigener Satz auf dieser Seite.'],
+      ['Handbuch der Statistik', 'Zweiter eigener Satz auf dieser Seite.'],
+      ['Ein anderer Kopf', 'Dritter eigener Satz auf dieser Seite.'],
+    ];
+    const { headers } = findRepeatedBoilerplate(partial, DEFAULT_CLEAN_OPTIONS);
     expect(headers.size).toBe(0);
   });
 });
