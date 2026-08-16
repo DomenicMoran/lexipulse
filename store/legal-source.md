@@ -18,8 +18,8 @@ Stand: 2026-08-16. Alle Angaben sind aus dem produktiven MenuCloud-Repository ge
 | Feld | Wert | Quelle |
 |---|---|---|
 | Telefon | +49 30 767 645 46 | `...\impressum\page.jsx:68` |
-| E-Mail (allgemein) | info@menucloud-berlin.de | `...\impressum\page.jsx:72` |
-| E-Mail (Datenschutz) | datenschutz@menucloud-berlin.de | `C:\Users\domen\Documents\MenuCloud\src\app\datenschutz\page.jsx:272` |
+| E-Mail (allgemein) | lexipulse@menucloud-berlin.de | Projekt-Alias, `MenuCloud\src\lib\projekt-postfach.json` |
+| E-Mail (Datenschutz) | lexipulse@menucloud-berlin.de | dieselbe Adresse, siehe unten |
 | Website (MenuCloud) | menucloud-berlin.de | `...\impressum\page.jsx:76` |
 
 ## Steuerliches
@@ -38,7 +38,7 @@ Quelle: `...\impressum\page.jsx:113-114`
 ## Verantwortlicher im Sinne der DSGVO (Art. 4 Nr. 7)
 
 Domenic Moran, MenuCloud Berlin, Heidelberger Str. 36, 12059 Berlin,
-Telefon +49 30 767 645 46, E-Mail info@menucloud-berlin.de
+Telefon +49 30 767 645 46, E-Mail lexipulse@menucloud-berlin.de
 Quelle: `...\datenschutz\page.jsx:70-92`
 
 ## Streitschlichtung
@@ -67,11 +67,17 @@ Quelle: `...\datenschutz\page.jsx:376-381`
 - Der KI-Hinweis nach EU AI Act aus dem MenuCloud-Impressum entfällt, weil LexiPulse
   keine generative KI in der Nutzerkommunikation einsetzt.
 
-## Offener Punkt für den Betreiber
+## Kontaktweg
 
-Die Rechtstexte für LexiPulse nennen als Kontakt `info@menucloud-berlin.de` und
-`datenschutz@menucloud-berlin.de`, weil das die einzigen nachweislich existierenden
-Postfächer sind. Sobald ein Postfach unter `lexipulse.de` eingerichtet ist, sollten die
-Adressen in `store/legal/*.md` einheitlich ausgetauscht werden. Vorher nicht ändern:
-eine im Impressum genannte, aber nicht erreichbare E-Mail-Adresse ist ein Abmahnrisiko
-nach § 5 Abs. 1 Nr. 2 TMG.
+Die Rechtstexte nennen `lexipulse@menucloud-berlin.de` — für allgemeine Anfragen und
+für Datenschutzanfragen dieselbe Adresse. Sie ist ein Alias auf
+`info@menucloud-berlin.de`; dort sortiert ein Sieve-Prefilter jede an sie gerichtete
+Mail in den Ordner `Projekte/LexiPulse`. Beantwortet wird im MenuCloud-Admin, der
+unter `lexipulse@` als Absender antworten darf.
+
+Ein eigenes Postfach unter `lexipulse.de` ist damit nicht mehr nötig. Wer die Adresse
+trotzdem umstellen will, ändert sie zuerst in
+`MenuCloud\src\lib\projekt-postfach.json`, lässt
+`node scripts/postfach-projekte-setup.mjs` laufen und tauscht sie erst danach in
+`store/legal/*.md` aus. Eine im Impressum genannte, aber nicht erreichbare Adresse ist
+ein Abmahnrisiko nach § 5 Abs. 1 Nr. 2 TMG.

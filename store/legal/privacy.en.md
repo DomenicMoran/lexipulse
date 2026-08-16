@@ -37,7 +37,7 @@ Heidelberger Str. 36
 Germany
 
 Phone: +49 30 767 645 46
-Email: info@menucloud-berlin.de
+Email: lexipulse@menucloud-berlin.de
 
 We have not appointed a data protection officer because the conditions of Art. 37 GDPR
 and Section 38 BDSG are not met.
@@ -176,7 +176,7 @@ Under the GDPR you have the right to:
 - **data portability** (Art. 20)
 - **object** to processing based on Art. 6(1)(f) GDPR (Art. 21)
 
-An informal message to info@menucloud-berlin.de is sufficient.
+An informal message to lexipulse@menucloud-berlin.de is sufficient.
 
 **Scope:** because your documents, settings and statistics exist only on your device, we
 hold no such data and cannot provide information about it. An access request can only

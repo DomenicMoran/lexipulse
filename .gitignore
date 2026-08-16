@@ -43,6 +43,9 @@ credentials.json
 # vercel
 .vercel/
 
+# agent scratch state, not project content
+.claude/
+
 # editor / os
 .DS_Store
 Thumbs.db

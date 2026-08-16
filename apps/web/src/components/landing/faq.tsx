@@ -92,10 +92,10 @@ export function Faq() {
           <p className="mt-4 max-w-[36ch] text-[17px] leading-relaxed text-[var(--lx-text-muted)]">
             Etwas offen geblieben? Schreiben Sie an{' '}
             <a
-              href="mailto:info@menucloud-berlin.de"
+              href="mailto:lexipulse@menucloud-berlin.de"
               className="text-[var(--lx-accent-text)] underline underline-offset-[3px]"
             >
-              info@menucloud-berlin.de
+              lexipulse@menucloud-berlin.de
             </a>
             .
           </p>

@@ -13,7 +13,7 @@ Stand: 16. August 2026
 
 Diese Bedingungen gelten für die Nutzung der Web-App unter lexipulse.de. Anbieter ist
 MenuCloud Berlin, Inhaber Domenic Moran, Heidelberger Str. 36, 12059 Berlin, E-Mail
-info@menucloud-berlin.de. Die vollständigen Anbieterangaben stehen im
+lexipulse@menucloud-berlin.de. Die vollständigen Anbieterangaben stehen im
 [Impressum](/impressum).
 
 Für die mobilen Apps im Apple App Store und bei Google Play gilt ergänzend Abschnitt 6.

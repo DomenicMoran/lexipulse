@@ -85,7 +85,7 @@ Kontaktdaten, AAB als versionCode 2 im internen Testkanal.
 **Code:** 309 Tests grün, Typecheck und Lint ohne Befund, CI grün, PolyForm
 Noncommercial, Signaturmaterial außerhalb des öffentlichen Repos.
 
-**Kontakt:** überall `info@menucloud-berlin.de`, auch für Datenschutzanfragen.
+**Kontakt:** überall `lexipulse@menucloud-berlin.de`, auch für Datenschutzanfragen.
 
 Signaturmaterial liegt unter `C:\Users\domen\Documents\mc-build\lexipulse-ios\`
 (Zertifikat `BY94XCS595` bis 2027-07-17, Profil `TNXJUGLT72`);

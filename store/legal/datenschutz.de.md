@@ -34,7 +34,7 @@ Heidelberger Str. 36
 Deutschland
 
 Telefon: +49 30 767 645 46
-E-Mail: info@menucloud-berlin.de
+E-Mail: lexipulse@menucloud-berlin.de
 
 Ein Datenschutzbeauftragter ist nicht bestellt, weil die Voraussetzungen des Art. 37
 DSGVO und des § 38 BDSG nicht erfüllt sind.
@@ -180,7 +180,7 @@ Sie haben nach der DSGVO folgende Rechte:
 - **Widerspruch** gegen Verarbeitungen, die auf Art. 6 Abs. 1 lit. f DSGVO beruhen
   (Art. 21)
 
-Zur Ausübung genügt eine formlose Nachricht an info@menucloud-berlin.de.
+Zur Ausübung genügt eine formlose Nachricht an lexipulse@menucloud-berlin.de.
 
 **Hinweis zur Reichweite:** Weil Ihre Dokumente, Einstellungen und Statistiken
 ausschließlich auf Ihrem Gerät liegen, haben wir dazu keine Daten, über die wir Auskunft

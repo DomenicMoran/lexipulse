@@ -16,7 +16,7 @@ German version published at lexipulse.de is authoritative.
 
 These terms govern the use of the web app at lexipulse.de. The provider is MenuCloud
 Berlin, owner Domenic Moran, Heidelberger Str. 36, 12059 Berlin, Germany, email
-info@menucloud-berlin.de. Full provider details are in the [legal notice](/impressum).
+lexipulse@menucloud-berlin.de. Full provider details are in the [legal notice](/impressum).
 
 Section 6 additionally applies to the mobile apps on the Apple App Store and Google Play.
 
