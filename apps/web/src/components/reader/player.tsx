@@ -85,6 +85,22 @@ export function Player({
     },
     [engine],
   );
+
+  /**
+   * Where the page view puts its highlight. It follows the stream only while the stream
+   * is stopped.
+   *
+   * Following it live cost more than it gave: at 350 words per minute the marker moves
+   * six times a second, and each move meant a `scrollIntoView` — a forced reflow across
+   * a thousand-odd elements — plus a re-render of the paragraph. Together they locked
+   * the tab. And nobody reads a page whose highlight jumps six times a second; the view
+   * exists for the moment you stop and look for your line.
+   */
+  const [pageIndex, setPageIndex] = React.useState(startIndex);
+  // Adjusted during render rather than in an effect: this is state derived from props,
+  // and React documents this shape for exactly that. An effect would mean one render
+  // with a stale highlight before the correction lands.
+  if (status !== 'playing' && pageIndex !== index) setPageIndex(index);
   // Derived, not stored: `effectiveWpmFor` computes the rate the stream would run at
   // without touching the tokens, so there is no effect-then-setState round trip and no
   // window in which the number on screen belongs to the previous speed.
@@ -525,7 +541,9 @@ export function Player({
         </IconButton>
       </div>
 
-      {showPage ? <PageView tokens={tokens} activeIndex={index} onSelect={seekFromPage} /> : null}
+      {showPage ? (
+        <PageView tokens={tokens} activeIndex={pageIndex} onSelect={seekFromPage} />
+      ) : null}
 
       <div className="flex flex-col gap-3">
         <label htmlFor="lx-wpm" className="sr-only">
