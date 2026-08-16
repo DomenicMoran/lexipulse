@@ -57,9 +57,9 @@ export default function RootLayout() {
             <ReaderProvider>
               <PdfBridgeProvider>
                 <AnnotationsGate>
-                <AlertProvider>
-                  <Shell ready={fontsLoaded || fontError !== null} />
-                </AlertProvider>
+                  <AlertProvider>
+                    <Shell ready={fontsLoaded || fontError !== null} />
+                  </AlertProvider>
                 </AnnotationsGate>
               </PdfBridgeProvider>
             </ReaderProvider>

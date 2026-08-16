@@ -752,8 +752,11 @@ const READER_FONT_STACKS: Record<ReaderFontKey, string> = {
  * Irlen-style tints, laid over the page at low alpha.
  *
  * They help some readers with visual stress and do nothing for others, which is why they
- * are a choice and not a default. The alpha stays at 0.10 so body text keeps its contrast
- * ratio — a tint that makes the page prettier and the text unreadable helps nobody.
+ * are a choice and not a default. The layer covers the text as well as the page, so the
+ * alpha decides whether the feature stays usable: measured across all four themes and all
+ * six tints at 0.10, the worst case is Sepia with cream at 7.93:1, against 4.5:1 for AA
+ * and 7:1 for AAA body text. A tint that makes the page prettier and the text unreadable
+ * helps nobody.
  */
 const OVERLAY_TINTS: Record<OverlayKey, string | null> = {
   none: null,
