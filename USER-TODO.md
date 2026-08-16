@@ -42,11 +42,18 @@ Bankkonto Finom Payments BV aktiv, W-8BEN und Certificate of Foreign Status akti
 
 ---
 
-## Eine Entscheidung, kein Blocker: Vercel-Tarif
+## Vercel-Tarif — erledigt, der Stand hier war veraltet
 
-Das Projekt liegt im Team `domenicmos-projects`, Tarif **Hobby**. Vercel erlaubt auf
-Hobby keine kommerzielle Nutzung. Die Web-App ist kostenlos, bewirbt aber eine
-kostenpflichtige App — das kann Vercel als kommerziell werten. Pro kostet 20 $/Monat.
+Das Projekt liegt im Team `domenicmos-projects`, und dieses Team steht auf **Pro**.
+Am 16.08.2026 über die API gegengelesen (`/v2/teams` meldet `billing.plan = pro`,
+`/v9/projects` führt `lexipulse` in genau diesem Team; es gibt kein zweites Team).
+Damit ist die Fair-Use-Frage vom Tisch: Kommerzielle Nutzung ist auf Pro
+ausdrücklich erlaubt.
+
+Der Eintrag stand hier noch auf „Hobby", weil der Tarif für ein anderes Projekt
+umgestellt wurde und ein Team allen gemeinsam ist. Das ist die Lehre daraus: Ein
+Tarif gehört dem Team, nicht dem Projekt, und eine Notiz je Projekt veraltet
+still, sobald ein Nachbarprojekt zahlt.
 
 ---
 
@@ -73,16 +80,31 @@ Auf derselben Seite: 1832 Tokens auf 1680, kein Marker mehr, Textbeginn beim ers
 echten Satz. Auf lexipulse.de ist das bereits live, weil die Web-App denselben Parser
 benutzt.
 
-**Die Entscheidung:** Ein neuer Build (versionCode 3) bricht die laufende
-Google-Prüfung ab, und die Wartezeit beginnt von vorn. Zwei Wege:
+**Entschieden am 16.08.2026: Wir warten und schieben 1.0.1 nach.** Beide Läden
+behalten ihre Warteposition, und der fertige Stand geht als erstes Update
+hinterher.
 
-- **Jetzt einreichen** — die Prüfung startet neu, dafür geht die bessere Fassung als
-  erste in den Laden.
-- **Nach der Freigabe als 1.0.1 nachschieben** — 1.0.0 erscheint wie eingereicht, das
-  Update folgt ohne Zeitverlust.
+Die Begründung ist eine Messung aus einem Nachbarprojekt vom selben Tag: Bei
+Dartile lief die Google-Prüfung seit dem 12.08., und ein Schreibvorgang am
+Ladeneintrag hat sie **abgebrochen** und eine neue gestartet — in der Console
+unter „Aktivität bei der Einreichung" als *Einreichung 1: Abgebrochen* und
+*Einreichung 2: Wird überprüft* nachlesbar. Vier Tage Wartezeit waren weg.
 
-Bei Apple stellt sich dieselbe Frage: Version 1.0 wartet auf die Prüfung, und ein
-neuer Build würde sie ebenfalls zurückwerfen.
+Dem steht gegenüber, was die drei Fixes wirklich sind: kein Absturz, kein
+fehlendes Feature, keine falsche Angabe. Die Navigation im Lesetext und die
+alleinstehenden Satzzeichen sind Qualitätsmängel im Ergebnis, und die
+Mapping-Datei ist eine Warnung. Nichts davon ist ein Ablehnungsgrund nach
+Richtlinie 2.1; ein Prüfer sieht eine funktionierende App.
+
+Damit ist der Tausch klar: sicherer Verlust von mehreren Tagen gegen einen
+kosmetischen Gewinn in der ersten Fassung, die ohnehin binnen Tagen ersetzt wird.
+
+**Beide Läden veröffentlichen nach der Freigabe von selbst.** Sobald 1.0.0
+draußen ist, geht 1.0.1 als versionCode 3 hinterher — dann ohne Wartekosten,
+weil keine laufende Prüfung mehr abgebrochen wird.
+
+Für Apple gilt dasselbe und aus demselben Grund: Ein neuer Build würde Version
+1.0 aus der Schlange werfen.
 
 ---
 
