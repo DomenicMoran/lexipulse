@@ -14,7 +14,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { runOnJS } from 'react-native-worklets';
 
 import { useTheme } from '../state/settings';
@@ -99,40 +99,20 @@ export function Screen({
   contentStyle?: StyleProp<ViewStyle>;
 }) {
   const theme = useTheme();
-  const insets = useSafeAreaInsets();
   const base: ViewStyle = { flex: 1, backgroundColor: theme.colors.bg };
   if (!scroll) return <View style={[base, contentStyle]}>{children}</View>;
   return (
-    <View style={base}>
-      <ScrollView
-        style={base}
-        contentContainerStyle={[
-          { padding: theme.space[5], paddingBottom: theme.space[16] },
-          contentStyle,
-        ]}
-        keyboardShouldPersistTaps="handled"
-        indicatorStyle={theme.dark ? 'white' : 'black'}
-      >
-        {children}
-      </ScrollView>
-      {/*
-       * An opaque strip behind the status bar. The layout is edge to edge, so scrolled
-       * content passes under the clock and the battery icon; without this the two are
-       * drawn on top of each other and both become hard to read. It sits above the
-       * scroll view and takes no touches, so nothing underneath becomes unreachable.
-       */}
-      <View
-        pointerEvents="none"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: insets.top,
-          backgroundColor: theme.colors.bg,
-        }}
-      />
-    </View>
+    <ScrollView
+      style={base}
+      contentContainerStyle={[
+        { padding: theme.space[5], paddingBottom: theme.space[16] },
+        contentStyle,
+      ]}
+      keyboardShouldPersistTaps="handled"
+      indicatorStyle={theme.dark ? 'white' : 'black'}
+    >
+      {children}
+    </ScrollView>
   );
 }
 

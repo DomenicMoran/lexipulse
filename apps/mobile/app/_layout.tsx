@@ -6,7 +6,7 @@ import * as SystemUI from 'expo-system-ui';
 import { useCallback, useEffect } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlertProvider } from '../src/components/alert';
 import { t } from '../src/i18n';
@@ -51,6 +51,7 @@ export default function RootLayout() {
 
 function Shell({ ready }: { ready: boolean }) {
   const { theme, loading, settings } = useSettings();
+  const insets = useSafeAreaInsets();
   const canShow = ready && !loading;
   // "Reduced motion" has to mean the whole app, not just the one component that happens
   // to animate — screen transitions are the largest movement in it.
@@ -82,6 +83,7 @@ function Shell({ ready }: { ready: boolean }) {
         }}
       >
         <Stack.Screen name="(tabs)" />
+
         <Stack.Screen
           name="import"
           options={{
@@ -93,6 +95,26 @@ function Shell({ ready }: { ready: boolean }) {
           }}
         />
       </Stack>
+      {/*
+       * An opaque strip behind the status bar, for every screen at once.
+       *
+       * The layout is edge to edge, so scrolled content passes under the clock and the
+       * battery icon and the two get drawn on top of each other. Putting this in the
+       * `Screen` primitive only covered the screens that use it — the library renders a
+       * `FlatList` directly once it has documents, and the player draws its own stage.
+       * At the root it holds for all of them. It takes no touches.
+       */}
+      <View
+        pointerEvents="none"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: insets.top,
+          backgroundColor: theme.colors.bg,
+        }}
+      />
     </View>
   );
 }
