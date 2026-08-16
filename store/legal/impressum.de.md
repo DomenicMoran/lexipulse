@@ -98,6 +98,22 @@ Genannte Produkt- und Firmennamen Dritter, etwa Apple App Store, Google Play ode
 Vercel, sind Marken oder eingetragene Marken der jeweiligen Inhaber und werden hier nur
 zur Beschreibung verwendet.
 
+## Schriftlizenzen
+
+Diese Seite und die App liefern die folgenden Schriften aus. Sie stehen unter freien
+Lizenzen, die eine Weitergabe erlauben, solange Urheberrecht und Lizenz genannt werden.
+
+- **JetBrains Mono**, Copyright 2020 The JetBrains Mono Project Authors, SIL Open Font
+  License 1.1
+- **Literata**, Copyright 2018 The Literata Project Authors, SIL Open Font License 1.1
+- **Inter**, Copyright 2016 The Inter Project Authors, SIL Open Font License 1.1
+- **IBM Plex Mono**, Copyright 2017 IBM Corp., SIL Open Font License 1.1
+- **OpenDyslexic**, Copyright 2019 Abbie Gonzalez, SIL Open Font License 1.1
+  ([Lizenztext](/fonts/LICENSE-OpenDyslexic.txt))
+
+Der vollständige Text der SIL Open Font License 1.1 steht unter
+[scripts.sil.org/OFL](https://scripts.sil.org/OFL).
+
 ## Weitere Rechtstexte
 
 - [Datenschutzerklärung](/datenschutz)

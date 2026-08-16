@@ -154,6 +154,12 @@ export const de = {
   'settings.about.offline': 'Alles bleibt auf diesem Gerät.',
   'settings.about.version': 'Version {version}',
   'settings.about.website': 'lexipulse.de',
+  'settings.about.licences': 'Schriftlizenzen',
+  'licences.title': 'Schriftlizenzen',
+  'licences.intro':
+    'LexiPulse liefert diese Schriften mit. Sie stehen unter freien Lizenzen, die eine Weitergabe in einer App erlauben, solange Urheberrecht und Lizenz mitgenannt werden. Genau dafür ist diese Seite da.',
+  'licences.ofl':
+    'Der vollständige Text der SIL Open Font License 1.1 ist für alle vier Leseschriften derselbe:',
 
   'settings.section.reader': 'Lesemodus',
   'settings.reader.font': 'Schrift',

@@ -33,6 +33,7 @@ import {
   T,
 } from '../../src/components/ui';
 import { useAlert } from '../../src/components/alert';
+import { FontLicences } from '../../src/components/font-licences';
 import { language, t } from '../../src/i18n';
 import { OVERLAY_LABELS } from '../../src/reader/typography';
 import { store } from '../../src/lib/store';
@@ -47,6 +48,7 @@ export default function SettingsScreen() {
   const { settings, update, replace, reset } = useSettings();
   const { refresh } = useLibrary();
   const { close } = useReader();
+  const [licences, setLicences] = useState(false);
 
   return (
     <Screen contentStyle={{ paddingTop: insets.top + theme.space[4] }}>
@@ -404,7 +406,18 @@ export default function SettingsScreen() {
           icon="globe-outline"
           onPress={() => void WebBrowser.openBrowserAsync('https://lexipulse.de')}
         />
+        <Divider />
+        {/* The bundled typefaces are redistributed with the app, and both the OFL and MIT
+            require their notice to travel along. Keeping it in the repository would not
+            reach anyone who installs the app. */}
+        <Row
+          label={t('settings.about.licences')}
+          icon="document-text-outline"
+          onPress={() => setLicences(true)}
+        />
       </Section>
+
+      <FontLicences visible={licences} onClose={() => setLicences(false)} />
     </Screen>
   );
 }

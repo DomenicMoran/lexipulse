@@ -408,8 +408,8 @@ export const SCREENS: readonly ScreenDef[] = [
     id: '01-player',
     headline: t('Ein Wort. Immer an derselben Stelle.', 'One word. Always in the same place.'),
     sub: t(
-      'Der Fixierpunkt bleibt stehen — dein Auge muss nicht mehr springen.',
-      'The fixation point holds still — your eye stops jumping.',
+      'Der Fixierpunkt bleibt stehen, dein Auge muss nicht mehr springen.',
+      'The fixation point holds still, so your eye stops jumping.',
     ),
     devPath: '/reader?doc=epub_die-verwandlung_seed01',
     tablet: true,
@@ -419,8 +419,8 @@ export const SCREENS: readonly ScreenDef[] = [
     id: '02-import',
     headline: t('EPUB, PDF, Artikel. In Sekunden.', 'EPUB, PDF, articles. In seconds.'),
     sub: t(
-      'Datei ablegen oder Link einfügen — der Rest passiert lokal.',
-      'Drop a file or paste a link — the rest happens locally.',
+      'Datei ablegen oder Link einfügen. Der Rest passiert auf dem Gerät.',
+      'Drop a file or paste a link. The rest happens on your device.',
     ),
     devPath: '/reader',
     tablet: true,
@@ -428,10 +428,10 @@ export const SCREENS: readonly ScreenDef[] = [
   },
   {
     id: '03-page',
-    headline: t('Anhalten und die ganze Seite sehen.', 'Stop, and see the whole page.'),
+    headline: t('Oder einfach ganz normal lesen.', 'Or simply read it the normal way.'),
     sub: t(
-      'Das aktuelle Wort bleibt markiert — tippe ein anderes an, um dort weiterzulesen.',
-      'The current word stays marked — tap another one to carry on from there.',
+      'Seitenmodus mit eigener Schrift, Markierungen und derselben Leseposition.',
+      'Page mode with your own typeface, highlights and the very same position.',
     ),
     // No route reaches this without a document open and the view expanded, so the capture
     // comes from a device.
@@ -441,10 +441,10 @@ export const SCREENS: readonly ScreenDef[] = [
   },
   {
     id: '04-settings',
-    headline: t('100 bis 1200 Wörter pro Minute. Vier Themes.', '100 to 1200 words per minute. Four themes.'),
+    headline: t('Lesehilfen, die wirklich helfen.', 'Reading aids that actually help.'),
     sub: t(
-      'Tempo, Pausen und Farben stellst du so ein, wie du liest.',
-      'Set pace, pauses and colours the way you actually read.',
+      'Fette Wortanfänge, ein Lineal für die Zeile, sechs Farbfilter, OpenDyslexic.',
+      'Bold word openings, a ruler for your line, six colour filters, OpenDyslexic.',
     ),
     devPath: '/reader?doc=epub_die-verwandlung_seed01',
     tablet: true,
@@ -454,8 +454,8 @@ export const SCREENS: readonly ScreenDef[] = [
     id: '05-library',
     headline: t('Deine Bibliothek. Offline. Auf deinem Gerät.', 'Your library. Offline. On your device.'),
     sub: t(
-      'Kein Konto, keine Cloud, keine Synchronisierung im Hintergrund.',
-      'No account, no cloud, no background sync.',
+      'Schlagwörter, Suche und Fortschritt. Kein Konto, keine Cloud.',
+      'Tags, search and progress. No account, no cloud.',
     ),
     devPath: '/reader/library',
     tablet: true,
@@ -465,8 +465,8 @@ export const SCREENS: readonly ScreenDef[] = [
     id: '06-stats',
     headline: t('Sieh, wie viel du wirklich liest.', 'See how much you actually read.'),
     sub: t(
-      'Wörter, Tempo und Lesezeit — nur für dich, nur auf diesem Gerät.',
-      'Words, pace and reading time — yours alone, on this device.',
+      'Wörter, Tempo und Lesezeit, nur für dich, nur auf diesem Gerät.',
+      'Words, pace and reading time, yours alone, on this device.',
     ),
     devPath: '/reader/stats',
     tablet: false,

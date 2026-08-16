@@ -148,6 +148,10 @@ export const en: Record<keyof typeof de, string> = {
   'settings.about.offline': 'Everything stays on this device.',
   'settings.about.version': 'Version {version}',
   'settings.about.website': 'lexipulse.de',
+  'settings.about.licences': 'Font licences',
+  'licences.title': 'Font licences',
+  'licences.intro': 'LexiPulse ships these typefaces. They are under free licences that allow redistribution inside an app as long as the copyright and licence are named, which is what this page is for.',
+  'licences.ofl': 'The full text of the SIL Open Font License 1.1, identical for all four reading faces:',
 
   'settings.section.reader': 'Page mode',
   'settings.reader.font': 'Typeface',

@@ -58,13 +58,22 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
       replace(normalizeSettings(settings));
       const plural = (value: number, one: string, many: string) =>
         `${value} ${value === 1 ? one : many}`;
-      setMessage(
-        `${plural(result.documents, 'Dokument', 'Dokumente')} und ${plural(
-          result.bookmarks,
-          'Lesezeichen',
-          'Lesezeichen',
-        )} eingespielt.`,
-      );
+      // Every kind the export carries is named here. Reporting only documents and
+      // bookmarks made a complete import look partial, and the file is meant to be a
+      // complete backup. Empty kinds are dropped so the sentence stays short.
+      const parts = [
+        plural(result.documents, 'Dokument', 'Dokumente'),
+        result.bookmarks > 0 ? plural(result.bookmarks, 'Lesezeichen', 'Lesezeichen') : null,
+        result.annotations > 0
+          ? plural(result.annotations, 'Markierung', 'Markierungen')
+          : null,
+        result.tags > 0 ? plural(result.tags, 'Schlagwort', 'Schlagwörter') : null,
+      ].filter((part): part is string => part !== null);
+      const listed =
+        parts.length === 1
+          ? parts[0]
+          : `${parts.slice(0, -1).join(', ')} und ${parts[parts.length - 1]}`;
+      setMessage(`${listed} eingespielt.`);
       onChanged();
     } catch {
       setError('Die Datei konnte nicht gelesen werden. Erwartet wird ein LexiPulse-Export.');

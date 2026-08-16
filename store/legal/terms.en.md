@@ -145,3 +145,19 @@ resolution platform is available at https://ec.europa.eu/consumers/odr/
 
 Should any provision of these terms be invalid, the validity of the remaining provisions
 is unaffected.
+
+## Font licences
+
+This site and the app ship the following typefaces. They are under free licences that
+permit redistribution as long as the copyright and licence are named.
+
+- **JetBrains Mono**, Copyright 2020 The JetBrains Mono Project Authors, SIL Open Font
+  License 1.1
+- **Literata**, Copyright 2018 The Literata Project Authors, SIL Open Font License 1.1
+- **Inter**, Copyright 2016 The Inter Project Authors, SIL Open Font License 1.1
+- **IBM Plex Mono**, Copyright 2017 IBM Corp., SIL Open Font License 1.1
+- **OpenDyslexic**, Copyright 2019 Abbie Gonzalez, SIL Open Font License 1.1
+  ([licence text](/fonts/LICENSE-OpenDyslexic.txt))
+
+The full text of the SIL Open Font License 1.1 is at
+[scripts.sil.org/OFL](https://scripts.sil.org/OFL).
