@@ -5,6 +5,7 @@ import {
   clampWpm,
   coreLength,
   effectiveWpm,
+  effectiveWpmFor,
   endsWithClausePunct,
   endsWithSentencePunct,
   estimateDurationMs,
@@ -154,5 +155,34 @@ describe('repaceTokens / estimateDurationMs / effectiveWpm', () => {
   it('returns 0 for an empty range instead of NaN', () => {
     expect(effectiveWpm([])).toBe(0);
     expect(estimateDurationMs([])).toBe(0);
+  });
+});
+
+describe('effectiveWpmFor', () => {
+  const text = 'Der schnelle Fuchs springt. Ein langer Satz mit Entwicklung und Verantwortung.';
+
+  it('agrees with effectiveWpm once the stream has been repaced', () => {
+    const tokens = tokenize(text, { wpm: 500 }).tokens;
+    expect(effectiveWpmFor(tokens, 500)).toBeCloseTo(effectiveWpm(tokens), 8);
+  });
+
+  it('answers for a speed the tokens were never paced to, without mutating them', () => {
+    const tokens = tokenize(text, { wpm: 300 }).tokens;
+    const before = tokens.map((t) => t.durationMs);
+
+    const at900 = effectiveWpmFor(tokens, 900);
+    const at200 = effectiveWpmFor(tokens, 200);
+
+    expect(at900).toBeGreaterThan(at200);
+    expect(tokens.map((t) => t.durationMs)).toEqual(before);
+  });
+
+  it('stays below the nominal WPM, because the pauses cost time', () => {
+    const tokens = tokenize(text, { wpm: 300 }).tokens;
+    expect(effectiveWpmFor(tokens, 600)).toBeLessThan(600);
+  });
+
+  it('returns 0 for an empty range', () => {
+    expect(effectiveWpmFor([], 400)).toBe(0);
   });
 });

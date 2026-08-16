@@ -6,7 +6,7 @@ import {
   WPM_MIN,
   WPM_STEP,
   contextAround,
-  effectiveWpm,
+  effectiveWpmFor,
   formatDuration,
   sentenceText,
   sentenceTextAt,
@@ -67,15 +67,19 @@ export function Player({
 }: PlayerProps) {
   const { settings, update } = useSettings();
 
-  const engineRef = React.useRef<RsvpEngine | null>(null);
-  if (engineRef.current === null) {
-    engineRef.current = new RsvpEngine({ tokens, settings, startIndex });
-  }
-  const engine = engineRef.current;
+  // Lazy state initialiser rather than a ref assigned during render: it runs exactly once
+  // and hands back a stable instance, without writing to anything mid-render.
+  const [engine] = React.useState(() => new RsvpEngine({ tokens, settings, startIndex }));
 
   const [index, setIndex] = React.useState(startIndex);
   const [status, setStatus] = React.useState<EngineStatus>('idle');
-  const [effective, setEffective] = React.useState(() => Math.round(effectiveWpm(tokens)));
+  // Derived, not stored: `effectiveWpmFor` computes the rate the stream would run at
+  // without touching the tokens, so there is no effect-then-setState round trip and no
+  // window in which the number on screen belongs to the previous speed.
+  const effective = React.useMemo(
+    () => Math.round(effectiveWpmFor(tokens, settings.wpm, settings.pacing)),
+    [tokens, settings.wpm, settings.pacing],
+  );
 
   const stageRef = React.useRef<HTMLDivElement>(null);
   const fittedSize = useFittedFontSize(stageRef, { maxWordLength: 22, min: 20, max: 120, initial: 48 });
@@ -89,8 +93,20 @@ export function Player({
   const lastSaved = React.useRef(0);
   const startCounted = React.useRef(false);
 
+  /*
+   * The engine subscription reads the current settings without being torn down and
+   * rebuilt every time one of them changes — resubscribing mid-sentence would restart
+   * the synthesiser.
+   *
+   * The write happens in an effect, not in the render body. Assigning to `ref.current`
+   * while rendering is a rules-of-React violation: React may render a component twice or
+   * discard the result, and the ref would then hold a value from a render that never
+   * reached the screen.
+   */
   const settingsRef = React.useRef(settings);
-  settingsRef.current = settings;
+  React.useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
 
   const closeSession = React.useCallback((finished: boolean) => {
     const state = session.current;
@@ -202,10 +218,8 @@ export function Player({
       pauseOnParagraph: settings.pauseOnParagraph,
       rewindTokens: settings.rewindTokens,
     });
-    setEffective(Math.round(effectiveWpm(tokens)));
   }, [
     engine,
-    tokens,
     settings.wpm,
     settings.pacing,
     settings.warmupTokens,
@@ -290,9 +304,12 @@ export function Player({
 
   React.useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
+      // `instanceof HTMLElement` rather than a cast: a key event can be dispatched at
+      // `document` or `window`, and those have no `closest`, so a plain cast would throw
+      // out of the handler and take the shortcut with it.
+      const target = event.target;
       if (
-        target &&
+        target instanceof HTMLElement &&
         (target.isContentEditable ||
           ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) ||
           target.closest('[role="dialog"]') !== null)

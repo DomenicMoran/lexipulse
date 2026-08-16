@@ -65,6 +65,18 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     let cancelled = false;
     const cached = readCache();
+    /*
+     * One deliberate cascading render on mount.
+     *
+     * The settings live in localStorage, which the server render cannot see. Reading them
+     * in the state initialiser instead would make the client's first render disagree with
+     * the server's markup and blow up hydration. So the first paint uses the defaults and
+     * this pass corrects it — once, on mount, never again.
+     *
+     * The visible flash the rule is really about is already handled elsewhere:
+     * `BOOT_THEME_SCRIPT` replays the cached custom properties before the first paint.
+     */
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- see the note above
     if (cached) setSettings(cached);
 
     void (async () => {

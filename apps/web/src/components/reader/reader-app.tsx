@@ -34,8 +34,13 @@ export function ReaderApp() {
 
   // Tokenising uses the current speed, but a later speed change must not rebuild the
   // stream — the engine re-paces the existing tokens in place.
+  // Written in an effect, never in the render body: assigning to `ref.current` while
+  // rendering is a rules-of-React violation, because React may discard a render and the
+  // ref would keep a value from a pass that never reached the screen.
   const wpmRef = React.useRef(settings.wpm);
-  wpmRef.current = settings.wpm;
+  React.useEffect(() => {
+    wpmRef.current = settings.wpm;
+  }, [settings.wpm]);
 
   const [loaded, setLoaded] = React.useState<LoadedDocument | null>(null);
   const [recent, setRecent] = React.useState<LibraryEntry[]>([]);

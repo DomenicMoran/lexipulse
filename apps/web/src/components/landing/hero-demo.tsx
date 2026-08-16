@@ -8,7 +8,7 @@ import {
   WPM_MAX,
   WPM_MIN,
   WPM_STEP,
-  effectiveWpm,
+  effectiveWpmFor,
   tokenize,
   type AccentName,
   type EngineStatus,
@@ -45,11 +45,9 @@ export function HeroDemo() {
       }).tokens,
   );
 
-  const engineRef = React.useRef<RsvpEngine | null>(null);
-  if (engineRef.current === null) {
-    engineRef.current = new RsvpEngine({ tokens, settings: DEFAULT_SETTINGS });
-  }
-  const engine = engineRef.current;
+  // Lazy state initialiser rather than a ref assigned during render: it runs exactly once
+  // and hands back a stable instance, without writing to anything mid-render.
+  const [engine] = React.useState(() => new RsvpEngine({ tokens, settings: DEFAULT_SETTINGS }));
 
   const [index, setIndex] = React.useState(0);
   const [status, setStatus] = React.useState<EngineStatus>('idle');
@@ -76,14 +74,17 @@ export function HeroDemo() {
     });
   }, [engine]);
 
-  const [effective, setEffective] = React.useState(() => Math.round(effectiveWpm(tokens)));
+  // Derived, not stored: `effectiveWpmFor` computes the rate the stream would run at
+  // without touching the tokens, so there is no effect-then-setState round trip and no
+  // window in which the number on screen belongs to the previous speed.
+  const effective = React.useMemo(
+    () => Math.round(effectiveWpmFor(tokens, settings.wpm)),
+    [tokens, settings.wpm],
+  );
 
   React.useEffect(() => {
-    // `setWpm` repaces the tokens in place, so the honest effective rate has to be read
-    // back afterwards rather than derived during render from stale durations.
     engine.setWpm(settings.wpm);
-    setEffective(Math.round(effectiveWpm(tokens)));
-  }, [engine, tokens, settings.wpm]);
+  }, [engine, settings.wpm]);
 
   React.useEffect(() => {
     if (status !== 'playing') return;

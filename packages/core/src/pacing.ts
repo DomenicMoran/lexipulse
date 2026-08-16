@@ -141,6 +141,10 @@ export function estimateDurationMs(
 /**
  * Effective words-per-minute for a range, after the pacing matrix has had its say.
  * Always lower than the nominal WPM — that gap is the honest number to show users.
+ *
+ * Reads the `durationMs` already on the tokens, so it only tells the truth after the
+ * stream has been paced for the current WPM. Use {@link effectiveWpmFor} when the answer
+ * is needed for a speed the tokens have not been repaced to yet.
  */
 export function effectiveWpm(tokens: readonly RsvpToken[], from = 0, to = tokens.length): number {
   const count = Math.min(to, tokens.length) - Math.max(0, from);
@@ -148,4 +152,31 @@ export function effectiveWpm(tokens: readonly RsvpToken[], from = 0, to = tokens
   const ms = estimateDurationMs(tokens, from, to);
   if (ms <= 0) return 0;
   return (count / ms) * 60_000;
+}
+
+/**
+ * Effective words-per-minute a stream *would* run at, without touching it.
+ *
+ * The mutating pair — `repaceTokens` then `effectiveWpm` — forces a UI that wants to
+ * display the number to run an effect and then set state, because the answer only exists
+ * after the mutation. This computes the same value from the tokens' text, so a component
+ * can derive it during render from the WPM alone.
+ */
+export function effectiveWpmFor(
+  tokens: readonly RsvpToken[],
+  wpm: number,
+  matrix: PacingMatrix = DEFAULT_PACING,
+  from = 0,
+  to = tokens.length,
+): number {
+  const start = Math.max(0, from);
+  const end = Math.min(to, tokens.length);
+  const count = end - start;
+  if (count <= 0) return 0;
+
+  let ms = 0;
+  for (let i = start; i < end; i += 1) {
+    ms += tokenDurationMs(tokens[i] as RsvpToken, wpm, matrix);
+  }
+  return ms > 0 ? (count / ms) * 60_000 : 0;
 }
