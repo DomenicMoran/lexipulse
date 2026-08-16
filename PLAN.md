@@ -1,108 +1,98 @@
 # LexiPulse — Umsetzungsplan
 
-Stand: 2026-08-16. Diese Datei ist der verbindliche Arbeitsplan. Abgehakt wird nur, was
-mit einem Beleg (Kommando-Output, HTTP-Response, Screenshot) verifiziert wurde.
+Stand: 2026-08-16. Abgehakt ist nur, was mit einem Beleg verifiziert wurde.
 
 ## Produkt
 
 **LexiPulse — Ultimate RSVP & Document Reader.**
-EPUB/PDF/Web-Artikel importieren, per RSVP (Rapid Serial Visual Presentation) mit
-ORP-Fixierung lesen. Offline-first, kein Konto nötig, keine Cloud.
+EPUB/PDF/Web-Artikel importieren, per RSVP mit ORP-Fixierung lesen. Offline-first, kein
+Konto, keine Cloud.
 
-- Domain: `lexipulse.de` (erworben)
-- Store-Preis: **4,99 € einmalig** (iOS + Android), kein Abo
-- Web-App: kostenlos, PWA, Open Source
-- Rechtstexte (Impressum/Datenschutz): Betreiberdaten aus MenuCloud übernehmen
+- Web: **https://lexipulse.de** — live, kostenlos
+- Store-Preis: **4,99 € einmalig**, kein Abo, keine Werbung
+- Repo: https://github.com/DomenicMoran/lexipulse
 
-## Accounts / Credentials (verifiziert 2026-08-16)
+## Accounts (verifiziert)
 
 | Dienst | Konto | Beleg |
 |---|---|---|
-| GitHub | `DomenicMoran` (aktiv) | `gh auth status` |
-| Vercel | `domenicmos-projects` / `team_glutztTQtWq7Te7NQiJC8KbM` | `/v2/user` 200 |
-| Expo/EAS | `menucloudberlin` (Owner) | `eas whoami` |
-| Apple ASC | Keys in `Dartile/.env.local`, `NOURI/.env` | – |
+| GitHub | `DomenicMoran/lexipulse` | Push + CI grün |
+| Vercel | `domenicmos-projects` / `prj_xkeizdRdseopIECdkLBc5Ft7xNk5` | Deployment READY |
+| DNS | INWX (BitDojo-Konto), A → 216.198.79.1 / 64.29.17.1 | `misconfigured: false` |
+| Expo/EAS | `@menucloudberlin/lexipulse` / `5aebaf91-…` | Build FINISHED, APK |
 
 ## Architektur
 
 ```
-LexiPulse/
-├── apps/
-│   ├── web/          Next.js 15 App Router, Tailwind v4, Framer Motion, PWA
-│   └── mobile/       Expo SDK 57, React Native, expo-router
-├── packages/
-│   ├── core/         RSVP-Engine, Parser-Pipeline, Storage, Types  (plattformfrei)
-│   ├── ui/           Design-Tokens + geteilte React-Komponenten
-│   └── assets/       Programmatische SVG/PNG-Generierung (Icons, Splash, Store)
-└── store/            ASO-Metadaten DE/EN, Screenshots, Release Notes
+apps/web/       Next.js 15 App Router, Tailwind v4, Framer Motion, PWA
+apps/mobile/    Expo SDK 57, expo-router, expo-sqlite
+packages/core/  RSVP-Engine, Parser, Storage — plattformfrei, 218 Tests
+packages/ui/    Design-Tokens, Player-Geometrie, React-Komponenten — 80 Tests
+packages/assets/ Icons, Logos, Splash, Store-Screenshots (programmatisch)
+store/          Rechtstexte, ASO-Metadaten, 38 Store-Screenshots
+docs/API.md     Interne API-Referenz
 ```
 
-## Arbeitspakete
+## Status
 
-### P0 — Fundament (Lead) ✅
-- [x] Monorepo: pnpm workspaces + Turborepo, tsconfig.base, prettier, .gitignore
-- [x] `@lexipulse/core`: types, ORP, Pacing-Matrix, Tokenizer, Engine, Settings
-- [x] `@lexipulse/core`: Parser (EPUB, PDF+Smart-Filter, HTML-Artikel, TXT/MD)
-- [x] `@lexipulse/core`: Storage-Abstraktion (Driver + LexiStore + Stats)
-- [x] Unit- und Integrationstests grün — **206 Tests, 11 Dateien**
-- [x] `pnpm install` sauber, typecheck 0 Fehler, ESLint 0 Errors
+### P0 — Fundament ✅
+- [x] Monorepo pnpm + Turborepo, tsconfig.base, prettier, .gitattributes (LF)
+- [x] `@lexipulse/core`: ORP, Pacing-Matrix, Tokenizer, Engine, Settings, Storage
+- [x] Parser: EPUB 2+3, PDF mit Smart-Filter, Web-Artikel, TXT/Markdown
+- [x] Satz-Rekonstruktion für TTS (`sentenceText`, `joinTokens`)
+- [x] **218 Tests** inkl. End-to-End-Durchlauf EPUB → Tokens → Engine → Store
 
-### P1 — Design-System (Lead) ✅
-- [x] `@lexipulse/ui`: Tokens (4 Themes × 3 Akzente), Typo-Skala, Spacing, Motion
-- [x] Web-Komponenten: Button, IconButton, Card, Badge, Kbd, Divider, ProgressBar,
-      Slider, Switch, SegmentedControl, Stepper, BentoGrid/Cell/Heading, StatTile
-- [x] `RsvpStage`/`RsvpWord` mit ORP-Fixierung per `translateX(…ch)`, Fokuslinien
-- [x] Player-Geometrie plattformneutral (`computeStageGeometry`, `pivotOffsetPx`) — 13 Tests
+### P1 — Design-System ✅
+- [x] 4 Themes × 3 Akzente, eigener Akzentsatz für helle Themes
+- [x] **Jede Textfarbe in jedem Theme ≥ 4,5:1** gegen Fläche und Hintergrund,
+      abgesichert durch 67 Kontrasttests statt nach Augenmaß
+- [x] `RsvpStage` mit ORP-Fixierung per `translateX(…ch)`
+- [x] 18 Komponenten, Player-Geometrie plattformneutral
 
-### P2 — Web-App + Landingpage (Agent WEB)
-- [ ] Landing: Hero mit Live-RSVP-Demo, Bento-Feature-Grid, Pricing, FAQ, Footer
-- [ ] Reader: Import (Datei/URL/Paste), Player, Settings-Matrix, Bibliothek, Statistik
-- [ ] IndexedDB-Driver, PWA-Manifest + Service Worker, Offline
-- [ ] `/api/extract` Route für URL-Import (CORS-Umgehung, SSRF-geschützt)
-- [ ] Rechtsseiten: Impressum, Datenschutz, AGB — Daten aus MenuCloud
-- [ ] Vercel-Deployment + Domain `lexipulse.de`
+### P2 — Web-App + Landingpage ✅
+- [x] Landing: Hero mit laufender Live-Demo der echten Engine, Bento-Grid, Preise, FAQ
+- [x] Reader: Import (Datei/URL/Text), Player, Einstellungsmatrix, Bibliothek, Statistik
+- [x] IndexedDB-Driver, PWA mit Service Worker, Offline-Seite
+- [x] `/api/extract` mit SSRF-Schutz, Rate-Limit, **ohne URL-Logging**
+- [x] JSON-Export und -Import (Art. 20 DSGVO), Round-Trip verifiziert
+- [x] Impressum, Datenschutz, AGB aus `store/legal/`
+- [x] **Live: LCP 400 ms, CLS 0,0005, 0 Konsolenfehler**
 
-### P3 — Mobile-App (Agent MOBILE)
-- [ ] Expo SDK 57, expo-router, Tabs: Bibliothek / Lesen / Statistik / Einstellungen
-- [ ] expo-sqlite-Driver, expo-document-picker Import, PDF via WebView-Bridge
-- [ ] RSVP-Player nativ (Reanimated, Gesten: Tap=Play, Swipe=Rewind/Kapitel)
-- [ ] TTS-Sync (expo-speech), Sound-Feedback, Keep-Awake
-- [ ] app.json/eas.json, Icon/Splash, IAP-Vorbereitung 4,99 €
+### P3 — Mobile-App ✅
+- [x] Expo SDK 57, expo-router-Tabs, expo-sqlite-Driver
+- [x] Player mit Gesten, TTS, Haptik, Keep-Awake
+- [x] PDF-Import über pdf.js-WebView-Brücke, offline, unabhängig belegt
+- [x] Manifest fragt nur INTERNET und VIBRATE ab
+- [x] `expo-doctor` 21/21, Export beide Plattformen, APK auf Emulator gelaufen
+- [x] **Kein OTA** — würde die Datenschutzaussage brechen
 
-### P4 — Assets (Agent ASSETS)
-- [ ] App-Icon programmatisch: tiefschwarz, „L" mit neon-rotem ORP-Punkt
-- [ ] Favicon-Set, Splash, OG-Image, Vektor-Logo (hell/dunkel)
-- [ ] Store-Screenshots automatisiert (Playwright → 6 Frames iOS + Android)
-- [ ] Feature-Grafik Play Store 1024×500
+### P4 — Assets ✅
+- [x] Icon, Logo, Favicon, Splash, OG-Bild programmatisch aus den Tokens
+- [x] Maskable-Beschnitt an den echten Pixeln gemessen (33,7 % bei 40 % erlaubt)
+- [x] 38 Store-Screenshots DE+EN, 5 von 6 Screens aus der **echten laufenden App**
 
-### P5 — DevOps & Store (Agent OPS)
-- [ ] GitHub-Repo `DomenicMoran/lexipulse` + Push
-- [ ] GitHub Actions: lint + typecheck + test auf PR, EAS-Build auf Tag
-- [ ] EAS-Projekt anlegen, `eas build` Testlauf iOS+Android
-- [ ] Store-Metadaten DE/EN: Titel, Untertitel, Keywords, Beschreibung, Release Notes
-- [ ] Datenschutz-Angaben (App Privacy / Data Safety): „keine Datenerhebung"
+### P5 — DevOps & Store ✅
+- [x] GitHub Actions: typecheck/lint/test, Web-Build, Expo-Export — **grün**
+- [x] EAS-Build-Workflow (nur auf Tag oder manuell)
+- [x] Vercel-Deployment automatisch bei Push auf main
+- [x] EAS-Build Android preview: **FINISHED**, APK-Artefakt
+- [x] Store-Metadaten DE/EN, Zeichenlimits nachgemessen
+- [x] App-Privacy-Antworten für Apple und Google
 
-### P6 — Verifikation (Lead)
-- [ ] Unit-Tests grün, Coverage-Report
-- [ ] EPUB- und PDF-Import mit echten Dateien getestet
-- [ ] Web live: Lighthouse LCP < 2,5 s, CLS < 0,1, INP < 200 ms
-- [ ] Browser-Durchlauf der kompletten Reader-Strecke (Screenshot-Beleg)
-- [ ] EAS-Build-Artefakte vorhanden
+### P6 — Offen
+- [ ] TTS mit echten Stimmen auf einem Desktop-Browser und einem echten Gerät prüfen
+      (Playwright-Chromium liefert keine Stimmen, Emulator keinen Ton)
+- [ ] iOS: nur Export und Typecheck geprüft, kein Simulator-Lauf (kein Mac)
+- [ ] Store-Einträge anlegen — siehe `USER-TODO.md`
 
-## Infrastruktur (Lead) — erledigt
+## Legal-Check
 
-- [x] GitHub `DomenicMoran/lexipulse` angelegt und gepusht (Autor `Domenic Moran`)
-- [x] `.gitattributes` mit `eol=lf`, `.gitignore` mit verankerten Expo-Pfaden
-- [x] GitHub Actions: `ci.yml` (typecheck/lint/test, Web-Build, Expo-Export),
-      `eas-build.yml` (nur auf Tag oder manuell — Build-Slots sind knapp)
-- [x] Vercel-Projekt `lexipulse` (`prj_xkeizdRdseopIECdkLBc5Ft7xNk5`), Root `apps/web`,
-      GitHub-verknüpft, Install `cd ../.. && pnpm install --frozen-lockfile`
-- [x] DNS `lexipulse.de` bei INWX auf Vercel gezeigt, `misconfigured: false`
-
-## Legal-Check (pro Feature)
-- DSGVO: keine Server-Speicherung von Dokumenten; Import läuft lokal. `/api/extract`
-  loggt keine URLs. Art. 20 → JSON-Export im Reader.
-- TTDSG: keine Cookies außer technisch notwendig → kein Banner nötig, wenn kein Tracking.
-- EU AI Act Art. 50: der Smart-Filter ist Heuristik, keine KI-Interaktion → keine
-  Offenlegungspflicht. Falls später LLM-Zusammenfassung: Hinweis nötig.
-- UWG § 5: keine erfundenen Nutzerzahlen, keine Fake-Rezensionen auf der Landingpage.
+- **DSGVO:** Dokumente werden nur lokal verarbeitet. `/api/extract` loggt die URL nicht —
+  im Code verankert und kommentiert. Art. 20 über JSON-Export erfüllt.
+- **TDDDG § 25 Abs. 2:** kein Tracking, keine nicht-notwendigen Cookies → kein Banner.
+- **EU AI Act Art. 50:** der Smart-Filter ist Heuristik, kein KI-System → keine
+  Offenlegungspflicht. Bei einer späteren LLM-Zusammenfassung wäre sie nötig.
+- **UWG § 5:** keine Nutzerzahlen, keine Bewertungen, keine unbelegten
+  Geschwindigkeitsversprechen. Die Feature-Grafik sagt, was die App *tut*, nicht was der
+  Nutzer dadurch *erreicht*.
+- **§ 5 TMG:** Impressum mit echten Betreiberdaten aus MenuCloud.

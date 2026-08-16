@@ -50,7 +50,18 @@ In der Play Console eine neue App anlegen:
 - App-Typ: App, **kostenpflichtig**, 4,99 €
 - Danach: Zahlungsprofil verknüpfen (ohne das lässt sich kein Preis setzen)
 
-## 5. Prüfen und freigeben
+## 5. Zwei Dinge, die ich nicht prüfen konnte
+
+**Sprachausgabe.** Der Code ist verdrahtet und typgeprüft, aber Playwright-Chromium hat
+keine installierten Stimmen und der Android-Emulator gibt keinen Ton aus. Bitte einmal
+auf einem normalen Desktop-Browser und auf einem echten Telefon anhören: Einstellungen →
+Vorlesen an, Stimme wählen, Player starten. Erwartet: die Stimme liest den Satz, in den
+der Stream gerade eintritt, und bricht bei Pause sofort ab.
+
+**iOS.** Ohne Mac konnte ich nur den JS-Export und den Typecheck fahren. Der erste
+`eas build --platform ios` wird zeigen, ob die native Seite durchläuft.
+
+## 6. Prüfen und freigeben
 
 Bevor du einreichst: die Screenshots unter `store/screenshots/` ansehen und die
 Beschreibungen in `store/metadata/` gegenlesen. Das ist der Text, der später im Store
