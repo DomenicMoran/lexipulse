@@ -259,10 +259,13 @@ describe('LexiStore', () => {
 
       const fresh = new LexiStore(new MemoryDriver());
       await fresh.init();
-      const result = await fresh.importAll(json);
+      // A full round trip is a restore, not a merge: merging deliberately keeps the
+      // receiving device's own settings, because font size and theme belong to the
+      // screen in front of you rather than to the library.
+      const result = await fresh.importAll(json, { mode: 'replace' });
 
-      expect(result.documents).toBe(1);
-      expect(result.bookmarks).toBe(1);
+      expect(result.documentsAdded).toBe(1);
+      expect(result.bookmarksAdded).toBe(1);
       expect((await fresh.getSettings()).wpm).toBe(555);
       expect((await fresh.getDocument('a'))?.title).toBe('Erstes');
       expect((await fresh.getProgress('a'))?.tokenIndex).toBe(3);
@@ -276,12 +279,11 @@ describe('LexiStore', () => {
     });
 
     it('ignores garbage input instead of throwing', async () => {
-      expect(await store.importAll('not json')).toEqual({
-        documents: 0,
-        bookmarks: 0,
-        annotations: 0,
-        tags: 0,
-      });
+      const result = await store.importAll('not json');
+      expect(result.documentsAdded).toBe(0);
+      expect(result.bookmarksAdded).toBe(0);
+      expect(result.annotationsAdded).toBe(0);
+      expect(result.tagsUpdated).toBe(0);
     });
 
     it('clearAll removes everything', async () => {
@@ -363,7 +365,7 @@ describe('tags', () => {
     await target.init();
     const result = await target.importAll(await store.exportAll());
 
-    expect(result.tags).toBe(1);
+    expect(result.tagsUpdated).toBe(1);
     expect(await target.getTags('doc-a')).toEqual(['Klassiker', 'Roman']);
   });
 
@@ -424,7 +426,7 @@ describe('annotations', () => {
     await target.init();
     const result = await target.importAll(await source.exportAll());
 
-    expect(result.annotations).toBe(1);
+    expect(result.annotationsAdded).toBe(1);
     expect((await target.listAnnotations('doc-a')).map((a) => a.id)).toEqual(['a']);
   });
 });

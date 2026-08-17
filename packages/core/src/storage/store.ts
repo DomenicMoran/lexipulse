@@ -11,6 +11,16 @@ import type {
   RsvpSettings,
 } from '../types.js';
 import type { StorageDriver } from './driver.js';
+import {
+  annotationKey,
+  bookmarkKey,
+  documentFingerprint,
+  emptyImportResult,
+  mergeStats,
+  newerProgress,
+  type ImportMode,
+  type ImportResult,
+} from './merge.js';
 
 export const SCHEMA_VERSION = 1;
 
@@ -200,11 +210,17 @@ export class LexiStore {
     return safeParse<ReadingProgress | null>(raw, null);
   }
 
+  /**
+   * Store a reading position, with the timestamp the caller gives it.
+   *
+   * This used to stamp `Date.now()` over whatever came in, which made restoring a
+   * position impossible: a record read out of a backup arrived carrying the moment it
+   * was written rather than the moment it was made, and "the newer side wins" then
+   * compares two lies. Every caller already sets `updatedAt`, so the override bought
+   * nothing and cost the merge its only ordering.
+   */
   async saveProgress(progress: ReadingProgress): Promise<void> {
-    await this.driver.set(
-      KEY.progress(progress.documentId),
-      JSON.stringify({ ...progress, updatedAt: Date.now() }),
-    );
+    await this.driver.set(KEY.progress(progress.documentId), JSON.stringify(progress));
   }
 
   // ----------------------------------------------------------------- bookmarks
@@ -400,58 +416,143 @@ export class LexiStore {
     return out;
   }
 
-  /** Restore a backup. Existing entries with the same id are overwritten. */
-  async importAll(
-    json: string,
-  ): Promise<{ documents: number; bookmarks: number; annotations: number; tags: number }> {
+  /**
+   * Bring a backup into this device.
+   *
+   * `merge` is the default and the safe one: nothing is lost, and where both sides know
+   * something, the newer wins. `replace` is for a fresh device or a factory reset, and
+   * throws away what is here.
+   *
+   * The distinction matters because the two are opposites. A merge that overwrote
+   * statistics would erase reading somebody actually did; a replace that merged would
+   * leave the remains of the old library behind after a reset.
+   */
+  async importAll(json: string, options: { mode?: ImportMode } = {}): Promise<ImportResult> {
+    const mode = options.mode ?? 'merge';
     const data = safeParse<Record<string, unknown>>(json, {});
-    let documents = 0;
-    let bookmarks = 0;
-    let annotations = 0;
-    let tags = 0;
+    const result = emptyImportResult(mode);
 
-    if (data.settings) await this.saveSettings(normalizeSettings(data.settings));
+    if (mode === 'replace') await this.clearAll();
+
+    /*
+     * Settings belong to the device, not to the library: font size, margins and theme
+     * are chosen for the screen in front of you, and a tablet inheriting a phone's
+     * values is a worse result than keeping its own. On a replace they come along,
+     * because there the whole point is to restore this device.
+     */
+    if (data.settings && mode === 'replace') {
+      await this.saveSettings(normalizeSettings(data.settings));
+    }
+
+    /*
+     * Documents are matched by content, not by id: `createDocumentId` mixes in a
+     * timestamp and a random suffix, so the same book imported on two devices carries
+     * two ids and merging on the id would duplicate it. Where an incoming document is
+     * recognised, the local record stays and everything hanging off the incoming one is
+     * rewritten to the local id, or the highlights would point at a document that is
+     * not here.
+     */
+    const remap = new Map<string, string>();
     if (Array.isArray(data.documents)) {
+      const local = await this.listDocuments();
+      const byFingerprint = new Map(local.map((doc) => [documentFingerprint(doc), doc.id]));
       for (const doc of data.documents as LexiDocument[]) {
-        if (doc && typeof doc.id === 'string') {
-          await this.saveDocument(doc);
-          documents += 1;
+        if (!doc || typeof doc.id !== 'string') continue;
+        const existing = mode === 'merge' ? byFingerprint.get(documentFingerprint(doc)) : undefined;
+        if (existing !== undefined) {
+          remap.set(doc.id, existing);
+          result.documentsMatched += 1;
+          continue;
         }
+        await this.saveDocument(doc);
+        byFingerprint.set(documentFingerprint(doc), doc.id);
+        remap.set(doc.id, doc.id);
+        result.documentsAdded += 1;
       }
     }
+    const mapId = (id: string) => remap.get(id) ?? id;
+
     if (Array.isArray(data.progress)) {
-      for (const p of data.progress as ReadingProgress[]) {
-        if (p && typeof p.documentId === 'string') await this.saveProgress(p);
+      for (const raw of data.progress as ReadingProgress[]) {
+        if (!raw || typeof raw.documentId !== 'string') continue;
+        const incoming = { ...raw, documentId: mapId(raw.documentId) };
+        if (mode === 'replace') {
+          await this.saveProgress(incoming);
+          result.progressUpdated += 1;
+          continue;
+        }
+        const local = await this.getProgress(incoming.documentId);
+        const winner = newerProgress(local, incoming);
+        if (winner === incoming) {
+          await this.saveProgress(incoming);
+          result.progressUpdated += 1;
+        } else {
+          result.progressKept += 1;
+        }
       }
     }
+
     if (Array.isArray(data.bookmarks)) {
-      for (const b of data.bookmarks as Bookmark[]) {
-        if (b && typeof b.id === 'string' && typeof b.documentId === 'string') {
-          await this.addBookmark(b);
-          bookmarks += 1;
-        }
+      const seen = new Set(
+        mode === 'merge' ? (await this.listAllBookmarks()).map(bookmarkKey) : [],
+      );
+      const seenIds = new Set(mode === 'merge' ? (await this.listAllBookmarks()).map((b) => b.id) : []);
+      for (const raw of data.bookmarks as Bookmark[]) {
+        if (!raw || typeof raw.id !== 'string' || typeof raw.documentId !== 'string') continue;
+        const bookmark = { ...raw, documentId: mapId(raw.documentId) };
+        // Two ways the same mark can arrive twice: the same backup read again, which the
+        // id catches, and the same passage marked on both devices, which it does not.
+        if (mode === 'merge' && (seenIds.has(bookmark.id) || seen.has(bookmarkKey(bookmark)))) continue;
+        await this.addBookmark(bookmark);
+        seen.add(bookmarkKey(bookmark));
+        seenIds.add(bookmark.id);
+        result.bookmarksAdded += 1;
       }
     }
+
     if (Array.isArray(data.annotations)) {
-      for (const a of data.annotations as Annotation[]) {
-        if (a && typeof a.id === 'string' && typeof a.documentId === 'string') {
-          await this.saveAnnotation(a);
-          annotations += 1;
+      const existing = mode === 'merge' ? await this.listAllAnnotations() : [];
+      const seen = new Set(existing.map(annotationKey));
+      const seenIds = new Set(existing.map((a) => a.id));
+      for (const raw of data.annotations as Annotation[]) {
+        if (!raw || typeof raw.id !== 'string' || typeof raw.documentId !== 'string') continue;
+        const annotation = { ...raw, documentId: mapId(raw.documentId) };
+        if (mode === 'merge' && (seenIds.has(annotation.id) || seen.has(annotationKey(annotation)))) {
+          continue;
         }
+        await this.saveAnnotation(annotation);
+        seen.add(annotationKey(annotation));
+        seenIds.add(annotation.id);
+        result.annotationsAdded += 1;
       }
     }
+
     if (Array.isArray(data.tags)) {
-      for (const record of data.tags as DocumentTags[]) {
-        if (record && typeof record.documentId === 'string') {
-          const stored = await this.setTags(record.documentId, normalizeTags(record.tags));
-          if (stored.length > 0) tags += 1;
-        }
+      for (const raw of data.tags as DocumentTags[]) {
+        if (!raw || typeof raw.documentId !== 'string') continue;
+        const documentId = mapId(raw.documentId);
+        // Union, not replacement: a shelf the other device does not know about is still
+        // a shelf this reader made.
+        const current = mode === 'merge' ? await this.getTags(documentId) : [];
+        const stored = await this.setTags(documentId, normalizeTags([...current, ...(raw.tags ?? [])]));
+        if (stored.length > 0) result.tagsUpdated += 1;
       }
     }
+
     if (data.stats && typeof data.stats === 'object') {
-      await this.driver.set(KEY.stats, JSON.stringify(data.stats));
+      if (mode === 'replace') {
+        await this.driver.set(KEY.stats, JSON.stringify(data.stats));
+      } else {
+        const merged = mergeStats(
+          await this.getStats(),
+          data.stats as Partial<ReadingStats>,
+          computeStreak,
+        );
+        await this.driver.set(KEY.stats, JSON.stringify(merged));
+      }
     }
-    return { documents, bookmarks, annotations, tags };
+
+    return result;
   }
 
   /** Wipe everything. Backs the "delete all my data" button. */
