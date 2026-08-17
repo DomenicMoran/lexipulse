@@ -4,7 +4,28 @@ Stand: 2026-08-17. **Offen ist nichts mehr, was jemand tun müsste.**
 
 ---
 
-## Was sich seit gestern geändert hat
+## Zweite Runde: was noch dazugekommen ist
+
+Nach der ersten Einreichung kamen die letzten offenen Punkte dazu:
+
+- **Nachschlagen eines Wortes.** Stand vorher als „bewusst nicht" im Plan, weil
+  die Datenschutzerklärung abschließend aufzählt, welche einzige Funktion einen
+  Server anspricht. Gebaut ist es jetzt ohne diesen Widerspruch: eine
+  Wortübersicht, die vollständig offline zeigt, wo das Wort im Dokument sonst
+  vorkommt, plus eine Übergabe an eine App deiner Wahl. Die App selbst sendet
+  nichts. Abschnitt 7 der Datenschutzerklärung sagt genau das.
+- **FictionBook (.fb2)** wird gelesen, mit Titel, Autor, Kapiteln und Umschlag.
+- **Markierungen als Markdown** ausgeben, nach Kapiteln geordnet.
+- **Tagesziel in Wörtern**, sichtbar in der Statistik.
+- **Web-Fassung nachgezogen**: Leselineal, Auto-Scroll, Blättern mit Seitenzahl
+  und Schlagwörter. Damit ist sie auf dem Stand der App.
+- **Feature-Grafik bei Play** nennt jetzt beide Leseweisen statt nur den
+  Wortstrom.
+- **Import-Bericht** erscheint in der Sprache der App statt auf Englisch.
+
+---
+
+## Was sich davor geändert hat
 
 LexiPulse ist nicht mehr nur ein RSVP-Leser, sondern ein vollständiger Reader.
 Dazu kam ein Seitenmodus über das ganze Dokument, mit vier mitgelieferten
@@ -24,8 +45,8 @@ gegenüber Käufern schlicht falsch.
 
 | Store | Stand | Was danach passiert |
 |---|---|---|
-| **Google Play** | Produktion auf **versionCode 6**, neuer Ladentext und 12 neue Bilder, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
-| **Apple App Store** | Version 1.0 mit **Build 7**, neuen Texten und 24 neuen Bildern, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
+| **Google Play** | Produktion auf **versionCode 7**, Ladentext und 12 Bilder aktuell, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
+| **Apple App Store** | Version 1.0 mit **Build 8**, neuen Texten und 24 Bildern, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
 
 In beiden Läden wurde die laufende Prüfung dafür bewusst abgebrochen und neu
 gestartet. Das kostet Wartezeit, aber die Alternative wäre gewesen, den alten
@@ -80,17 +101,20 @@ wird, nicht aus dem Quelltext geschlossen:
 
 ---
 
-## Zwei Kleinigkeiten, die bewusst offen sind
+## Was bewusst offen bleibt
 
-1. **Feature-Grafik bei Play** trägt weiter die Zeile „Ein Wort nach dem anderen.
-   Immer an derselben Stelle." Das ist sachlich richtig, verkauft aber nur den
-   Wortstrom. Sie neu zu erzeugen fasst denselben Generator an, der auch die
-   App-Symbole schreibt, deshalb nicht nach dem fertigen Build. Kandidat fürs
-   nächste Update.
-2. **Wörterbuch und Übersetzung** sind bewusst nicht gebaut. Die
-   Datenschutzerklärung zählt abschließend auf, welche einzige Funktion einen
-   Server kontaktiert; eine Nachschlagefunktion würde diese Aussage falsch
-   machen. Begründung steht in `docs/ROADMAP_READER.md`.
+1. **MOBI und AZW3** bleiben draußen. Was Amazon heute ausliefert, ist KFX mit
+   DRM; das zu öffnen wäre eine Umgehung technischer Schutzmaßnahmen. Bliebe
+   eine Handvoll alter DRM-freier Dateien, und „MOBI wird unterstützt" zu
+   behaupten, obwohl es bei den meisten echten Dateien fehlschlägt, wäre
+   schlechter als es zu lassen.
+2. **Cloud-Sync und Konto** bleiben draußen. Beides widerspricht der Zusage
+   „nichts verlässt das Gerät", die in der Datenschutzerklärung, den
+   Store-Texten und im Über-Bereich der App steht. Das wäre kein Feature mehr,
+   sondern ein anderes Produkt mit Servern, Konten und neuen Rechtstexten.
+3. **Der iOS-Pfad des Nachschlagens ist ungetestet.** Die Übergabe läuft dort
+   über das Teilen-Blatt; ohne Mac ließ sich das hier nicht am Gerät prüfen.
+   Der Android-Pfad ist geprüft, auch der Fall ohne passende App.
 
 ---
 
