@@ -26,10 +26,18 @@ const ACCEPTED_MIME = [
   'text/markdown',
   'text/html',
   'application/xhtml+xml',
+  // Pictures become one PDF: a contract on the table, three photographs, something that
+  // has to be signed and sent back.
+  'image/png',
+  'image/jpeg',
+  'image/webp',
   // Some Android providers report an unknown type for .epub/.md — without this the file
   // is greyed out in the picker and the user cannot select it at all.
   'application/octet-stream',
 ];
+
+/** Which of the picked files are pictures rather than documents. */
+const IMAGE_MIME = /^image\/(png|jpeg|webp)$/;
 
 export interface ImportProgress {
   /** 1-based page currently being extracted, PDF only. */
@@ -52,21 +60,98 @@ export async function importFromPicker(
   const result = await DocumentPicker.getDocumentAsync({
     type: ACCEPTED_MIME,
     copyToCacheDirectory: true,
-    multiple: false,
+    multiple: true,
   });
   if (result.canceled) return null;
 
-  const asset = result.assets[0];
-  if (!asset) return null;
+  const assets = result.assets ?? [];
+  const first = assets[0];
+  if (!first) return null;
 
-  const bytes = await readFileBytes(asset.uri);
-  return importDocument(bytes, {
-    fileName: asset.name || 'document',
-    pdf: {
-      loader: options.pdfLoader,
-      onProgress: (page, total) => options.onProgress?.({ page, total }),
-    },
+  const pictures = assets.filter((asset) => IMAGE_MIME.test(asset.mimeType ?? ''));
+  if (pictures.length > 0 && pictures.length === assets.length) {
+    return importPictures(pictures, options);
+  }
+
+  const bytes = await readFileBytes(first.uri);
+  return withOriginal(
+    await importDocument(bytes, {
+      fileName: first.name || 'document',
+      pdf: {
+        loader: options.pdfLoader,
+        // A scan carries no text at all. Refusing it was right while the app could only
+        // read words out of a PDF; it can show and mark up the page now.
+        allowEmptyText: true,
+        onProgress: (page, total) => options.onProgress?.({ page, total }),
+      },
+    }),
+    first.uri,
+    first.name || 'document',
+  );
+}
+
+/**
+ * Several pictures, in the order they were picked, as one PDF.
+ *
+ * Built first and then imported as a PDF, so the viewer, the signature and the export are
+ * the one path that already works rather than a second kind of document.
+ */
+async function importPictures(
+  assets: readonly { uri: string; name: string; mimeType?: string | null }[],
+  options: FileImportOptions,
+): Promise<LexiDocument> {
+  const pictures: { bytes: Uint8Array; mime: string }[] = [];
+  for (const asset of assets) {
+    pictures.push({
+      bytes: await readFileBytes(asset.uri),
+      mime: asset.mimeType ?? 'image/jpeg',
+    });
+  }
+
+  const { imagesToPdf } = await import('@lexipulse/pdf/export');
+  const bytes = await imagesToPdf(pictures);
+  const name =
+    assets.length === 1
+      ? (assets[0] as { name: string }).name.replace(/\.[a-zA-Z0-9]+$/, '')
+      : `${assets.length} Bilder`;
+
+  const document = await importDocument(bytes, {
+    fileName: `${name}.pdf`,
+    pdf: { loader: options.pdfLoader, allowEmptyText: true },
   });
+  return storeOriginal(document, bytes, `${name}.pdf`);
+}
+
+/** Keep the untouched file beside the parsed text, for the original surface. */
+async function withOriginal(
+  document: LexiDocument,
+  uri: string,
+  fileName: string,
+): Promise<LexiDocument> {
+  if (document.source !== 'pdf') return document;
+  // Read again rather than reuse the bytes handed to the parser: pdf.js transfers that
+  // buffer to its worker and leaves it detached on this side.
+  return storeOriginal(document, await readFileBytes(uri), fileName);
+}
+
+async function storeOriginal(
+  document: LexiDocument,
+  bytes: Uint8Array,
+  fileName: string,
+): Promise<LexiDocument> {
+  try {
+    const { store } = await import('./store');
+    const original = await store.putOriginal(document.id, bytes, {
+      mime: 'application/pdf',
+      fileName,
+      pageCount: document.importReport.rawSections,
+    });
+    return original ? { ...document, original } : document;
+  } catch {
+    // No space, or a directory the platform refused. The text is parsed and worth
+    // keeping — the reader loses the original page, not the document.
+    return document;
+  }
 }
 
 /**

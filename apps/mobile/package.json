@@ -15,11 +15,13 @@
     "build:icons": "node scripts/make-placeholder-icons.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "build:pdf-surface": "node scripts/build-pdf-surface.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
     "@lexipulse/core": "workspace:*",
+    "@lexipulse/pdf": "workspace:*",
     "@lexipulse/ui": "workspace:*",
     "expo": "~57.0.13",
     "expo-asset": "~57.0.11",
@@ -54,13 +56,18 @@
     "react-native-worklets": "0.10.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
     "@types/react": "~19.2.4",
+    "@types/react-dom": "19.2.1",
     "eas-cli": "22.0.0",
     "esbuild": "0.28.2",
     "eslint": "9.39.5",
     "eslint-config-expo": "57.0.1",
     "pdfjs-dist": "5.4.149",
+    "postcss": "8.5.6",
+    "react-dom": "19.2.3",
     "rimraf": "6.0.1",
+    "tailwindcss": "4.3.3",
     "typescript": "~6.0.3",
     "typescript-eslint": "8.67.0",
     "vitest": "4.1.10"

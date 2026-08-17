@@ -1,5 +1,6 @@
 import { LexiStore } from '@lexipulse/core/storage';
 
+import { NativeFileStore } from './file-store';
 import { SqliteDriver } from './sqlite-driver';
 
 /**
@@ -9,7 +10,9 @@ import { SqliteDriver } from './sqlite-driver';
  * on the same file — so it is created once and `init()` is awaited exactly once.
  */
 export const driver = new SqliteDriver();
-export const store = new LexiStore(driver);
+/** Original PDFs live as files, not as rows; see `file-store.ts`. */
+export const files = new NativeFileStore();
+export const store = new LexiStore(driver, files);
 
 let ready: Promise<void> | null = null;
 

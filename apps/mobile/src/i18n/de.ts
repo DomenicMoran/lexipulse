@@ -73,6 +73,7 @@ export const de = {
   'player.text': 'Fließtext',
   'player.toPage': 'Als Seite lesen',
   'player.toRsvp': 'Zum Wortstrom',
+  'player.toOriginal': 'Original anzeigen',
   'player.text.hint': 'Tippe ein Wort an, um dort weiterzulesen.',
   'player.text.here': 'Hier bist du',
   'player.page': 'Seite {page} von {total}',

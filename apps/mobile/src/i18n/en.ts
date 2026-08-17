@@ -70,6 +70,7 @@ export const en: Record<keyof typeof de, string> = {
   'player.text': 'Full text',
   'player.toPage': 'Read as a page',
   'player.toRsvp': 'Back to the stream',
+  'player.toOriginal': 'Show the original',
   'player.text.hint': 'Tap a word to carry on from there.',
   'player.text.here': 'You are here',
   'player.page': 'Page {page} of {total}',

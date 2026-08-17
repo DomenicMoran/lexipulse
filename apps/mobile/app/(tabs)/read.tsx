@@ -3,7 +3,14 @@ import { useCallback, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { contextAround, formatDuration, textOfRange, type Annotation } from '@lexipulse/core';
+import {
+  contextAround,
+  formatDuration,
+  pageForToken,
+  pageTokenStarts,
+  textOfRange,
+  type Annotation,
+} from '@lexipulse/core';
 import { computeStageGeometry, fitFontSize } from '@lexipulse/ui/geometry';
 
 import {
@@ -186,6 +193,18 @@ export default function ReadScreen() {
           label={pageMode ? t('player.toRsvp') : t('player.toPage')}
           onPress={toggleMode}
         />
+        {document?.original ? (
+          <IconButton
+            icon="document-text-outline"
+            label={t('player.toOriginal')}
+            onPress={() => {
+              // The original counts in pages; the stream counts in tokens. The anchors
+              // recorded at import are what turns one into the other.
+              const page = pageForToken(pageTokenStarts(document, tokens), snapshot.index);
+              router.push(`/original?doc=${encodeURIComponent(document.id)}&page=${page}`);
+            }}
+          />
+        ) : null}
         <IconButton
           icon="search-outline"
           label={t('search.title')}
