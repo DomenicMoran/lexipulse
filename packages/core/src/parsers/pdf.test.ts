@@ -148,6 +148,19 @@ describe('parsePdf', () => {
     ).rejects.toThrow(/OCR/i);
   });
 
+  it('accepts a document with no text when the caller can show the pages anyway', async () => {
+    const doc = await parsePdf(new Uint8Array([1]), {
+      loader: () => Promise.resolve(fakeDoc([[], []])),
+      allowEmptyText: true,
+      fallbackTitle: 'Scan',
+    });
+
+    expect(doc.wordCount).toBe(0);
+    expect(doc.chapters).toEqual([]);
+    expect(doc.importReport.rawSections).toBe(2);
+    expect(doc.importReport.notes.join(' ')).toMatch(/no text layer/i);
+  });
+
   it('releases the pdf.js document even when parsing fails', async () => {
     const destroy = vi.fn(() => Promise.resolve());
     const doc: PdfDocumentProxy = { ...fakeDoc([[]]), destroy };

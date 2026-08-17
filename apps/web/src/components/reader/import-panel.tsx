@@ -6,7 +6,9 @@ import * as React from 'react';
 import { LinkIcon, TextIcon, UploadIcon } from '@/components/icons';
 import {
   ACCEPTED_EXTENSIONS,
+  IMAGE_TYPES,
   importFromFile,
+  importFromImages,
   importFromText,
   importFromUrl,
   type ImportProgress,
@@ -54,9 +56,21 @@ export function ImportPanel({ onImported }: ImportPanelProps) {
 
   const handleFiles = React.useCallback(
     (files: FileList | null) => {
-      const file = files?.[0];
-      if (!file) return;
-      void run(() => importFromFile(file, setProgress));
+      const chosen = Array.from(files ?? []);
+      const first = chosen[0];
+      if (!first) return;
+
+      /*
+       * Pictures become one PDF, in the order they were chosen.
+       *
+       * A photographed contract is the case: three pictures go in, one document comes
+       * out, and everything after this point is the path a PDF already takes.
+       */
+      if (IMAGE_TYPES.test(first.type)) {
+        void run(() => importFromImages(chosen.filter((f) => IMAGE_TYPES.test(f.type)), setProgress));
+        return;
+      }
+      void run(() => importFromFile(first, setProgress));
     },
     [run],
   );
@@ -104,12 +118,16 @@ export function ImportPanel({ onImported }: ImportPanelProps) {
                 Datei hierher ziehen oder auswählen
               </p>
               <p className="mt-1 text-[13px] text-[var(--lx-text-muted)]">
-                EPUB, FB2, PDF, TXT, Markdown, HTML — bis 80 MB
+                PDF, EPUB, FB2, TXT, Markdown, HTML — bis 80 MB
+              </p>
+              <p className="mt-1 text-[13px] text-[var(--lx-text-muted)]">
+                Mehrere Bilder werden zu einer PDF, in der Reihenfolge der Auswahl.
               </p>
             </div>
             <input
               ref={inputRef}
               type="file"
+              multiple
               accept={ACCEPTED_EXTENSIONS}
               className="hidden"
               onChange={(event) => {

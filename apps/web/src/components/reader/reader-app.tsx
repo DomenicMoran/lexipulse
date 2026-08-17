@@ -75,6 +75,16 @@ export function ReaderApp() {
             const tokens = tokenizeChapters(document.chapters, { wpm: wpmRef.current });
             if (cancelled) return;
 
+            /*
+             * A scan has pages but no words. The word stream would be an empty screen with
+             * a dead play button, so the reader is taken to the surface that can actually
+             * show the document — once, and only when there is one.
+             */
+            if (tokens.length === 0 && document.original) {
+              router.replace(`/reader/original?doc=${encodeURIComponent(document.id)}&page=1`);
+              return;
+            }
+
             const requestedPage = fromPage === null ? null : Number.parseInt(fromPage, 10);
             const startIndex =
               requestedPage !== null && Number.isFinite(requestedPage)
@@ -108,7 +118,7 @@ export function ReaderApp() {
     return () => {
       cancelled = true;
     };
-  }, [documentId, fromPage, hydrated]);
+  }, [documentId, fromPage, hydrated, router]);
 
   React.useEffect(() => {
     if (sheet === 'none') return;

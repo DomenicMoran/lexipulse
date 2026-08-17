@@ -63,6 +63,11 @@ const FAQ: { question: string; answer: string }[] = [
       'Auf Wunsch ja. Beim Speichern können Sie wählen, ob die betroffenen Seiten als Bild neu geschrieben werden — dann ist der Text darunter weg, auch für Kopieren und Suchen. Ohne diese Einstellung wird er nur überdeckt und bleibt lesbar, wenn jemand ihn markiert und kopiert.',
   },
   {
+    question: 'Was ist mit gescannten PDFs und Fotos?',
+    answer:
+      'Eine gescannte PDF ohne Textebene öffnen und bearbeiten Sie ganz normal — nur Wortstrom und Volltextsuche fehlen, weil es keinen Text gibt. Und wenn Sie mehrere Bilder auswählen, macht LexiPulse daraus eine PDF, in der Reihenfolge der Auswahl: abfotografieren, unterschreiben, zurückschicken.',
+  },
+  {
     question: 'Öffnet LexiPulse auch geschützte PDFs?',
     answer:
       'Ja, wenn Sie das Kennwort haben. Es wird nur zum Öffnen verwendet, nirgends gespeichert und nirgends gesendet.',

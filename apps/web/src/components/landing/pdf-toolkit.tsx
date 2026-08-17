@@ -41,6 +41,8 @@ export const TOOL_GROUPS: Group[] = [
       'Seiten drehen, löschen, verschieben',
       'Leere Seite, eine andere PDF oder ein Bild einfügen',
       'Geschütztes PDF mit Kennwort öffnen',
+      'Gescannte PDFs ohne Textebene öffnen und bearbeiten',
+      'Fotos werden zu einer PDF — abfotografieren, unterschreiben, zurückschicken',
       'Als neue Datei speichern oder das Original ersetzen',
       'Schwärzen, das den Text wirklich entfernt — nicht nur überdeckt',
     ],

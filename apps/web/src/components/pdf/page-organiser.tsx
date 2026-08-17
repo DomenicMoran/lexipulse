@@ -22,6 +22,7 @@ export function PageOrganiser({
   sizes,
   busy,
   onApply,
+  onExtract,
   onClose,
   onGoToPage,
 }: {
@@ -29,6 +30,8 @@ export function PageOrganiser({
   sizes: PageSize[];
   busy: boolean;
   onApply: (op: PageOp) => Promise<void>;
+  /** Writes the chosen pages out as a document of their own. */
+  onExtract: (pages: number[]) => Promise<void>;
   onClose: () => void;
   onGoToPage: (page: number) => void;
 }) {
@@ -97,12 +100,17 @@ export function PageOrganiser({
             }))
           }
         />
+        <Action
+          label="Auswahl herauslösen"
+          disabled={busy || selected.size === 0}
+          onClick={() => void onExtract([...selected].sort((a, b) => a - b))}
+        />
       </div>
 
       <p className="shrink-0 px-3 pt-2 text-[12px] text-[var(--lx-text-muted)]">
         {selected.size > 0
-          ? `${selected.size} Seite${selected.size === 1 ? '' : 'n'} gewählt — Eingefügtes landet nach Seite ${after}.`
-          : 'Eine Seite antippen wählt sie aus. Eingefügtes landet am Ende.'}
+          ? `${selected.size} Seite${selected.size === 1 ? '' : 'n'} gewählt — Eingefügtes landet nach Seite ${after}, Herausgelöstes wird eine neue Datei.`
+          : 'Eine Seite antippen wählt sie aus, zweimal tippen springt hin. Eine ganze PDF hier einzufügen führt zwei Dokumente zusammen.'}
       </p>
 
       <ul className="grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto p-3">

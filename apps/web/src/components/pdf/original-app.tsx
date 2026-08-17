@@ -10,7 +10,7 @@ import {
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
-import { buildPdf, remapPage, type PageOp } from '@/lib/pdf-export';
+import { buildPdf, extractPages, remapPage, type PageOp } from '@/lib/pdf-export';
 import { getFileStore, getStore } from '@/lib/store';
 import { FormPanel } from './form-panel';
 import { MarkLayer, type Tool, type ToolStyle } from './mark-layer';
@@ -310,6 +310,32 @@ export function OriginalApp() {
     [documentId, marks, reload],
   );
 
+  /** The chosen pages as a document of their own. The original is not touched. */
+  const extractSelection = React.useCallback(
+    async (pages: number[]) => {
+      if (pages.length === 0) return;
+      setBusy('Die Seiten werden herausgelöst…');
+      try {
+        const original = await loadOriginalBytes();
+        if (!original) throw new Error('Die Originaldatei fehlt.');
+        const output = await extractPages(original, pages);
+        const base = (record?.original?.fileName ?? record?.title ?? 'dokument').replace(
+          /\.pdf$/i,
+          '',
+        );
+        downloadBytes(output, `${base}-seite-${pages[0]}${pages.length > 1 ? '-ff' : ''}.pdf`);
+        setToast(
+          `${pages.length} Seite${pages.length === 1 ? '' : 'n'} als neue Datei gespeichert.`,
+        );
+      } catch (error) {
+        setToast(error instanceof Error ? error.message : 'Die Seiten konnten nicht herausgelöst werden.');
+      } finally {
+        setBusy(null);
+      }
+    },
+    [loadOriginalBytes, record],
+  );
+
   const download = React.useCallback(async () => {
     const bytes = await loadOriginalBytes();
     if (!bytes) return;
@@ -445,13 +471,19 @@ export function OriginalApp() {
                 <ToolButton label="Bearbeitete Datei speichern" onClick={() => setSaving(true)}>
                   ⤓
                 </ToolButton>
-                <button
-                  type="button"
-                  onClick={toStream}
-                  className="inline-flex h-8 items-center rounded-[6px] bg-[var(--lx-accent)] px-3 text-[13px] font-medium text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
-                >
-                  Ab hier im Wortstrom
-                </button>
+                {/*
+                  Hidden for a document with no text layer. There is nothing to stream,
+                  and the reader screen would only send the reader straight back here.
+                */}
+                {(record?.wordCount ?? 0) > 0 && (
+                  <button
+                    type="button"
+                    onClick={toStream}
+                    className="inline-flex h-8 items-center rounded-[6px] bg-[var(--lx-accent)] px-3 text-[13px] font-medium text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
+                  >
+                    Ab hier im Wortstrom
+                  </button>
+                )}
               </>
             }
             pageOverlay={(pageNumber, geometry) => {
@@ -486,6 +518,7 @@ export function OriginalApp() {
             sizes={state.sizes}
             busy={busy !== null}
             onApply={applyPageOp}
+            onExtract={extractSelection}
             onClose={() => setPanel('none')}
             onGoToPage={(value) => viewer.current?.goToPage(value)}
           />

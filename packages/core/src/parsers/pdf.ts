@@ -123,6 +123,15 @@ export interface PdfParseOptions {
   onProgress?: (page: number, total: number) => void;
   /** Disable table stripping for documents that are mostly data. */
   stripTables?: boolean;
+  /**
+   * Accept a PDF with no text layer instead of refusing it.
+   *
+   * A scan, or a photograph turned into a PDF, carries no text at all. Refusing it was
+   * right while the only thing this app could do with a PDF was read words out of it; it
+   * is wrong now that the page itself can be shown, marked up and signed. The document
+   * comes back with no words, and the surface that opens it has to cope with that.
+   */
+  allowEmptyText?: boolean;
 }
 
 function metaString(info: Record<string, unknown> | undefined, key: string): string | null {
@@ -147,6 +156,7 @@ export async function parsePdf(
     chapterWords = 1400,
     onProgress,
     stripTables = true,
+    allowEmptyText = false,
   } = options;
 
   const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
@@ -156,7 +166,8 @@ export async function parsePdf(
     const pages = await extractPdfPages(doc, onProgress);
     const cleaned = cleanPages(pages, { stripTables });
 
-    if (cleaned.text.trim().length === 0) {
+    const empty = cleaned.text.trim().length === 0;
+    if (empty && !allowEmptyText) {
       throw new Error(
         'No extractable text found. This PDF is likely a scan — run OCR on it first.',
       );
@@ -185,7 +196,9 @@ export async function parsePdf(
         rawSections: pages.length,
         removed: cleaned.removed,
         dehyphenated: cleaned.dehyphenated,
-        notes: buildPdfNotes(pages.length, cleaned),
+        notes: empty
+          ? [`${pages.length} pages processed`, 'no text layer — pages only']
+          : buildPdfNotes(pages.length, cleaned),
         durationMs: Date.now() - started,
       },
     });

@@ -6,7 +6,11 @@ import { getStore } from './store';
 /** Hard ceiling for a single file. Past this the browser tab, not the parser, is the limit. */
 export const MAX_FILE_BYTES = 80 * 1024 * 1024;
 
-export const ACCEPTED_EXTENSIONS = '.epub,.fb2,.pdf,.txt,.md,.markdown,.html,.htm,.xhtml';
+export const ACCEPTED_EXTENSIONS =
+  '.epub,.fb2,.pdf,.txt,.md,.markdown,.html,.htm,.xhtml,.png,.jpg,.jpeg,.webp';
+
+/** Pictures the app turns into a PDF before importing them. */
+export const IMAGE_TYPES = /^image\/(png|jpeg|webp)$/;
 
 export interface ImportProgress {
   /** What is happening right now, already in German. */
@@ -35,6 +39,15 @@ export async function importFromFile(
     fileName: file.name,
     pdf: {
       loader: loadPdf,
+      /*
+       * A PDF with no text layer is still a document.
+       *
+       * Refusing it was right while the only thing the app could do with a PDF was read
+       * words out of it. Now the page itself can be shown, marked up and signed, so a
+       * scan or a photographed contract comes in — with no words, which the reader is
+       * told rather than left to discover.
+       */
+      allowEmptyText: true,
       onProgress: (page, total) =>
         onProgress({
           label: `Seite ${formatNumber(page)} von ${formatNumber(total)}`,
@@ -86,6 +99,43 @@ const MIME_BY_SOURCE: Partial<Record<LexiDocument['source'], string>> = {
   fb2: 'application/x-fictionbook+xml',
 };
 
+/**
+ * Photographs and scans, turned into one PDF and imported as such.
+ *
+ * The everyday case this exists for: a contract on the kitchen table, three pictures on a
+ * phone, and something that has to be signed and sent back. Building a PDF out of them
+ * first means everything downstream — the viewer, the signature, the export — is the one
+ * path that already works, rather than a second kind of document to maintain.
+ */
+export async function importFromImages(
+  files: readonly File[],
+  onProgress: ProgressHandler,
+): Promise<LexiDocument> {
+  if (files.length === 0) throw new Error('Es wurde kein Bild ausgewählt.');
+
+  onProgress({ label: 'Bilder werden gelesen', percent: null });
+  const pictures: { bytes: Uint8Array; mime: string }[] = [];
+  for (const file of files) {
+    if (!IMAGE_TYPES.test(file.type)) {
+      throw new Error(`${file.name} ist kein PNG, JPEG oder WebP.`);
+    }
+    pictures.push({ bytes: new Uint8Array(await file.arrayBuffer()), mime: file.type });
+  }
+
+  onProgress({ label: 'PDF wird gebaut', percent: null });
+  const { imagesToPdf } = await import('./pdf-export');
+  const bytes = await imagesToPdf(pictures);
+
+  const name =
+    files.length === 1
+      ? (files[0] as File).name.replace(/\.[a-z0-9]+$/i, '')
+      : `${files.length} Bilder`;
+
+  return importFromFile(new File([bytes.slice().buffer as ArrayBuffer], `${name}.pdf`, {
+    type: 'application/pdf',
+  }), onProgress);
+}
+
 export function importFromText(text: string): LexiDocument {
   if (text.trim().length === 0) throw new Error('Der eingefügte Text ist leer.');
   return parseText(text, { source: 'clipboard', origin: null });
@@ -126,6 +176,11 @@ export function describeReport(report: ImportReport): string[] {
 
   if (report.source === 'pdf') {
     lines.push(`${count(report.rawSections, 'Seite', 'Seiten')} verarbeitet`);
+    if (report.notes.includes('no text layer — pages only')) {
+      lines.push('Kein Textlayer — Seiten ja, Wortstrom und Suche nein');
+      lines.push(`Verarbeitet in ${formatNumber(report.durationMs)} ms`);
+      return lines;
+    }
   } else if (report.rawSections > 0) {
     lines.push(`${count(report.rawSections, 'Abschnitt', 'Abschnitte')} erkannt`);
   }
