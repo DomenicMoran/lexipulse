@@ -79,9 +79,10 @@ export function ToolPalette({
   disabled?: boolean;
 }) {
   return (
-    /* Same reason as the toolbar above: on a phone thirteen tools wrap into three rows
-       and push the page off the screen. One row that scrolls keeps them all reachable. */
-    <div className="flex flex-nowrap items-center gap-x-3 gap-y-1.5 overflow-x-auto [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
+    /* Same reason as the toolbar above, and the same fix: one row, always, that scrolls
+       where it has to. A breakpoint does not help — the WebView reports a width that says
+       "desktop" on a device that is anything but. */
+    <div className="flex flex-nowrap items-center gap-x-3 gap-y-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {TOOL_GROUPS.map((group, index) => (
         <React.Fragment key={group.title}>
           {index > 0 && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-[var(--lx-border)]" />}
@@ -135,7 +136,7 @@ export function StyleBar({
   canDelete: boolean;
 }) {
   return (
-    <div className="flex flex-nowrap items-center gap-3 overflow-x-auto [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
+    <div className="flex flex-nowrap items-center gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {usesColor(tool) && (
         <div role="group" aria-label="Farbe" className="flex shrink-0 items-center gap-1">
           {PALETTE.map((color) => (
@@ -210,7 +211,7 @@ export function StyleBar({
         <button
           type="button"
           onClick={onDelete}
-          className="ml-auto inline-flex h-8 items-center rounded-[6px] border border-[var(--lx-border)] px-3 text-[13px] text-[var(--lx-text-muted)] transition-colors duration-140 hover:border-[var(--lx-border-strong)] hover:text-[var(--lx-text)]"
+          className="ml-auto inline-flex h-8 shrink-0 items-center rounded-[6px] border border-[var(--lx-border)] px-3 text-[13px] text-[var(--lx-text-muted)] transition-colors duration-140 hover:border-[var(--lx-border-strong)] hover:text-[var(--lx-text)]"
         >
           Auswahl löschen
         </button>

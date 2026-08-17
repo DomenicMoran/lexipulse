@@ -472,14 +472,18 @@ export function PdfSurface({
                   >
                     ▤
                   </ToolButton>
+                  {/*
+                    Plain arrows, not the prettier ⭳ and ⤓: the WebView on Android has no
+                    glyph for the first of those and drew an empty box on the device.
+                  */}
                   <ToolButton label="Original weitergeben" onClick={() => void shareOriginal()}>
-                    ⭳
+                    ↑
                   </ToolButton>
                   <ToolButton
                     label="Bearbeitete Datei speichern"
                     onClick={() => setSaving(true)}
                   >
-                    ⤓
+                    ↓
                   </ToolButton>
                   {/*
                     Hidden for a document with no text layer. There is nothing to stream,
@@ -491,9 +495,7 @@ export function PdfSurface({
                       onClick={() => toStream(page.current)}
                       className="inline-flex h-8 shrink-0 items-center rounded-[6px] bg-[var(--lx-accent)] px-3 text-[13px] font-medium whitespace-nowrap text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
                     >
-                      {/* The long form needs room a phone does not have. */}
-                      <span className="sm:hidden">Wortstrom</span>
-                      <span className="hidden sm:inline">Ab hier im Wortstrom</span>
+                      Ab hier im Wortstrom
                     </button>
                   )}
                 </>

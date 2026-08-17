@@ -486,13 +486,14 @@ function Toolbar({
 
   return (
     /*
-     * One row that scrolls sideways on a phone, wrapping only where there is room.
+     * Always one row that scrolls sideways, never a wrapping one.
      *
-     * Wrapping unconditionally stacked eleven controls into three rows on a 390 px screen
-     * and pushed the page itself off the bottom of the display. A toolbar that takes a
-     * third of the height is not a toolbar.
+     * Wrapping stacked eleven controls into three rows and pushed the page off the bottom
+     * of the display. Doing that only below a breakpoint was not enough: the WebView on a
+     * phone reports a CSS width well past `sm`, so the app got the three-row toolbar the
+     * browser had just been cured of. Where there is room this row simply never scrolls.
      */
-    <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto border-b border-[var(--lx-border)] bg-[var(--lx-surface)] px-3 py-2 [scrollbar-width:none] sm:flex-wrap sm:overflow-x-visible [&::-webkit-scrollbar]:hidden">
+    <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto border-b border-[var(--lx-border)] bg-[var(--lx-surface)] px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <ToolButton
         label="Miniaturen"
         pressed={sidebar === 'thumbs'}
@@ -579,7 +580,7 @@ function Toolbar({
         ⌕
       </ToolButton>
 
-      {extra && <div className="flex shrink-0 items-center gap-1.5 sm:ml-auto">{extra}</div>}
+      {extra && <div className="ml-auto flex shrink-0 items-center gap-1.5 pl-2">{extra}</div>}
     </div>
   );
 }
