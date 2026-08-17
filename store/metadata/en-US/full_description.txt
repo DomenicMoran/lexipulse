@@ -1,7 +1,7 @@
 LexiPulse is two ways of reading in one app. The word stream shows text one word at a time in a fixed spot, so your eyes stay still instead of jumping back and forth across every line. Page mode shows the same document as ordinary flowing text, in the typeface you choose. The reading position is the same in both: switch whenever you like and never lose your place.
 
 IMPORT
-• EPUB, version 2 and 3, with chapter structure and metadata
+• EPUB (2 and 3) and FictionBook, with chapters and metadata
 • PDF with a smart filter: headers, footers, page numbers and table rows are removed, words split across a line break are put back together
 • Web articles by URL, without menus, banners and comment columns
 • Text and Markdown files, Markdown with chapters
@@ -31,9 +31,11 @@ READING AIDS
 
 SEARCH AND HIGHLIGHTS
 • Full-text search with a hit list and chapter
+• Word overview: everywhere else that word appears in the document
 • Accent-tolerant: "fur" finds "für", "traumen" finds "Träume"
 • Highlights in five colours, with notes
 • A list of every highlight, one tap jumps to it
+• Export highlights as Markdown, grouped by chapter
 
 CONTROLS
 • Tap to start and pause, swipe to go back or forward
@@ -45,6 +47,7 @@ LIBRARY
 • Reading progress per document, you always start again where you stopped
 • Bookmarks anywhere
 • Statistics with a reading streak, words read and effective speed
+• A daily goal in words, if you want one
 • Export all your own data as JSON, at any time and without going through us (GDPR Art. 20)
 
 PRIVACY

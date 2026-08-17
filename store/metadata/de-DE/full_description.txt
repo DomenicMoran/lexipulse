@@ -1,8 +1,8 @@
 LexiPulse ist zwei Leseweisen in einer App. Der Wortstrom zeigt Texte Wort für Wort an einer festen Stelle, damit Ihre Augen ruhig bleiben statt in jeder Zeile hin und her zu springen. Der Seitenmodus zeigt dasselbe Dokument als normalen Fließtext, mit Ihrer Schrift. Die Leseposition ist in beiden dieselbe: Sie wechseln jederzeit und verlieren nie Ihre Stelle.
 
 IMPORT
-• EPUB, Version 2 und 3, mit Kapitelstruktur und Metadaten
-• PDF mit Smart-Filter: Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen werden entfernt, getrennte Wörter wieder zusammengesetzt
+• EPUB (2 und 3) und FictionBook, mit Kapiteln und Metadaten
+• PDF mit Smart-Filter: Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen raus, getrennte Wörter zusammengesetzt
 • Web-Artikel per URL, ohne Menüs, Banner und Kommentarspalten
 • Text- und Markdown-Dateien, Markdown auch mit Kapiteln
 • Text direkt aus der Zwischenablage
@@ -31,21 +31,24 @@ LESEHILFEN
 
 SUCHEN UND MARKIEREN
 • Volltextsuche mit Trefferliste und Kapitelangabe
+• Wortübersicht: wo ein Wort im Dokument sonst noch steht
 • Umlauttolerant: „fur" findet „für", „traumen" findet „Träume"
 • Markierungen in fünf Farben, mit Notiz
 • Liste aller Markierungen, ein Tippen springt zur Stelle
+• Markierungen als Markdown ausgeben, nach Kapiteln geordnet
 
 BEDIENUNG
 • Tippen startet und pausiert, Wischen springt zurück oder weiter
-• 4 Themes: OLED Black, Graphite, Sepia, Minimal White. OLED Black spart Strom auf OLED-Displays
+• 4 Themes: OLED Black, Graphite, Sepia, Minimal White
 • 3 Akzentfarben für den Erkennungspunkt
 
 BIBLIOTHEK
 • Offline-Bibliothek mit Suche, Sortierung und Filtern
-• Lesefortschritt pro Dokument, Sie steigen immer an derselben Stelle ein
+• Lesefortschritt pro Dokument
 • Lesezeichen an beliebigen Stellen
 • Statistik mit Lese-Streak, gelesenen Wörtern und effektiver Geschwindigkeit
-• Export aller eigenen Daten als JSON, jederzeit und ohne Umweg über uns (Art. 20 DSGVO)
+• Tagesziel in Wörtern, wenn Sie eines wollen
+• Export aller eigenen Daten als JSON (Art. 20 DSGVO)
 
 DATENSCHUTZ
 Kein Konto, keine Registrierung. Ihre Dokumente werden ausschließlich auf Ihrem Gerät verarbeitet und gespeichert, nichts wird hochgeladen. Kein Tracking, keine Analyse-Werkzeuge, keine Werbung, keine Werbe-Identifikatoren.
@@ -58,7 +61,7 @@ PREIS
 Zusätzlich gibt es eine kostenlose Web-Version unter lexipulse.de.
 
 FÜR WEN
-Für alle, die viel lesen: Studierende mit Skripten, Berufstätige mit langen PDFs, und alle, die eine Reihe von E-Books vor sich haben. Durch die Lesehilfen auch für Menschen, denen normaler Fließtext schwerfällt.
+Für alle, die viel lesen: Studierende, Berufstätige mit langen PDFs, und alle mit einer Reihe von E-Books. Durch die Lesehilfen auch für Menschen, denen normaler Fließtext schwerfällt.
 
 HINWEIS
 LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt und keine Therapie. Wie gut Sie einen Text erfassen, hängt vom Text, Ihrer Vorkenntnis und Ihrer Tagesform ab. Beginnen Sie bei 250 bis 300 Wörtern pro Minute und steigern Sie langsam.

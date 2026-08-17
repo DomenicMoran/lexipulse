@@ -1,6 +1,6 @@
 # Der vollständige Plan: LexiPulse als Reader
 
-Stand: 2026-08-17. Grundlage ist `MARKTANALYSE_2026-08-16.md`.
+Stand: 2026-08-17 (zweite Runde). Grundlage ist `MARKTANALYSE_2026-08-16.md`.
 Status: **fertig** · **in Arbeit** · **offen** · **bewusst nicht**
 
 Die Reihenfolge folgt Abhängigkeiten, nicht Wunschdenken. Jede Stufe wird am
@@ -31,6 +31,9 @@ Gerät geprüft, bevor die nächste beginnt.
 | 2.6 | Markierungen im Export enthalten | **fertig** |
 | 2.7 | Auto-Scroll mit Geschwindigkeit | **fertig** |
 | 2.8 | Blättern mit Seitenzahlen | **fertig** |
+| 2.9 | FictionBook (.fb2) importieren | **fertig** |
+| 2.10 | Markierungen als Markdown ausgeben | **fertig** |
+| 2.11 | Tagesziel in Wörtern | **fertig** |
 
 ## Stufe 3 — Der Unterschied zum Rest des Marktes
 
@@ -53,8 +56,8 @@ zusammen.
 | 4.2 | Sortieren: zuletzt, Titel, hinzugefügt, Fortschritt | **fertig** |
 | 4.3 | Filtern: alle, angefangen, ungelesen, gelesen | **fertig** |
 | 4.4 | Sammlungen und Tags | **fertig** |
-| 4.5 | Wörterbuch beim Antippen eines Wortes | **bewusst nicht** |
-| 4.6 | Übersetzung der Auswahl | **bewusst nicht** |
+| 4.5 | Nachschlagen eines Wortes | **fertig**, ohne eingebautes Wörterbuch |
+| 4.6 | Übersetzung der Auswahl | **fertig** über die Übergabe ans Betriebssystem |
 
 ## Stufe 5 — Web-App auf gleichem Stand
 
@@ -64,11 +67,14 @@ zusammen.
 | 5.2 | Typografie, Bionic, Farbfilter | **fertig** |
 | 5.3 | Suche | **fertig** |
 | 5.4 | Markierungen | **fertig** |
+| 5.5 | Leselineal, Auto-Scroll, Blättern, Schlagwörter | **fertig** |
 
-Was die Web-Fassung **nicht** hat: Blättern mit Seitenzahl, Leselineal,
-Auto-Scroll und Schlagwörter. Das ist Absicht und keine Lücke im Versprechen:
-Die Store-Texte beschreiben die App, und die kostenlose Web-Fassung wird dort
-nur als zusätzliche Möglichkeit genannt, nicht als gleichwertig.
+Die Web-Fassung ist damit auf dem Stand der App. Das Blättern löst sie über
+CSS-Spalten statt über gemessene Zeilenkästen, weil der Browser den Umbruch
+selbst beherrscht; die Seitenzahl ergibt sich aus `scrollWidth / clientWidth`.
+Nicht nachgebaut ist das Nachschlagen: Die Übergabe an eine App der eigenen
+Wahl ist eine Betriebssystem-Sache und hat im Browser keine Entsprechung, die
+diesen Namen verdient.
 
 ---
 
@@ -81,19 +87,19 @@ Nicht aus Bequemlichkeit weggelassen, sondern weil es dem Produkt schadet:
   Über-Bereich der App steht. Ließe sich nur mit neuen Rechtstexten und einer
   neuen Datenschutz-Erklärung im Store einführen.
 - **Konto und Geräte-Sync.** Dasselbe, plus: Die App hat bewusst keine Anmeldung.
-- **Formate MOBI, AZW3, FB2.** Proprietär beziehungsweise DRM-behaftet; der
-  Aufwand steht in keinem Verhältnis zur Nachfrage bei einem Schnellleser.
 - **CBZ/CBR (Comics).** RSVP ergibt bei Bildern keinen Sinn.
 - **Plugin-System wie KOReader.** Ein Wartungsversprechen, das eine App mit einem
   Entwickler nicht halten kann.
-- **Wörterbuch und Übersetzung (4.5, 4.6).** Die Datenschutzerklärung zählt
-  abschließend auf, welche einzige Funktion überhaupt einen Server kontaktiert:
-  der Import eines Web-Artikels. Eine Nachschlage- oder Übersetzungsfunktion
-  würde diese Aussage falsch machen — in `privacy.en.md`, in
-  `datenschutz.de.md` und in beiden Store-Einträgen. Ein Wörterbuch offline
-  mitzuliefern scheitert an Größe und Lizenz, das Betriebssystem bietet
-  plattformübergreifend keine brauchbare Schnittstelle. Wird nur gebaut, wenn
-  die Rechtstexte vorher geändert und neu eingereicht werden.
+- **Ein eingebautes Wörterbuch.** Ein Nachschlagewerk offline mitzuliefern
+  scheitert an Größe und Lizenz, und eines online abzufragen würde die Zusage
+  brechen, dass die App selbst nichts sendet. Gebaut ist stattdessen die
+  Wortübersicht (offline, aus dem Dokument selbst) plus eine ausdrückliche
+  Übergabe an eine App der eigenen Wahl. Abschnitt 7 der Datenschutzerklärung
+  sagt das, und der Eintrag in der App sagt es auch.
+- **MOBI und AZW3.** Was Amazon heute ausliefert, ist KFX mit DRM; das zu
+  öffnen wäre eine Umgehung technischer Schutzmaßnahmen. Bliebe die Handvoll
+  alter DRM-freier Dateien, und „MOBI wird unterstützt“ zu behaupten, obwohl es
+  bei den meisten echten Dateien fehlschlägt, wäre schlechter als es zu lassen.
 
 ## Was zuletzt entschieden wird
 

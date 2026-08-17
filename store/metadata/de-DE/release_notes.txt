@@ -3,11 +3,11 @@ Version 1.0.0
 Erste Veröffentlichung von LexiPulse.
 
 • Wortstrom mit ORP-Fixierung, 100 bis 1200 Wörter pro Minute
-• Seitenmodus mit vier Schriften und freier Typografie
+• Seitenmodus mit vier Schriften, Blättern und Auto-Scroll
 • Eine Leseposition für beide Modi
-• Import von EPUB, PDF, Web-Artikeln, Text und Markdown
-• Volltextsuche, Markierungen in fünf Farben mit Notizen
+• Import: EPUB, FictionBook, PDF, Web-Artikel, Text, Markdown
+• Suche, Wortübersicht, Markierungen mit Notizen
 • Lesehilfen: Bionic, Leselineal, Farbfilter, OpenDyslexic
-• Vorlesefunktion, Statistik, Datenexport
+• Bibliothek mit Schlagwörtern, Statistik, Tagesziel, Export
 
 Alles lokal. Kein Konto, kein Tracking, keine Werbung.
