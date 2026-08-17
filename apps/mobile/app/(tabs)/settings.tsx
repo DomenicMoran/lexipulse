@@ -36,6 +36,7 @@ import {
   T,
 } from '../../src/components/ui';
 import { useAlert } from '../../src/components/alert';
+import { BackupRows } from '../../src/components/backup';
 import { FontLicences } from '../../src/components/font-licences';
 import { formatNumber, language, t } from '../../src/i18n';
 import { OVERLAY_LABELS } from '../../src/reader/typography';
@@ -392,10 +393,15 @@ export default function SettingsScreen() {
         </View>
       </Section>
 
+      {/* ----------------------------------------------------------------- backup */}
+      {/* Creating a backup and reading one back belong together: a file the app cannot
+          restore is not a backup, and the two rows only make sense side by side. */}
+      <Section title={t('settings.section.backup')}>
+        <BackupRows />
+      </Section>
+
       {/* ------------------------------------------------------------------- data */}
       <Section title={t('settings.section.data')}>
-        <ExportRow />
-        <Divider />
         <HighlightExportRow />
         <Divider />
         <Row
@@ -654,49 +660,6 @@ function VoicePicker({
         />
       ))}
     </View>
-  );
-}
-
-/** GDPR Art. 20: the whole library, progress and stats as one JSON file. */
-function ExportRow() {
-  const alert = useAlert();
-  const [busy, setBusy] = useState(false);
-
-  const onExport = useCallback(() => {
-    setBusy(true);
-    void (async () => {
-      try {
-        const json = await store.exportAll();
-        const file = new FileSystem.File(
-          FileSystem.Paths.cache,
-          `lexipulse-export-${new Date().toISOString().slice(0, 10)}.json`,
-        );
-        if (file.exists) file.delete();
-        file.create();
-        file.write(json);
-
-        if (await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(file.uri, {
-            mimeType: 'application/json',
-            dialogTitle: t('settings.export'),
-            UTI: 'public.json',
-          });
-        }
-      } catch (error) {
-        alert(t('settings.export.failed'), String(error));
-      } finally {
-        setBusy(false);
-      }
-    })();
-  }, [alert]);
-
-  return (
-    <Row
-      label={t('settings.export')}
-      hint={t('settings.export.hint')}
-      icon="download-outline"
-      onPress={busy ? undefined : onExport}
-    />
   );
 }
 

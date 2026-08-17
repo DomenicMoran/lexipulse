@@ -116,6 +116,7 @@ export const de = {
   'settings.section.appearance': 'Darstellung',
   'settings.section.player': 'Player',
   'settings.section.audio': 'Ton & Sprache',
+  'settings.section.backup': 'Sichern und Übertragen',
   'settings.section.data': 'Daten',
   'settings.section.about': 'Über',
 
@@ -149,8 +150,64 @@ export const de = {
   'settings.keepAwake': 'Bildschirm wachhalten',
   'settings.keepAwake.hint': 'Nur während der Wiedergabe',
 
-  'settings.export': 'Meine Daten exportieren',
-  'settings.export.hint': 'Vollständige JSON-Sicherung (Art. 20 DSGVO)',
+  'backup.create': 'Sicherung erstellen',
+  'backup.create.hint':
+    'Bibliothek, Fortschritt, Lesezeichen und Markierungen als eine Datei, die sich hier wieder einlesen lässt (Art. 20 DSGVO)',
+  'backup.folder': 'In Ordner speichern',
+  'backup.folder.hint': 'Legt die Sicherung direkt in einem Ordner deiner Wahl ab',
+  'backup.folder.done': 'Sicherung gespeichert',
+  'backup.folder.doneBody': '{name} liegt jetzt im gewählten Ordner.',
+  'backup.failed': 'Sicherung fehlgeschlagen',
+  'backup.share.unavailable': 'Dieses Gerät bietet kein Teilen an. Nutze „In Ordner speichern“.',
+
+  'backup.restore': 'Sicherung einlesen',
+  'backup.restore.hint': 'Aus einer Datei von diesem oder einem anderen Gerät',
+  'backup.restore.failed': 'Einlesen fehlgeschlagen',
+  'backup.restore.unreadable.title': 'Keine LexiPulse-Sicherung',
+  'backup.restore.unreadable.body':
+    'Diese Datei lässt sich nicht als Sicherung lesen. Wähle die JSON-Datei, die LexiPulse beim Sichern erzeugt hat.',
+  'backup.restore.tooNew.title': 'Aus einer neueren Fassung',
+  'backup.restore.tooNew.body':
+    'Diese Sicherung stammt aus einer neueren Fassung von LexiPulse. Aktualisiere zuerst die App, sonst geht beim Einlesen etwas verloren.',
+
+  'backup.preview.title': 'Das steht in der Sicherung',
+  'backup.preview.exportedAt': 'Erstellt am {date}',
+  'backup.preview.exportedAt.unknown': 'Ohne Erstellungsdatum',
+  'backup.preview.documents': 'Dokumente',
+  'backup.preview.annotations': 'Markierungen',
+  'backup.preview.bookmarks': 'Lesezeichen',
+  'backup.preview.tags': 'Dokumente mit Schlagwörtern',
+  'backup.preview.extras': 'Enthält außerdem Einstellungen und Lesestatistik.',
+  'backup.preview.titles': 'Zum Beispiel',
+
+  'backup.mode.merge': 'Zusammenführen',
+  'backup.mode.merge.hint':
+    'Nichts geht verloren. Was schon da ist, bleibt; bei der Leseposition gewinnt die neuere.',
+  'backup.mode.replace': 'Alles ersetzen',
+  'backup.mode.replace.hint':
+    'Verwirft, was auf diesem Gerät liegt, und stellt den Stand der Datei her.',
+  'backup.replace.confirm.title': 'Wirklich alles ersetzen?',
+  'backup.replace.confirm.body':
+    'Bibliothek, Lesefortschritt, Lesezeichen, Markierungen und Statistik auf diesem Gerät werden verworfen und durch den Inhalt der Datei ersetzt. Das lässt sich nicht rückgängig machen.',
+
+  'backup.report.merge': 'Zusammengeführt',
+  'backup.report.replace': 'Wiederhergestellt',
+  'backup.report.nothing': 'Es gab nichts zu übernehmen. Die Sicherung war leer.',
+  'backup.report.documentsAdded.one': '1 Dokument neu',
+  'backup.report.documentsAdded.other': '{count} Dokumente neu',
+  'backup.report.documentsMatched.one': '1 Dokument war schon da',
+  'backup.report.documentsMatched.other': '{count} Dokumente waren schon da',
+  'backup.report.annotationsAdded.one': '1 Markierung neu',
+  'backup.report.annotationsAdded.other': '{count} Markierungen neu',
+  'backup.report.bookmarksAdded.one': '1 Lesezeichen neu',
+  'backup.report.bookmarksAdded.other': '{count} Lesezeichen neu',
+  'backup.report.tagsUpdated.one': 'Schlagwörter für 1 Dokument übernommen',
+  'backup.report.tagsUpdated.other': 'Schlagwörter für {count} Dokumente übernommen',
+  'backup.report.progressUpdated.one': '1 Leseposition übernommen',
+  'backup.report.progressUpdated.other': '{count} Lesepositionen übernommen',
+  'backup.report.progressKept.one': '1 Leseposition behalten, weil sie neuer war',
+  'backup.report.progressKept.other': '{count} Lesepositionen behalten, weil sie neuer waren',
+
   'settings.exportHighlights': 'Markierungen exportieren',
   'settings.exportHighlights.hint': 'Als Markdown, nach Kapiteln geordnet',
   'settings.exportHighlights.empty': 'In diesem Dokument gibt es noch keine Markierungen.',

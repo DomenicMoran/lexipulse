@@ -110,6 +110,7 @@ export const en: Record<keyof typeof de, string> = {
   'settings.section.appearance': 'Appearance',
   'settings.section.player': 'Player',
   'settings.section.audio': 'Sound & speech',
+  'settings.section.backup': 'Back up and transfer',
   'settings.section.data': 'Data',
   'settings.section.about': 'About',
 
@@ -143,8 +144,64 @@ export const en: Record<keyof typeof de, string> = {
   'settings.keepAwake': 'Keep screen awake',
   'settings.keepAwake.hint': 'Only while playing',
 
-  'settings.export': 'Export my data',
-  'settings.export.hint': 'Complete JSON backup (GDPR Art. 20)',
+  'backup.create': 'Create a backup',
+  'backup.create.hint':
+    'Library, progress, bookmarks and highlights as one file that can be read back in here (GDPR Art. 20)',
+  'backup.folder': 'Save to a folder',
+  'backup.folder.hint': 'Writes the backup straight into a folder you pick',
+  'backup.folder.done': 'Backup saved',
+  'backup.folder.doneBody': '{name} is now in the folder you picked.',
+  'backup.failed': 'Backup failed',
+  'backup.share.unavailable': 'This device offers no sharing. Use "Save to a folder".',
+
+  'backup.restore': 'Read a backup',
+  'backup.restore.hint': 'From a file made on this device or another one',
+  'backup.restore.failed': 'Reading the backup failed',
+  'backup.restore.unreadable.title': 'Not a LexiPulse backup',
+  'backup.restore.unreadable.body':
+    'This file cannot be read as a backup. Pick the JSON file LexiPulse writes when it creates one.',
+  'backup.restore.tooNew.title': 'From a newer version',
+  'backup.restore.tooNew.body':
+    'This backup comes from a newer version of LexiPulse. Update the app first, or reading it would drop something.',
+
+  'backup.preview.title': 'What this backup holds',
+  'backup.preview.exportedAt': 'Created on {date}',
+  'backup.preview.exportedAt.unknown': 'No creation date',
+  'backup.preview.documents': 'Documents',
+  'backup.preview.annotations': 'Highlights',
+  'backup.preview.bookmarks': 'Bookmarks',
+  'backup.preview.tags': 'Documents with tags',
+  'backup.preview.extras': 'It also holds settings and reading stats.',
+  'backup.preview.titles': 'For example',
+
+  'backup.mode.merge': 'Merge',
+  'backup.mode.merge.hint':
+    'Nothing is lost. What is here stays; for a reading position the newer one wins.',
+  'backup.mode.replace': 'Replace everything',
+  'backup.mode.replace.hint':
+    'Throws away what is on this device and restores the state of the file.',
+  'backup.replace.confirm.title': 'Replace everything?',
+  'backup.replace.confirm.body':
+    'Library, reading progress, bookmarks, highlights and stats on this device will be thrown away and replaced by the contents of the file. This cannot be undone.',
+
+  'backup.report.merge': 'Merged',
+  'backup.report.replace': 'Restored',
+  'backup.report.nothing': 'There was nothing to take over. The backup was empty.',
+  'backup.report.documentsAdded.one': '1 new document',
+  'backup.report.documentsAdded.other': '{count} new documents',
+  'backup.report.documentsMatched.one': '1 document was already here',
+  'backup.report.documentsMatched.other': '{count} documents were already here',
+  'backup.report.annotationsAdded.one': '1 new highlight',
+  'backup.report.annotationsAdded.other': '{count} new highlights',
+  'backup.report.bookmarksAdded.one': '1 new bookmark',
+  'backup.report.bookmarksAdded.other': '{count} new bookmarks',
+  'backup.report.tagsUpdated.one': 'Tags taken over for 1 document',
+  'backup.report.tagsUpdated.other': 'Tags taken over for {count} documents',
+  'backup.report.progressUpdated.one': '1 reading position taken over',
+  'backup.report.progressUpdated.other': '{count} reading positions taken over',
+  'backup.report.progressKept.one': '1 reading position kept, because it was newer',
+  'backup.report.progressKept.other': '{count} reading positions kept, because they were newer',
+
   'settings.exportHighlights': 'Export highlights',
   'settings.exportHighlights.hint': 'As Markdown, grouped by chapter',
   'settings.exportHighlights.empty': 'This document has no highlights yet.',
