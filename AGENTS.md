@@ -15,9 +15,10 @@ The moment `window`, `document`, `AsyncStorage` or `node:fs` appears in
 it is gone silently: the tests still pass, because they run under Node.
 
 ```
-apps/web/         Next.js 15 App Router — landing page, reader, PDF surface, PWA
+apps/web/         Next.js 15 App Router — landing page, reader, PWA
 apps/mobile/      Expo SDK 57 — iOS and Android
 packages/core/    RSVP engine, parsers, page marks, storage. Platform-free.
+packages/pdf/     The original surface: rendering a PDF page and working on it
 packages/ui/      Design tokens, player geometry, shared React components
 packages/assets/  Icon, logo and store-screenshot generation
 store/            Legal texts, ASO metadata, store screenshots
@@ -25,22 +26,37 @@ store/            Legal texts, ASO metadata, store screenshots
 
 ## The original surface
 
-A PDF is kept byte for byte next to the text extracted from it, and rendered by pdf.js on
-`/reader/original`. Everything the reader adds — highlights, drawings, signatures, form
-answers — is stored beside the document as editable records (`packages/core/pdf-marks.ts`),
-never written into the file until an export is asked for. That is what makes a mark
-movable a week later, and what keeps the original untouched until the reader says
-otherwise.
+A PDF is kept byte for byte next to the text extracted from it, and rendered by pdf.js.
+Everything the reader adds — highlights, drawings, signatures, form answers — is stored
+beside the document as editable records (`packages/core/src/pdf-marks.ts`), never written
+into the file until an export is asked for. That is what makes a mark movable a week
+later, and what keeps the original untouched until the reader says otherwise.
 
-Two rules hold that together:
+**`packages/pdf` has one host-shaped hole in it.** The surface draws pages and edits them;
+where the document comes from, where a finished file goes and how a picture is chosen all
+arrive through `PdfHost`. The web app fills that with IndexedDB and a download, the mobile
+app with SQLite and the share sheet — from inside a WebView, because pdf.js needs a DOM
+that React Native does not have. Anything that reaches for `window.location`, a store or a
+router inside this package breaks the second host silently.
 
-**Coordinates are PDF points, never screen pixels.** `apps/web/src/components/pdf/geometry.ts`
-is the one place that crosses between them, and it is tested at all four rotations. A sign
-error there puts a highlight a page-width from its word, and only on rotated pages.
+Four rules hold it together, each of them paid for:
+
+**Coordinates are PDF points, never screen pixels.** `packages/pdf/src/geometry.ts` is the
+one place that crosses between them, tested at all four rotations. A sign error there puts
+a highlight a page-width from its word, and only on rotated pages.
 
 **Never identify a class by `constructor.name`.** The production build renames every class
 to a letter. Form-field detection did exactly that, passed every test, and told every
 visitor to the deployed site that their document had no form.
+
+**A shared package needs a `@source` line.** Tailwind's automatic detection stops at the
+app directory. Without `@source '../../packages/pdf/src'` in `globals.css` the surface
+loses `h-[100dvh]` and `min-h-0`, the scroller grows to the height of the whole document,
+and nothing scrolls — a broken layout, not a missing colour.
+
+**The wire format lives in one file.** `apps/mobile/src/pdf/wire.ts` is imported by both
+the React Native side and the page inside the WebView. Two copies drift, and the failure is
+a call that never resolves with nothing on screen to explain it.
 
 ## Language
 

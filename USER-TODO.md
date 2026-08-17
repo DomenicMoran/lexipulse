@@ -1,7 +1,65 @@
 # USER-TODO — LexiPulse
 
-Stand: 2026-08-17. **Zu tun ist nichts. Eine Entscheidung steht an, aber sie hat
-Zeit — siehe „Was Sie entscheiden müssen, wenn 1.0 durch ist".**
+Stand: 2026-08-17, abends. **Zu tun ist eines: Bescheid geben, wenn 1.0
+freigegeben ist.** Alles für 1.1 liegt fertig im Repo.
+
+---
+
+## Fünfte Runde: Die App kann jetzt dasselbe, und die Store-Texte stehen
+
+Die Werkzeuge von heute Nachmittag gab es nur in der Web-Fassung. Jetzt gibt es
+sie in der App — und zwar nicht als zweite Umsetzung: die Oberfläche ist ein
+eigenes Paket geworden, das beide benutzen. In der App läuft sie in einer
+mitgelieferten WebView, weil pdf.js einen Browser braucht, den React Native nicht
+hat. Dieselbe Datei, kein Netz, alles auf dem Gerät.
+
+In der App neu:
+
+- Bildschirm **Original**, aus dem Player erreichbar, sobald ein Dokument eine
+  Originaldatei hat
+- Markieren, zeichnen, Textfelder, Notizen, Formulare, Unterschreiben, Seiten
+  ordnen — derselbe Werkzeugkasten wie im Web
+- Fertige Datei geht ins Teilen-Blatt, das Original lässt sich ersetzen
+- Der Import behält die Originaldatei, nimmt Scans an und macht aus mehreren
+  Bildern eine PDF
+
+**Store-Texte und Bilder sind fertig**, in beiden Sprachen:
+
+- Name: **LexiPulse: PDF & E-Book**, Untertitel „Ausfüllen, unterschreiben"
+- Beschreibung, Kurzbeschreibung, Suchbegriffe und Versionshinweise neu
+  geschrieben, alle innerhalb der Zeichenlimits
+- Zwei neue Bildschirmfotos, aufgenommen aus der laufenden App: die
+  Originalseite mit Markierung und Notiz, und die Werkzeuge mit einer
+  Unterschrift auf der Linie
+
+**Hochgeladen ist davon nichts** — und das ist Absicht.
+
+## Das eine, worauf ich warte
+
+Apple steht auf `WAITING_FOR_REVIEW`, Play prüft ebenfalls. Die neuen Texte
+beschreiben Funktionen, die im geprüften 1.0-Paket nicht drin sind; sie jetzt
+einzutragen wäre ein Ablehnungsgrund und gegenüber Käufern falsch. Bei Play
+bricht ein Eingriff die laufende Prüfung ohnehin ab.
+
+Sobald 1.0 freigegeben ist, läuft es in dieser Reihenfolge:
+
+1. 1.1 bauen (Android und iOS)
+2. Texte und Bilder übertragen — sie liegen fertig unter `store/metadata/` und
+   `store/screenshots/`
+3. Einreichen
+
+**Zum EAS-Kontingent:** Die Zähler setzen sich am **1. September 2026** zurück.
+Ein iOS-Bau davor müsste sich wieder ein fremdes Konto leihen, wie bei Build 9.
+Wenn 1.0 vorher durchgeht und Sie nicht warten wollen, sagen Sie Bescheid.
+
+## Was noch nicht am Gerät gelaufen ist
+
+Die Oberfläche in der WebView ist als gebautes Bündel im Browser geprüft: Seiten
+gerendert, gesucht, markiert, gespeichert, die ausgelieferte Datei zurückgelesen.
+Das Protokoll zwischen App und WebView hat eigene Tests. Was fehlt, ist ein Lauf
+auf einem echten Telefon — die Emulatoren auf diesem Rechner waren von anderen
+Läufen belegt und haben nicht mehr geantwortet. Das gehört vor die Einreichung
+von 1.1, zusammen mit dem ohnehin nötigen Bau.
 
 ---
 

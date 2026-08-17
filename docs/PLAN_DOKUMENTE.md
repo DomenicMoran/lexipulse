@@ -94,8 +94,8 @@ das Produkt steht, und sie gilt hier genauso.
 |---|---|---|
 | 9.1 | Landingpage: Reader und PDF-Werkzeug vorn, Wortstrom als Argument | **fertig** |
 | 9.2 | Eigene Seite `/pdf` mit eigenen Suchbegriffen | **fertig** |
-| 9.3 | Store-Titel, Untertitel, Beschreibung, Suchbegriffe neu | **offen** |
-| 9.4 | Neue Bildschirmfotos aus der laufenden App | **offen** |
+| 9.3 | Store-Titel, Untertitel, Beschreibung, Suchbegriffe neu | **fertig**, wartet auf den Build |
+| 9.4 | Neue Bildschirmfotos aus der laufenden App | **fertig** (2 neue, beide live aufgenommen) |
 | 9.5 | Rechtstexte nachziehen, wo sich etwas ändert | **fertig** (Datenschutz DE+EN) |
 
 ---
@@ -172,11 +172,29 @@ Datei meldete „kein Formular". Und drei schnelle Eingaben im Formular übersch
 gegenseitig, weil der Bearbeiter das ganze Wertepaket zurückgab. Beide sind behoben, für
 den ersten steht ein Test, der die Klassen zur Laufzeit genauso umbenennt wie ein Minifier.
 
+## Zweite Runde am selben Tag: die App und der Auftritt
+
+**Die Oberfläche ist ein eigenes Paket geworden.** `@lexipulse/pdf` zeichnet Seiten und
+bearbeitet sie; alles Umgebende kommt über `PdfHost` von außen. Die Web-App ist der eine
+Wirt, die mobile App der andere — dort läuft dasselbe Bündel in einer mitgelieferten
+WebView, weil pdf.js einen DOM braucht, den React Native nicht hat.
+
+**Die App hat jetzt denselben Werkzeugkasten.** Neuer Bildschirm `/original`, aus dem
+Player erreichbar. Originale liegen als Dateien im App-Verzeichnis, der Import behält sie,
+nimmt Scans an und macht aus mehreren Bildern eine PDF.
+
+**Store-Texte und Bildschirmfotos liegen fertig im Repo** — Name, Untertitel,
+Beschreibung, Suchbegriffe, Versionshinweise in beiden Sprachen, dazu zwei neue Aufnahmen
+aus der laufenden App. Hochgeladen wird nichts, solange 1.0 in Prüfung ist; die Regel
+steht in `store/metadata/README.md`.
+
 ## Was als Nächstes ansteht
 
-1. **Mobil nachziehen.** Die App kann von alldem nichts. Der Weg ist die mitgelieferte
-   WebView, die heute schon pdf.js für den Import fährt — eine Umsetzung, zwei Hosts.
-2. **Store-Auftritt** zusammen mit dem Build, der die Funktionen enthält. Vorher nicht:
-   beide Läden prüfen gerade, und ein Eingriff bricht die Prüfung ab.
-3. **Reste der Werkzeuge**: Zusammenführen, Teilen, Bilder-zu-PDF und
-   Dokumenteigenschaften haben ihren Kern, aber noch keine Oberfläche.
+1. **Der Weg über die echte WebView ist noch nicht am Gerät gelaufen.** Belegt ist das
+   gebaute Bündel im Browser gegen einen Stellvertreter-Wirt, und das Protokoll zwischen
+   beiden Seiten mit Tests. Was fehlt, ist ein Lauf auf einem Telefon.
+2. **1.1 bauen und einreichen**, sobald 1.0 durch ist. Das EAS-Kontingent setzt sich am
+   1. September zurück; davor müsste sich der iOS-Bau wieder ein fremdes Konto leihen.
+3. **Reste der Werkzeuge**: Zusammenführen läuft über „PDF einfügen", Herauslösen ist
+   gebaut; Dokumenteigenschaften haben ihren Kern, aber noch keine Oberfläche.
+4. **EPUB im Originallayout** und Texterkennung für Scans bleiben offen (Stufe 8).
