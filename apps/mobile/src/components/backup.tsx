@@ -128,6 +128,43 @@ export function isFileLink(url: string): boolean {
   return /^(content|file):/i.test(url);
 }
 
+/**
+ * Throw away the copy iOS made of an incoming file.
+ *
+ * `LSSupportsOpeningDocumentsInPlace` is `false`, so the system never hands over the file
+ * the user tapped. It copies it into the app's own `Documents/Inbox` and passes that path
+ * along. The copy belongs to the app, and it is not a small one: a backup carries every
+ * document in full text. Left alone it would stay in the app's storage for good, invisible
+ * from the inside, counted into the device backup, and growing by one whole library with
+ * every restore.
+ *
+ * Only paths inside `Inbox` are touched, so a file the app was handed for any other reason
+ * is never deleted. On Android nothing arrives this way — a `content://` URI belongs to the
+ * other app and is none of our business.
+ */
+function discardInboxCopy(uri: string): void {
+  if (Platform.OS !== 'ios' || !uri.startsWith('file://')) return;
+  try {
+    const inbox = new FileSystem.Directory(FileSystem.Paths.document, 'Inbox');
+    /*
+     * `/var` on iOS is a symlink to `/private/var`, and the two sides of this comparison
+     * do not agree on which one to say: the app's own directory comes back as
+     * `file:///var/...`, while an URL the system hands in arrives as
+     * `file:///private/var/...`. Comparing them as they are would never match, and the
+     * cleanup would quietly never run — the worst kind of failure, because nothing looks
+     * broken from the outside.
+     */
+    const plain = (value: string): string => value.replace('file:///private/', 'file:///');
+    if (!plain(uri).startsWith(plain(inbox.uri))) return;
+    const copy = new FileSystem.File(uri);
+    if (copy.exists) copy.delete();
+  } catch (error) {
+    // A leftover copy costs storage; failing the import the reader just asked for would
+    // cost them the restore. The first is the smaller loss.
+    console.warn('[LexiPulse] could not remove the inbox copy', error);
+  }
+}
+
 interface BackupImportValue {
   /** True while a file is being read or written back into the store. */
   busy: boolean;
@@ -182,6 +219,9 @@ export function BackupImportProvider({ children }: { children: React.ReactNode }
           console.warn('[LexiPulse] could not read backup file', error);
           alert(t('backup.restore.unreadable.title'), t('backup.restore.unreadable.body'));
         } finally {
+          // After the read, whatever its outcome: the contents are in memory by now, and a
+          // file that turned out not to be a backup leaves a copy behind just the same.
+          discardInboxCopy(uri);
           setBusy(false);
         }
       })();
