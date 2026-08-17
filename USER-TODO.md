@@ -1,15 +1,15 @@
 # USER-TODO — LexiPulse
 
-Stand: 2026-08-17, abends. **Zu tun ist eines: Bescheid geben, wenn 1.0
-freigegeben ist.** Alles für 1.1 liegt fertig im Repo — und die Pakete sind
-gebaut, nicht nur der Code:
+Stand: 2026-08-17, nachts. **Zu tun ist nichts.** 1.0 ist in beiden Läden
+zurückgezogen, 1.1 ist eingereicht und liegt bei den Prüfern.
 
-| | Version | Nummer | Stand |
-|---|---|---|---|
-| Android (AAB) | 1.1.0 | versionCode 10 | gebaut, mit dem Play-Upload-Schlüssel signiert |
-| iOS (IPA) | 1.1.0 | Build 11 | siehe „Die beiden Pakete für 1.1" weiter unten |
+| | Stand | Danach |
+|---|---|---|
+| Apple | 1.1, Build 11, `WAITING_FOR_REVIEW` | Freigabe `AFTER_APPROVAL` — geht ohne weiteren Klick live |
+| Play | 1.1.0, versionCode 10, Produktionsspur | Verwaltete Veröffentlichung war für 1.0 aus und wurde nicht angefasst — geht nach der Prüfung direkt live |
 
-Beide liegen unter `C:\Users\domen\Documents\mc-build\`. Hochgeladen ist nichts.
+Beide Prüfuhren fangen von vorn an: Apple meist 1–2 Tage, Google bis zu 7. Die
+Pakete liegen zusätzlich unter `C:\Users\domen\Documents\mc-build\`.
 
 ---
 
@@ -40,7 +40,8 @@ In der App neu:
   Originalseite mit Markierung und Notiz, und die Werkzeuge mit einer
   Unterschrift auf der Linie
 
-**Hochgeladen ist davon nichts** — und das ist Absicht.
+Hochgeladen war davon zunächst nichts; das kam mit der Einreichung von 1.1,
+siehe den nächsten Abschnitt.
 
 ## Beide Läden halten jetzt 1.1
 
@@ -143,23 +144,12 @@ Ansichten" und einen über die PDF-Werkzeuge, dazu eine eigene Seite
 `lexipulse.de/pdf` für Leute, die gar keinen Reader suchen, sondern eine Aufgabe
 haben.
 
-## Was Sie entscheiden müssen, wenn 1.0 durch ist
+## Was hier stand, ist überholt
 
-Die Store-Texte bleiben **unangetastet**, solange beide Läden prüfen: ein
-Eingriff bei Play bricht die Prüfung ab, bei Apple müsste die Einreichung
-zurückgezogen werden. Beides ist in dieser Woche schon einmal passiert.
-
-Sobald 1.0 freigegeben ist, stellt sich die Frage, wie es weitergeht:
-
-1. **Erst mobil nachziehen, dann Store-Texte.** Die App bekommt dieselben
-   Werkzeuge über die mitgelieferte WebView, die heute schon pdf.js fährt. Danach
-   werden Titel, Untertitel, Beschreibung, Suchbegriffe und alle Bildschirmfotos
-   neu gemacht und als 1.1 eingereicht. Das ist der ehrliche Weg und der längere.
-2. **Store-Texte schon vorher anfassen.** Ginge nur für das, was die App heute
-   kann — also nichts von den PDF-Werkzeugen. Bringt wenig und kostet eine
-   Prüfrunde.
-
-Empfehlung ist 1. Bis dahin ist an den Läden nichts zu tun.
+An dieser Stelle stand die Frage, ob erst mobil nachgezogen und dann die
+Store-Texte geändert werden — mit der Empfehlung, 1.0 abzuwarten. Beides ist
+entschieden und erledigt: 1.0 wurde zurückgezogen, und in beiden Läden liegt
+jetzt 1.1 mit den Werkzeugen und den dazu passenden Texten.
 
 ---
 
@@ -222,7 +212,7 @@ gegenüber Käufern schlicht falsch.
 
 ---
 
-## Wo die App gerade steht
+## Wo die App am Nachmittag des 17.08. stand (überholt)
 
 | Store | Stand | Was danach passiert |
 |---|---|---|
