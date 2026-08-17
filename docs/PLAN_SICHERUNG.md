@@ -210,14 +210,39 @@ Offen bleibt der **iOS-Pfad**: Dort ist für „In Ordner speichern" nichts zu
 bauen, weil das Teilen-Blatt „In Dateien sichern" bereits enthält, aber geprüft
 werden konnte es ohne Mac nicht.
 
-## Warum Apple hinterherhinkt
+## Wie Apple doch noch gebaut wurde
+
+Der erste Befund stimmte: Das Kontingent des Kontos `menucloudberlin` ist
+aufgebraucht, und `expo-updates` fehlt, ein OTA-Weg existiert also nicht.
+
+Was er uebersah: Unter derselben Anmeldung haengen vier Konten, und das
+Kontingent haengt am Konto, dem das Projekt gehoert, nicht an der Person.
+`menucloud2` war ebenfalls leer, `salatipro` und `salatibox` nicht. Gebaut wurde
+unter `salatibox`.
+
+Dafuer musste dreierlei voruebergehend geaendert werden, und alles davon gehoert
+danach zurueckgesetzt:
+
+1. `owner` und `projectId` in `app.config.ts` zeigen auf das andere Konto.
+2. `appVersionSource` in `eas.json` von `remote` auf `local`. Ein frisches
+   Projekt beginnt seinen Zaehler bei 1, und Apple haelt fuer Version 1.0 schon
+   Build 8; eine niedrigere Nummer wird abgelehnt.
+3. `autoIncrement` aus, weil EAS das mit einer dynamischen Konfiguration bei
+   lokaler Versionsfuehrung nicht zusammenbringt. Die Nummer steht deshalb fest
+   im `ios`-Block.
+
+Die iOS-Zugangsdaten kommen aus `credentials.json`, also aus lokalen Dateien.
+Sie haengen nicht am EAS-Konto und mussten nicht angefasst werden.
+
+## Warum es ueberhaupt so weit kam
 
 Das EAS-Kontingent des kostenlosen Tarifs ist fuer diesen Monat aufgebraucht und
 setzt sich am 1. September 2026 zurueck. Ohne Mac laesst sich iOS nicht lokal
 bauen, und `expo-updates` ist nicht eingebunden, ein OTA-Weg existiert also
 auch nicht. Geprueft, nicht vermutet.
 
-Folge: Die Apple-Beschreibung wird **nicht** um Sichern und Uebertragen
-ergaenzt, solange kein iOS-Build die Funktion enthaelt. Ein Ladeneintrag, der
-etwas nennt, das im gepruefen Paket fehlt, ist ein Ablehnungsgrund und
-gegenueber Kaeufern falsch.
+Solange kein iOS-Build die Funktion enthielt, blieb die Apple-Beschreibung
+bewusst unveraendert: Ein Ladeneintrag, der etwas nennt, das im gepruefen Paket
+fehlt, ist ein Ablehnungsgrund und gegenueber Kaeufern falsch. Erst mit dem Bau
+unter dem anderen Konto durfte sie nachziehen, und zwar zusammen mit dem Build,
+nicht davor.
