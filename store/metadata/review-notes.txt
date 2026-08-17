@@ -1,0 +1,53 @@
+LexiPulse ist ein Reader fuer PDF und E-Books mit einem Werkzeugkasten fuer PDFs, dazu
+eine dritte Leseart: der Wortstrom zeigt Text Wort fuer Wort an fester Position (RSVP).
+
+Kein Konto, keine Anmeldung, kein Kauf noetig. Die App laesst sich sofort nach dem Start
+in vollem Umfang pruefen.
+
+PDF LESEN UND BEARBEITEN (der Schwerpunkt dieser Fassung)
+
+PDFs kommen ueber die Import-Ansicht der App herein, nicht ueber das Teilen-Blatt. Eine
+Beispieldatei mit Signaturlinie liegt bereit:
+
+1. Safari oeffnen, https://lexipulse.de/beispiel-vereinbarung.pdf aufrufen und die Datei
+   herunterladen. Sie liegt danach unter "Dateien" > "Downloads".
+   (Jede andere PDF auf dem Geraet geht ebenso.)
+2. LexiPulse starten, Tab "Bibliothek" > "Importieren" > "Datei waehlen" > die eben
+   geladene PDF.
+3. Nach dem Import erscheint der Wortstrom-Player. In seiner Werkzeugleiste auf
+   "Original anzeigen" tippen: das ist die Seitenansicht mit Zoom, Miniaturen,
+   Gliederung und Volltextsuche.
+4. Dort auf "Bearbeiten" (Stift) tippen. Die Leiste darunter enthaelt Markieren,
+   Unterstreichen, Freihand, Rechteck, Ellipse, Linie, Pfeil, Textfeld, Notiz und
+   "Unterschrift" (Zeichnen, Tippen oder Bild). Seite 5 der Beispieldatei hat eine
+   Signaturlinie dafuer.
+5. "Seiten ordnen" dreht, loescht und verschiebt Seiten. "Formular ausfuellen" liest
+   vorhandene Formularfelder aus.
+6. Der Pfeil nach unten ("Bearbeitete Datei speichern") erzeugt die fertige Datei; auf
+   dem Geraet oeffnet sich dabei das Teilen-Blatt. Wahlweise laesst sich das Original in
+   der Bibliothek ersetzen.
+
+WORTSTROM
+
+Im Player startet und pausiert ein Tippen; Wischen nach links oder rechts springt zehn
+Woerter zurueck oder vor. Unter "Importieren" > "Web-Artikel" laesst sich ausserdem eine
+Adresse einfuegen und der Text daraus laden, zum Beispiel
+https://de.wikipedia.org/wiki/Schnelllesen
+
+DATENSCHUTZ
+
+Alle Dokumente werden ausschliesslich lokal auf dem Geraet verarbeitet und in einer
+SQLite-Datenbank in der App-Sandbox gespeichert — auch beim Bearbeiten, Ausfuellen und
+Unterschreiben. Es gibt kein Konto, kein Tracking und keine Werbung. Die einzige
+Netzwerkanfrage der App ist der Abruf einer Seite, deren Adresse die Nutzerin oder der
+Nutzer selbst eingibt.
+
+In den Einstellungen laesst sich jederzeit "Meine Daten exportieren" (JSON) und "Alle
+Daten loeschen" ausfuehren.
+
+Die gezeichnete Unterschrift ist ein Bild der Unterschrift, wie ein unterschriebener und
+eingescannter Ausdruck. Sie ist keine qualifizierte elektronische Signatur nach eIDAS,
+und die App behauptet das an keiner Stelle.
+
+Die Altersfreigabe 17+ ergibt sich allein aus dem Import per Adresse, weil die App damit
+Text von einer frei waehlbaren Webseite laden kann.

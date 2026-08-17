@@ -42,68 +42,46 @@ In der App neu:
 
 **Hochgeladen ist davon nichts** — und das ist Absicht.
 
-## Das eine, worauf ich warte
+## Beide Läden halten jetzt 1.1
 
-Apple steht auf `WAITING_FOR_REVIEW`, Play prüft ebenfalls. Die neuen Texte
-beschreiben Funktionen, die im geprüften 1.0-Paket nicht drin sind; sie jetzt
-einzutragen wäre ein Ablehnungsgrund und gegenüber Käufern falsch. Bei Play
-bricht ein Eingriff die laufende Prüfung ohnehin ab.
+Die alte Einreichung ist zurückgezogen und durch 1.1 ersetzt — auf deine
+Anweisung hin. Der Preis dafür ist Wartezeit: beide Prüfuhren fangen von vorn
+an. Der Gewinn ist, dass kein Eintrag online geht, der LexiPulse als bloßen
+Speed-Reader verkauft, während die App PDFs bearbeitet, ausfüllt und
+unterschreibt.
 
-**Nachgefragt am 17.08. abends, bei beiden Läden direkt:**
+| | Vorher | Jetzt |
+|---|---|---|
+| Apple | 1.0, Build 10, „LexiPulse: Speed Reader" | **1.1, Build 11**, `WAITING_FOR_REVIEW`, „LexiPulse: PDF & E-Book" |
+| Play | versionCode 9, 1.0.0 | **versionCode 10, 1.1.0** in der Produktionsspur |
 
-- Apple, über die App-Store-Connect-Schnittstelle: Version 1.0, Zustand
-  `WAITING_FOR_REVIEW`, Build 10, Freigabe `AFTER_APPROVAL`. Der Versuch, den
-  1.1-Eintrag schon anzulegen, wird abgelehnt: *„You cannot create a new version
-  of the App in the current state."* Vorbereiten lässt sich der Eintrag also
-  nicht — Apple gibt ihn erst frei, wenn 1.0 die Prüfung verlassen hat.
-- Play, über die Publisher-Schnittstelle (lesend, der Entwurf wurde verworfen):
-  Spur `production` hält versionCode 9 als `completed`, Spur `internal` die 2.
-  Die öffentliche Store-Seite antwortet in allen Sprachen mit 404, die App ist
-  also noch nicht veröffentlicht. Das Paket liegt bei Google, die Erstprüfung
-  läuft.
+Bei Apple lief das so: Freigabeart zuerst auf `MANUAL` (sonst wäre die alte
+Fassung live gegangen, falls ein Prüfer sie mitten im Vorgang durchwinkt),
+Einreichung zurückgezogen, Fassung von 1.0 auf 1.1 umbenannt, Freigabe zurück
+auf `AFTER_APPROVAL`, Name, Untertitel, Beschreibung und Suchbegriffe in beiden
+Sprachen gesetzt, alle 32 Bildschirmfotos ersetzt, Bau 11 angehängt, eingereicht.
 
-Es liegt damit an keiner Stelle etwas bei uns. Beide Läden warten auf ihre
-eigenen Prüfer.
+Bei Play in einem einzigen Vorgang: Paket, Eintrag, Bilder, Feature-Grafik und
+Versionshinweise — bei Play ist eine Änderung eine Transaktion, zwei Aufrufe
+wären zwei Entwürfe, von denen der erste verfällt.
 
-**Vorgezogen, weil es die laufende Prüfung nicht berührt:** Das iOS-Paket 1.1.0
-(Build 11) ist bei Apple hochgeladen und wird verarbeitet. Builds hängen nicht am
-Versionseintrag — der Upload ändert an 1.0 nichts, spart nach der Freigabe aber
-die Verarbeitungszeit. `ITSAppUsesNonExemptEncryption` steht auf `false`, Apple
-fragt die Ausfuhrbestimmung also nicht nach; der Build ist sofort anhängbar.
+Zwei Dinge, die Apple anders macht als erwartet:
 
-Bei Play wurde bewusst **nichts** hochgeladen. Die Produktionsspur hält den
-Erstrelease, und ein neues Paket dort ersetzt ihn — mitten in der Erstprüfung
-wäre das der teuerste mögliche Zeitpunkt. Das AAB liegt fertig daneben.
+- **Versionshinweise nimmt Apple nicht an**, solange die App nie veröffentlicht
+  war: „Neue Funktionen" beschreibt eine Änderung gegenüber etwas, das es im
+  Laden nicht gibt. Bei Play stehen sie drin.
+- **Die Prüfhinweise beschrieben nur den Wortstrom.** Ein Prüfer, der PDF-
+  Bearbeitung in der Beschreibung liest und nicht findet, lehnt ab. Sie sind neu
+  geschrieben und liegen als `store/metadata/review-notes.txt` im Repo, damit sie
+  gegen die App gegengelesen werden können — was nötig war: der erste Entwurf
+  beschrieb die Beschriftungen der **Web**-Fassung („Dokument importieren",
+  „Datei auswählen"), die App sagt „Importieren" und „Datei wählen".
 
-Sobald 1.0 freigegeben ist, läuft es in dieser Reihenfolge:
-
-1. ~~1.1 bauen (Android und iOS)~~ — erledigt, siehe unten
-2. Texte und Bilder übertragen — sie liegen fertig unter `store/metadata/` und
-   `store/screenshots/`
-3. Einreichen
-
-## Die beiden Pakete für 1.1
-
-Gebaut wurden sie schon jetzt, damit nach der Freigabe von 1.0 nur noch
-hochgeladen werden muss. Das EAS-Kontingent von `menucloudberlin` ist bis zum
-**1. September 2026** aufgebraucht, also lief auch dieser Bau unter dem
-geliehenen Konto `salatibox` — wie bei Build 9, nach demselben Verfahren in
-`docs/PLAN_SICHERUNG.md`.
-
-Bei Android war dabei eine Falle, die es bei iOS nicht gab: Der Schlüssel, mit
-dem Play die App wiedererkennt, liegt auf dem eigenen Konto. Ein Bau unter einem
-fremden Konto legt sich stillschweigend einen neuen an, gelingt, und wird erst
-beim Hochladen abgelehnt. Der Bau wurde deshalb auf den lokalen Upload-Schlüssel
-umgestellt.
-
-Nachgewiesen ist es am fertigen Paket, nicht am Bau-Protokoll:
-
-- Fingerabdruck im AAB und im Upload-Schlüssel sind derselbe SHA-256
-  (`EA:E2:14:9E:…:48:A7`)
-- Im Manifest des Bundles stehen `versionCode 10` und `1.1.0`
-
-Die geliehenen Einstellungen sind danach zurückgesetzt; das Repo beschreibt
-wieder den eigenen Zustand.
+Dazu kam heraus, dass die iOS-App nur `public.json` als Dateityp anmeldet, also
+die Sicherungsdatei. Eine PDF lässt sich auf dem iPhone **nicht** über „Öffnen
+mit" hineinreichen, nur über die Import-Ansicht der App. Damit ein Prüfer
+überhaupt eine PDF zur Hand hat, liegt unsere fiktive Beispieldatei jetzt unter
+**lexipulse.de/beispiel-vereinbarung.pdf** — mit Signaturlinie auf Seite 5.
 
 ## Am Gerät gelaufen — und drei Fehler gefunden, die nur dort auftreten
 
