@@ -104,7 +104,7 @@ export function ImportPanel({ onImported }: ImportPanelProps) {
                 Datei hierher ziehen oder auswählen
               </p>
               <p className="mt-1 text-[13px] text-[var(--lx-text-muted)]">
-                EPUB, PDF, TXT, Markdown, HTML — bis 80 MB
+                EPUB, FB2, PDF, TXT, Markdown, HTML — bis 80 MB
               </p>
             </div>
             <input

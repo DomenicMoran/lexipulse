@@ -3,7 +3,7 @@ import * as React from 'react';
 import { CheckIcon } from '@/components/icons';
 
 const WEB_FEATURES = [
-  'Alle Import-Formate: EPUB, PDF, TXT, Markdown, HTML, URL',
+  'Alle Import-Formate: EPUB, FB2, PDF, TXT, Markdown, HTML, URL',
   'Kompletter Player mit Pacing-Matrix und Tastatursteuerung',
   'Bibliothek, Lesezeichen, Statistik, Datenexport',
   'Offline nutzbar, als App installierbar',

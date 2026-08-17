@@ -33,7 +33,7 @@ const ITEMS: QuestionAnswer[] = [
     question: 'Welche Formate kann ich importieren?',
     answer: (
       <>
-        EPUB, PDF, TXT, Markdown und HTML als Datei oder per Drag-and-drop. Dazu Text aus
+        EPUB, FictionBook, PDF, TXT, Markdown und HTML als Datei oder per Drag-and-drop. Dazu Text aus
         der Zwischenablage und Artikel über eine Internetadresse. PDFs ohne Textebene —
         also reine Scans — lassen sich nicht lesen; dafür brauchen Sie vorher eine
         Texterkennung.

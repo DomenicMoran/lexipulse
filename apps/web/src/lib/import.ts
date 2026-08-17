@@ -5,7 +5,7 @@ import { formatNumber } from './format';
 /** Hard ceiling for a single file. Past this the browser tab, not the parser, is the limit. */
 export const MAX_FILE_BYTES = 80 * 1024 * 1024;
 
-export const ACCEPTED_EXTENSIONS = '.epub,.pdf,.txt,.md,.markdown,.html,.htm,.xhtml';
+export const ACCEPTED_EXTENSIONS = '.epub,.fb2,.pdf,.txt,.md,.markdown,.html,.htm,.xhtml';
 
 export interface ImportProgress {
   /** What is happening right now, already in German. */

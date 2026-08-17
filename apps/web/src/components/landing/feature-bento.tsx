@@ -99,7 +99,7 @@ export function FeatureBento() {
         <BentoCell span={2} rows={1}>
           <BentoHeading
             title="Import-Formate"
-            description="EPUB, PDF, TXT, Markdown und HTML per Datei oder Drag-and-drop. Dazu Text einfügen und Web-Artikel per Adresse."
+            description="EPUB, FictionBook, PDF, TXT, Markdown und HTML per Datei oder Drag-and-drop. Dazu Text einfügen und Web-Artikel per Adresse."
           />
           <div className="mt-auto flex flex-wrap gap-1.5 pt-6">
             {['EPUB', 'PDF', 'TXT', 'MD', 'HTML', 'URL'].map((format) => (
