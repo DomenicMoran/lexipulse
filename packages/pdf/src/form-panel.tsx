@@ -2,7 +2,7 @@
 
 import type { PdfFieldValue } from '@lexipulse/core';
 import * as React from 'react';
-import { readFormFields, type PdfFormField } from '@/lib/pdf-export';
+import { readFormFields, type PdfFormField } from './export.js';
 
 /**
  * Filling in an interactive form.

@@ -1,11 +1,14 @@
 @import 'tailwindcss';
 
 /*
- * The shared component package lives outside this app directory, so Tailwind's
- * automatic source detection never sees it. Without this line every utility used by
- * @lexipulse/ui would be missing from the stylesheet.
+ * The shared packages live outside this app directory, so Tailwind's automatic source
+ * detection never sees them. Without these lines every utility they use is missing from
+ * the stylesheet — and the failure is not a missing colour, it is a collapsed layout: the
+ * PDF surface lost `h-[100dvh]` and `min-h-0`, the scroller grew to 31 789 px instead of
+ * scrolling, and the page counter read 5 while page 1 was on screen.
  */
 @source '../../../../packages/ui/src';
+@source '../../../../packages/pdf/src';
 
 /*
  * OpenDyslexic, self-hosted.

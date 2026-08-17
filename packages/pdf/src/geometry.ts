@@ -1,4 +1,4 @@
-import type { PageSize } from './pdf-doc';
+import type { PageSize } from './document.js';
 
 /**
  * The one conversion between the two coordinate systems on this screen.

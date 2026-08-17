@@ -2,9 +2,9 @@
 
 import type { PDFDocumentProxy, PDFPageProxy, RenderTask } from 'pdfjs-dist';
 import * as React from 'react';
-import { getPdfjs } from '@/lib/pdf-loader';
-import { boxSize, rectToStyle } from './geometry';
-import { readLinks, type PageLink, type PageSize } from './pdf-doc';
+import { boxSize, rectToStyle } from './geometry.js';
+import { readLinks, type PageLink, type PageSize } from './document.js';
+import { getPdfjs } from './pdfjs.js';
 
 /**
  * One page of the original document.

@@ -10,9 +10,8 @@ import {
   type PdfRect,
 } from '@lexipulse/core';
 import * as React from 'react';
-import { getFileStore } from '@/lib/store';
-import { boxSize, boxToPdf, clampToPage, pdfToBox, rectToStyle } from './geometry';
-import type { PageSize } from './pdf-doc';
+import type { PageSize } from './document.js';
+import { boxSize, boxToPdf, clampToPage, pdfToBox, rectToStyle } from './geometry.js';
 
 /**
  * Everything the reader drew on one page, and the pointer handling that puts it there.
@@ -55,6 +54,8 @@ export interface MarkLayerProps {
   requestStamp?: () => Promise<{ imageId: string; ratio: number } | null>;
   /** Asks the surface for the words of a text box or a note. */
   requestText?: (initial: string) => Promise<string | null>;
+  /** Resolves a stamped picture so it can be shown before the file is written. */
+  loadStamp: (id: string) => Promise<{ bytes: Uint8Array; mime: string } | null>;
 }
 
 /** Kinds that follow the reader's text selection instead of a drawn rectangle. */
@@ -78,6 +79,7 @@ export function MarkLayer({
   onUpdate,
   requestStamp,
   requestText,
+  loadStamp,
 }: MarkLayerProps) {
   const host = React.useRef<HTMLDivElement | null>(null);
   const box = boxSize(size, scale, rotation);
@@ -370,6 +372,7 @@ export function MarkLayer({
             scale={scale}
             rotation={rotation}
             selected={mark.id === selectedId}
+            loadStamp={loadStamp}
           />
         ) : null,
       )}
@@ -598,12 +601,14 @@ function MarkImage({
   scale,
   rotation,
   selected,
+  loadStamp,
 }: {
   mark: PdfMark;
   size: PageSize;
   scale: number;
   rotation: number;
   selected: boolean;
+  loadStamp: (id: string) => Promise<{ bytes: Uint8Array; mime: string } | null>;
 }) {
   const [url, setUrl] = React.useState<string | null>(
     mark.imageId ? (stampUrls.get(mark.imageId) ?? null) : null,
@@ -615,12 +620,10 @@ function MarkImage({
     let cancelled = false;
 
     void (async () => {
-      const files = await getFileStore();
-      const bytes = await files.get(id);
-      const meta = await files.stat(id);
-      if (cancelled || !bytes) return;
-      const blob = new Blob([bytes.slice().buffer as ArrayBuffer], {
-        type: meta?.mime ?? 'image/png',
+      const picture = await loadStamp(id);
+      if (cancelled || !picture) return;
+      const blob = new Blob([picture.bytes.slice().buffer as ArrayBuffer], {
+        type: picture.mime,
       });
       const objectUrl = URL.createObjectURL(blob);
       stampUrls.set(id, objectUrl);
@@ -630,18 +633,17 @@ function MarkImage({
     return () => {
       cancelled = true;
     };
-  }, [mark.imageId]);
+  }, [mark.imageId, loadStamp]);
 
   const box = rectToStyle(mark.rect, size, scale, rotation);
   if (!url) return null;
 
   return (
     /*
-     * A plain `<img>`, not `next/image`. The source is a blob URL for a file that never
-     * left this device; there is no server that could resize it, and routing it through
-     * the image optimiser would mean uploading a signature to do so.
+     * A plain `<img>`. The source is a blob URL for a file that never left this device;
+     * there is no server that could resize it, and an image optimiser would mean
+     * uploading a signature in order to shrink it.
      */
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={url}
       alt={mark.kind === 'signature' ? 'Unterschrift' : 'Eingesetztes Bild'}

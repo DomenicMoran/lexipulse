@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import type { Tool, ToolStyle } from './mark-layer';
+import type { Tool, ToolStyle } from './mark-layer.js';
 
 /**
  * The tool palette and the strip of settings that belongs to whichever tool is active.

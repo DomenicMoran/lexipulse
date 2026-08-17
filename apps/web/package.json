@@ -19,6 +19,7 @@
   "dependencies": {
     "@cantoo/pdf-lib": "2.8.4",
     "@lexipulse/core": "workspace:*",
+    "@lexipulse/pdf": "workspace:*",
     "@lexipulse/ui": "workspace:*",
     "clsx": "2.1.1",
     "framer-motion": "13.1.0",

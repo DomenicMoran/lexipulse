@@ -2,8 +2,8 @@
 
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
 import * as React from 'react';
-import { isPasswordError, loadPdfForRender } from '@/lib/pdf-loader';
-import { getStore } from '@/lib/store';
+import type { PdfHost } from './host.js';
+import { getPdfjs, isPasswordError } from './pdfjs.js';
 
 /**
  * Opening, holding and searching the original PDF.
@@ -33,7 +33,39 @@ export interface PageSize {
  * two seconds of nothing on screen for a document whose pages are almost always the same
  * size; guessing and correcting shows the first page immediately and settles silently.
  */
-export function usePdfOriginal(documentId: string | null): {
+/**
+ * Open a PDF for display.
+ *
+ * `cMapUrl` and `standardFontDataUrl` are what make a CJK document and a PDF that relies
+ * on the fourteen standard fonts render at all instead of coming up blank. They are only
+ * passed when the host has them: the mobile bundle carries neither and would otherwise
+ * ask a `file://` path for them on every page.
+ *
+ * `isEvalSupported` stays false. pdf.js uses `eval` to speed up font programs; turning
+ * that off costs a little scroll performance and removes the only place where bytes out
+ * of an untrusted file become code.
+ */
+export async function openForRender(
+  data: Uint8Array,
+  options: { password?: string; cMapUrl?: string; standardFontDataUrl?: string } = {},
+): Promise<PDFDocumentProxy> {
+  const pdfjs = await getPdfjs();
+  return pdfjs.getDocument({
+    data,
+    password: options.password,
+    ...(options.cMapUrl ? { cMapUrl: options.cMapUrl, cMapPacked: true } : {}),
+    ...(options.standardFontDataUrl ? { standardFontDataUrl: options.standardFontDataUrl } : {}),
+    isEvalSupported: false,
+    verbosity: 0,
+  }).promise;
+}
+
+export interface OriginalOptions {
+  cMapUrl?: string;
+  standardFontDataUrl?: string;
+}
+
+export function usePdfOriginal(host: PdfHost, options: OriginalOptions = {}): {
   state: PdfLoadState;
   submitPassword: (password: string) => void;
   setPageSize: (pageNumber: number, size: PageSize) => void;
@@ -49,7 +81,7 @@ export function usePdfOriginal(documentId: string | null): {
    * which the screen still shows the previous document's pages — visible as a flash of
    * the wrong file every time the reader retypes a password.
    */
-  const key = `${documentId ?? ''}|${password ?? ''}|${attempt}`;
+  const key = `${host.documentId}|${password ?? ''}|${attempt}`;
   const [result, setResult] = React.useState<{ key: string; state: PdfLoadState } | null>(null);
   const state: PdfLoadState = result?.key === key ? result.state : { status: 'loading' };
 
@@ -61,13 +93,8 @@ export function usePdfOriginal(documentId: string | null): {
     };
 
     void (async () => {
-      if (!documentId) {
-        settle({ status: 'error', message: 'Kein Dokument ausgewählt.' });
-        return;
-      }
       try {
-        const store = await getStore();
-        const bytes = await store.getOriginal(documentId);
+        const bytes = await host.loadOriginal();
         if (cancelled) return;
         if (!bytes) {
           settle({
@@ -78,7 +105,11 @@ export function usePdfOriginal(documentId: string | null): {
           return;
         }
 
-        const doc = await loadPdfForRender(bytes, password);
+        const doc = await openForRender(bytes, {
+          password,
+          cMapUrl: options.cMapUrl,
+          standardFontDataUrl: options.standardFontDataUrl,
+        });
         if (cancelled) {
           void doc.destroy();
           return;
@@ -113,7 +144,10 @@ export function usePdfOriginal(documentId: string | null): {
       cancelled = true;
       void opened?.destroy();
     };
-  }, [documentId, password, attempt, key]);
+    // `host` is deliberately not a dependency: it is rebuilt on every render of the
+    // surface, and depending on it would reopen the document on every keystroke.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [host.documentId, password, attempt, key, options.cMapUrl, options.standardFontDataUrl]);
 
   const submitPassword = React.useCallback((value: string) => {
     setPassword(value);

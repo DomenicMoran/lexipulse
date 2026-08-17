@@ -123,7 +123,7 @@ export async function importFromImages(
   }
 
   onProgress({ label: 'PDF wird gebaut', percent: null });
-  const { imagesToPdf } = await import('./pdf-export');
+  const { imagesToPdf } = await import('@lexipulse/pdf/export');
   const bytes = await imagesToPdf(pictures);
 
   const name =

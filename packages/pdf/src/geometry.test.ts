@@ -6,7 +6,7 @@ import {
   normalizeTurn,
   pdfToBox,
   rectToStyle,
-} from './geometry';
+} from './geometry.js';
 
 /** A4 in points. Portrait, so a turn is visible in the numbers. */
 const A4 = { width: 595, height: 842 };

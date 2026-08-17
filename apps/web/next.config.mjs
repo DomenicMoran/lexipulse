@@ -25,7 +25,7 @@ const PREFERRED_MODULES = [
 const nextConfig = {
   reactStrictMode: true,
   // The workspace packages ship TypeScript source, not a build artefact.
-  transpilePackages: ['@lexipulse/core', '@lexipulse/ui'],
+  transpilePackages: ['@lexipulse/core', '@lexipulse/pdf', '@lexipulse/ui'],
   poweredByHeader: false,
   experimental: {
     optimizePackageImports: ['framer-motion'],

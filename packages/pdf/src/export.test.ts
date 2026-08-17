@@ -21,7 +21,7 @@ import {
   setProperties,
   toWinAnsi,
   wrapText,
-} from './pdf-export';
+} from './export.js';
 
 /** A small document with text, a form field and a known page count. */
 async function samplePdf(pages = 3): Promise<Uint8Array> {

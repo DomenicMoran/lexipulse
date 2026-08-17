@@ -2,15 +2,15 @@
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import * as React from 'react';
-import { formatNumber } from '@/lib/format';
 import {
   readOutline,
   searchPdf,
   type OutlineEntry,
   type PageSize,
   type SearchHit,
-} from './pdf-doc';
-import { PdfPage } from './pdf-page';
+} from './document.js';
+import { formatNumber } from './format.js';
+import { PdfPage } from './page.js';
 
 /**
  * The original surface: the PDF as its author laid it out.

@@ -2,9 +2,9 @@
 
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import * as React from 'react';
-import type { PageOp } from '@/lib/pdf-export';
-import type { PageSize } from './pdf-doc';
-import { PdfPage } from './pdf-page';
+import type { PageSize } from './document.js';
+import type { PageOp } from './export.js';
+import { PdfPage } from './page.js';
 
 /**
  * Rearranging the document itself: turning, deleting, reordering, adding.
