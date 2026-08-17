@@ -27,6 +27,7 @@ import { pathToFileURL } from 'node:url';
 import { chromium } from 'playwright';
 import type { Browser, Page } from 'playwright';
 import { seedEntries } from './seed.js';
+import { buildSeedPdf, buildSeedSignature, SEED_PDF_DOCUMENT_ID, SEED_STAMP_ID } from './seed-pdf.js';
 
 import { REPO_ROOT } from './fonts.js';
 import { SCREENS } from './templates/screens.js';
@@ -202,36 +203,85 @@ async function reachable(url: string, timeoutMs = 2000): Promise<boolean> {
  * on the root first, write, and only then navigate to the screen.
  */
 async function seedLibrary(page: Page, origin: string): Promise<void> {
+  // Built before the navigation: the signature is rasterised by this very page, and doing
+  // it afterwards would replace the app with an SVG.
+  const signature = await buildSeedSignature(page);
+  const pdf = await buildSeedPdf();
+
   await page.goto(origin, { waitUntil: 'domcontentloaded', timeout: 20_000 });
-  const written = await page.evaluate(async (entries: [string, string][]) => {
-    // Runs in the page. Writes straight into the `kv` object store the IndexedDB driver
-    // uses, creating the database at the driver's version if the app has not opened it.
-    const db = await new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('lexipulse', 1);
-      request.onupgradeneeded = () => {
-        if (!request.result.objectStoreNames.contains('kv')) {
-          request.result.createObjectStore('kv');
-        }
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-    await new Promise<void>((resolve, reject) => {
-      const tx = db.transaction('kv', 'readwrite');
-      const store = tx.objectStore('kv');
-      for (const [key, value] of entries) store.put(value, key);
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-    const count = await new Promise<number>((resolve, reject) => {
-      const tx = db.transaction('kv', 'readonly');
-      const request = tx.objectStore('kv').count();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-    db.close();
-    return count;
-  }, seedEntries());
+  const payload = {
+    entries: seedEntries(),
+    files: [
+      { id: `original:${SEED_PDF_DOCUMENT_ID}`, mime: 'application/pdf', data: [...pdf] },
+      { id: SEED_STAMP_ID, mime: 'image/png', data: [...signature] },
+    ],
+  };
+
+  const written = await page.evaluate(
+    async (input: {
+      entries: [string, string][];
+      files: { id: string; mime: string; data: number[] }[];
+    }) => {
+      /*
+       * Runs in the page, straight into the object stores the IndexedDB driver uses.
+       *
+       * Opened without a version on purpose: naming one pins this script to whatever the
+       * driver happened to use the day it was written, and the moment the app adds a
+       * store — which it did, for the original files — the seeding either fails outright
+       * or creates a database the app then has to upgrade underneath itself.
+       */
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const probe = indexedDB.open('lexipulse');
+        probe.onupgradeneeded = () => {
+          const created = probe.result;
+          if (!created.objectStoreNames.contains('kv')) created.createObjectStore('kv');
+          if (!created.objectStoreNames.contains('files')) created.createObjectStore('files');
+        };
+        probe.onsuccess = () => resolve(probe.result);
+        probe.onerror = () => reject(probe.error);
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction('kv', 'readwrite');
+        const store = tx.objectStore('kv');
+        for (const [key, value] of input.entries) store.put(value, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+
+      if (db.objectStoreNames.contains('files')) {
+        await new Promise<void>((resolve, reject) => {
+          const tx = db.transaction('files', 'readwrite');
+          const store = tx.objectStore('files');
+          for (const file of input.files) {
+            const bytes = new Uint8Array(file.data);
+            store.put(
+              {
+                id: file.id,
+                mime: file.mime,
+                bytes: bytes.byteLength,
+                updatedAt: Date.now(),
+                blob: new Blob([bytes.buffer as ArrayBuffer], { type: file.mime }),
+              },
+              file.id,
+            );
+          }
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+
+      const count = await new Promise<number>((resolve, reject) => {
+        const tx = db.transaction('kv', 'readonly');
+        const request = tx.objectStore('kv').count();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      db.close();
+      return count;
+    },
+    payload,
+  );
 
   if (written < seedEntries().length) {
     throw new Error(`Seeding wrote only ${written} keys; the capture would show an empty app.`);
@@ -248,6 +298,42 @@ const AFTER_LOAD: Record<string, (page: Page) => Promise<void>> = {
   '04-settings': async (page) => {
     await page.getByRole('button', { name: 'Einstellungen öffnen' }).click();
     await page.waitForSelector('[data-lexipulse-screen="04-settings"]', { timeout: 5_000 });
+  },
+  '07-original': async (page) => {
+    // The first page has to have finished drawing, or the sheet is photographed blank.
+    await page.waitForFunction(
+      () => {
+        const canvas = document.querySelector('[data-pdf-page="1"] canvas');
+        return canvas instanceof HTMLCanvasElement && canvas.width > 0 && canvas.style.opacity === '1';
+      },
+      undefined,
+      { timeout: 20_000 },
+    );
+  },
+  '08-tools': async (page) => {
+    await page.waitForFunction(
+      () => {
+        const canvas = document.querySelector('[data-pdf-page="5"] canvas');
+        return canvas instanceof HTMLCanvasElement && canvas.width > 0 && canvas.style.opacity === '1';
+      },
+      undefined,
+      { timeout: 20_000 },
+    );
+    await page.getByRole('button', { name: 'Bearbeiten', exact: true }).click();
+    await page.waitForSelector('[data-lexipulse-screen="08-tools"]', { timeout: 5_000 });
+
+    // The tool rows change the height above the page, and clicking scrolled the toolbar
+    // sideways. Both leave the shot showing the wrong thing, so land on the page again
+    // and put the toolbars back to the start.
+    await page.fill('#lx-pdf-page', '5');
+    await page.press('#lx-pdf-page', 'Enter');
+    await page.evaluate(() => {
+      document.querySelectorAll('[class*="overflow-x-auto"]').forEach((bar) => {
+        bar.scrollLeft = 0;
+      });
+      (document.activeElement as HTMLElement | null)?.blur();
+    });
+    await page.waitForTimeout(600);
   },
 };
 

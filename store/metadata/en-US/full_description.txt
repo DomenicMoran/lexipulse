@@ -1,71 +1,80 @@
-LexiPulse is two ways of reading in one app. The word stream shows text one word at a time in a fixed spot, so your eyes stay still instead of jumping back and forth across every line. Page mode shows the same document as ordinary flowing text, in the typeface you choose. The reading position is the same in both: switch whenever you like and never lose your place.
+LexiPulse is three ways of reading the same document — and a toolkit for everything else you do with a PDF. None of it leaves your device.
 
-IMPORT
-• EPUB (2 and 3) and FictionBook, with chapters and metadata
-• PDF with a smart filter: headers, footers, page numbers and table rows are removed, words split across a line break are put back together
-• Web articles by URL, without menus, banners and comment columns
-• Text and Markdown files, Markdown with chapters
-• Text straight from the clipboard
+THREE VIEWS, ONE READING POSITION
+• Original: the page as it was laid out, with figures, tables and forms
+• Page: the same document as flowing text, in the typeface you choose
+• Word stream: one word at a time in a fixed spot, when you need to get through it
+Switch whenever you like and never lose your place.
+
+THE PDF AS A PDF
+• Zoom, fit width, fit page, rotate, dark rendering
+• Thumbnails, the document's own outline, links
+• Full-text search with a hit list and a jump to the match
+• Open protected files with a password; the password is never stored
+
+ANNOTATE AND COMMENT
+• Highlight, underline and strike along the line, not as a box you drag
+• Draw freehand, any width and colour; rectangle, ellipse, line and arrow
+• Text boxes anywhere, at any size
+• Sticky notes that other PDF apps show as well
+
+FILL IN AND SIGN
+• Form fields: text, checkboxes, dropdowns, multiple choice
+• Close a half-filled form and carry on tomorrow
+• Flatten the answers so nobody can change them
+• Draw, type or photograph your signature; white paper turns transparent
+
+PAGES AND FILES
+• Rotate, delete and reorder pages
+• Insert a blank page, another PDF or an image — which is also how you merge
+• Pull selected pages out as a file of their own
+• Several photos become one PDF: photograph it, sign it, send it back
+• Redaction that really removes the text instead of covering it
+• Save as a new file or replace the original
+
+PAGE MODE
+• The whole document as flowing text, not just one chapter
+• Four typefaces including OpenDyslexic; size, spacing, margins and justification
+• Turn pages with a page number or scroll, plus auto-scroll
 
 WORD STREAM
 • 100 to 1200 words per minute, continuously adjustable
 • Every word sits on its Optimal Recognition Point, marked in colour
-• A pacing matrix instead of a fixed beat: long words get 25 percent more time on screen, punctuation 75 percent, and at the end of a paragraph it doubles
-• Warm-up ramp: the stream starts at 40 percent and accelerates to full speed
-• 10-word rewind, jump to sentence, paragraph or chapter
-• Read aloud, in step with the stream
-
-PAGE MODE
-• The whole document as flowing text, not just one chapter
-• Four typefaces: Literata, Inter, the system face and OpenDyslexic
-• Text size, line spacing, margins and justification all adjustable
-• Turn pages with a page number, or scroll continuously
-• Auto-scroll at a speed you set
-• Tap a word to jump there in the word stream
+• Long words and punctuation get more time, paragraph endings twice as much
+• A warm-up ramp after every start, read-aloud in step
 
 READING AIDS
 • Bionic emphasis: word openings in bold, strength adjustable
 • A reading ruler that follows the line you are on
-• Six colour filters over the page, for readers with visual stress
+• Six colour filters for readers with visual stress
 • OpenDyslexic ships with the app, nothing is downloaded
 
-SEARCH AND HIGHLIGHTS
-• Full-text search with a hit list and chapter
-• Word overview: everywhere else that word appears in the document
-• Accent-tolerant: "fur" finds "für", "traumen" finds "Träume"
-• Highlights in five colours, with notes
-• A list of every highlight, one tap jumps to it
-• Export highlights as Markdown, grouped by chapter
+SEARCH AND HIGHLIGHTS IN TEXT
+• Full-text search, accent-tolerant: "fur" finds "für"
+• Highlights in five colours with notes, as a list and as Markdown
 
-CONTROLS
-• Tap to start and pause, swipe to go back or forward
-• 4 themes: OLED Black, Graphite, Sepia, Minimal White. OLED Black saves power on OLED screens
-• 3 accent colours for the recognition point
+IMPORT
+• PDF, including scans with no text layer
+• EPUB (2 and 3) and FictionBook with chapters and cover
+• Text, Markdown, HTML, the clipboard and web articles by URL
+• A smart filter removes running heads, footers, page numbers and table rows
 
 LIBRARY
-• Offline library with search, sorting and filters
-• Reading progress per document, you always start again where you stopped
-• Bookmarks anywhere
-• Statistics with a reading streak, words read and effective speed
-• A daily goal in words, if you want one
+• Search, sort, filter and tag
+• Reading progress, bookmarks, statistics with a streak and a daily goal
 • Back up and move to another device, no account and no server
-• Merge two devices: the newer side wins and nothing is duplicated
 • Export all your own data as JSON (GDPR Art. 20)
 
 PRIVACY
-No account, no registration. Your documents are processed and stored on your device only, nothing is uploaded. No tracking, no analytics, no ads, no advertising identifiers.
-
-The only feature that contacts a server at all is importing a web article by URL. The page is fetched server-side, only the text comes back, and the URL is not logged. If you want to avoid even that, import from a file or the clipboard. After import the app works without an internet connection.
+No account, no tracking, no ads. Your documents are processed and stored on your device only — including while you edit, fill in and sign them. The one feature that contacts a server is importing a web article by URL.
 
 PRICE
-4.99 euros once. No subscription, no in-app purchases, no ads, no trial that turns into a bill. Buy once, keep it.
+4.99 euros once. No subscription, no in-app purchases, no ads. There is also a free web version at lexipulse.de.
 
-There is also a free web version at lexipulse.de.
-
-WHO IT IS FOR
-Anyone who reads a lot: students with course material, professionals with long PDFs, and anyone with a stack of e-books waiting. The reading aids also make it useful for people who find ordinary body text hard going.
+WHAT LEXIPULSE DOES NOT DO
+No conversion to Word and no server-side compression — both would mean uploading your file. The drawn signature is a picture of your signature, like a printout you signed and scanned; it is not a qualified electronic signature under eIDAS. A scanned PDF can be viewed and edited, but not searched.
 
 PLEASE NOTE
-LexiPulse is a tool for displaying text, not a medical device and not a therapy. How well you take a text in depends on the text, on what you already know and on the day. Start at 250 to 300 words per minute and build up slowly.
+LexiPulse is a tool for displaying text, not a medical device. Start the word stream at 250 to 300 words per minute.
 
 Legal notice, privacy policy and terms: lexipulse.de

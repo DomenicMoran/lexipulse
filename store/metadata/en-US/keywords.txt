@@ -1,1 +1,1 @@
-spritz,bionic,focus,wpm,ebook,book,article,text,study,offline,skim,fixation,dyslexia,highlight
+edit,form,annotate,highlight,scan,epub,reader,speedreading,notes,pages,markup,document,rsvp

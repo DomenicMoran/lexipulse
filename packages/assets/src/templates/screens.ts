@@ -13,6 +13,8 @@
 import { computeOrp } from '@lexipulse/core';
 import { computeStageGeometry, pivotOffsetColumns } from '@lexipulse/ui/geometry';
 
+import { SEED_PDF_DOCUMENT_ID } from '../seed-pdf.js';
+
 export type Locale = 'de' | 'en';
 
 export interface ScreenDef {
@@ -403,6 +405,118 @@ const stats = (locale: Locale): string => {
 `;
 };
 
+
+/* ------------------------------------------------------------- original surface */
+
+/**
+ * The fallback for the two original-surface screens.
+ *
+ * Both are captured from the running app whenever the dev server is up — a rendered PDF
+ * page is not something worth rebuilding in HTML, and a rebuilt one would be a picture of
+ * a document the app never produced. This exists so the run never writes nothing: it
+ * shows the toolbar and the page frame honestly, without pretending to be a render.
+ */
+function documentSheet(locale: Locale, marked: boolean): string {
+  const lines =
+    locale === 'de'
+      ? [
+          'Diese Vereinbarung regelt die Zusammenarbeit zwischen der',
+          'Musterwerk GmbH und der Beispiel Studio GbR für das',
+          'Vorhaben „Blaupause".',
+          '',
+          '1. Gegenstand',
+          'Die Beispiel Studio GbR erstellt ein Gestaltungskonzept',
+          'einschließlich zweier Entwurfsrunden.',
+          '',
+          '2. Fristen',
+          'Der erste Entwurf wird innerhalb von vier Wochen nach',
+          'Vertragsschluss vorgelegt.',
+        ]
+      : [
+          'This agreement covers the work between Musterwerk GmbH',
+          'and Beispiel Studio GbR on the "Blaupause" project.',
+          '',
+          '1. Scope',
+          'Beispiel Studio GbR produces a design concept including',
+          'two rounds of revisions.',
+          '',
+          '2. Deadlines',
+          'The first draft is delivered within four weeks of the',
+          'agreement being signed.',
+        ];
+
+  const marks = marked
+    ? `<span class="sheet-hl" style="top:118px;left:22px;width:236px"></span>
+       <span class="sheet-hl" style="top:136px;left:22px;width:188px"></span>
+       <span class="sheet-note" style="top:114px;left:266px">i</span>`
+    : '';
+
+  return `
+  <div class="sheet">
+    ${marks}
+    ${lines
+      .map((line) =>
+        line.length === 0
+          ? '<p class="sheet-gap"></p>'
+          : `<p class="${/^\d\./.test(line) ? 'sheet-h' : ''}">${line}</p>`,
+      )
+      .join('')}
+    ${
+      marked
+        ? `<p class="sheet-sign">${locale === 'de' ? 'Unterschrift' : 'Signature'}</p>
+           <svg class="sheet-ink" viewBox="0 0 240 60" fill="none" stroke="currentColor"
+                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+             <path d="M8 44 C 24 14, 40 12, 46 26 C 50 38, 40 48, 36 42 C 32 36, 46 22, 64 22
+                      C 82 22, 82 44, 96 42 C 110 40, 108 18, 118 18 C 128 18, 124 44, 136 42
+                      C 148 40, 148 14, 164 20 C 178 26, 166 46, 178 42 C 196 36, 208 18, 232 12"/>
+           </svg>`
+        : ''
+    }
+  </div>`;
+}
+
+function pdfToolbar(editing: boolean): string {
+  const tools = editing
+    ? ['▬', '⎯', '✎', '▭', 'T', '🗨', '✒']
+    : ['▤', '☰', '‹', '1 / 3', '›', '↔', '⟳', '◐', '⌕'];
+  return `<div class="pdf-bar ${editing ? 'is-tools' : ''}">${tools
+    .map((glyph) => `<span>${glyph}</span>`)
+    .join('')}</div>
+    ${
+      editing
+        ? `<div class="pdf-swatches">${['#ffd400', '#ff8a00', '#e5484d', '#0091ff', '#30a46c']
+            .map((colour) => `<i style="background:${colour}"></i>`)
+            .join('')}</div>`
+        : ''
+    }`;
+}
+
+const original = (locale: Locale): string => `
+  ${statusBar()}
+  ${pageHead(
+    locale === 'de' ? 'Original' : 'Original',
+    locale === 'de'
+      ? 'Die Seite so, wie sie gesetzt wurde.'
+      : 'The page exactly as it was laid out.',
+  )}
+  ${pdfToolbar(false)}
+  ${documentSheet(locale, false)}
+  ${tabBar('read', locale)}
+`;
+
+const originalTools = (locale: Locale): string => `
+  ${statusBar()}
+  ${pageHead(
+    locale === 'de' ? 'Bearbeiten' : 'Edit',
+    locale === 'de'
+      ? 'Markieren, ausfüllen, unterschreiben — alles im Gerät.'
+      : 'Annotate, fill in, sign — all on the device.',
+  )}
+  ${pdfToolbar(true)}
+  ${documentSheet(locale, true)}
+  ${tabBar('read', locale)}
+`;
+
 export const SCREENS: readonly ScreenDef[] = [
   {
     id: '01-player',
@@ -460,6 +574,28 @@ export const SCREENS: readonly ScreenDef[] = [
     devPath: '/reader/library',
     tablet: true,
     body: library,
+  },
+  {
+    id: '07-original',
+    headline: t('Die PDF, wie sie gesetzt wurde.', 'The PDF exactly as it was laid out.'),
+    sub: t(
+      'Abbildungen, Tabellen, Formulare. Mit Zoom, Miniaturen und Volltextsuche.',
+      'Figures, tables, forms. With zoom, thumbnails and full-text search.',
+    ),
+    devPath: `/reader/original?doc=${SEED_PDF_DOCUMENT_ID}&page=1`,
+    tablet: true,
+    body: original,
+  },
+  {
+    id: '08-tools',
+    headline: t('Markieren, ausfüllen, unterschreiben.', 'Annotate, fill in, sign.'),
+    sub: t(
+      'Alles im Gerät. Keine Datei wird hochgeladen, auch beim Bearbeiten nicht.',
+      'All on the device. No file is uploaded, not even while you edit it.',
+    ),
+    devPath: `/reader/original?doc=${SEED_PDF_DOCUMENT_ID}&page=5`,
+    tablet: true,
+    body: originalTools,
   },
   {
     id: '06-stats',

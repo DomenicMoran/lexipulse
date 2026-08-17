@@ -8,6 +8,13 @@ tatsächliche Funktionsumfang von LexiPulse.
 - Kein Nutzerkonto, keine Registrierung, kein Login.
 - Dokumente, Lesefortschritt, Lesezeichen, Einstellungen und Statistik liegen
   ausschließlich lokal auf dem Gerät (SQLite in der App, IndexedDB in der Web-App).
+- Seit 1.1 gehört dazu auch die **Originaldatei** einer importierten PDF sowie alles,
+  was darauf entsteht: Markierungen, Zeichnungen, Unterschriften und ausgefüllte
+  Formularfelder. In der App liegen die Originale als Dateien im privaten
+  App-Verzeichnis, in der Web-App als Blobs in derselben IndexedDB. Das Bearbeiten und
+  das Schreiben der fertigen PDF laufen vollständig auf dem Gerät; es gibt dafür keinen
+  Server und keinen Dienst, der beteiligt wäre. An den Antworten unten ändert das
+  nichts — erhoben wird weiterhin nichts.
 - Keine Analytics-, Crash- oder Werbe-SDKs. Kein Firebase, kein Google Analytics, kein
   Sentry, kein Facebook SDK, kein AdMob, kein Attributions-SDK.
 - Kein Zugriff auf IDFA oder Advertising ID, kein App Tracking Transparency-Prompt

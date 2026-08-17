@@ -1,71 +1,80 @@
-LexiPulse ist zwei Leseweisen in einer App. Der Wortstrom zeigt Texte Wort für Wort an einer festen Stelle, damit Ihre Augen ruhig bleiben statt in jeder Zeile hin und her zu springen. Der Seitenmodus zeigt dasselbe Dokument als normalen Fließtext, mit Ihrer Schrift. Die Leseposition ist in beiden dieselbe: Sie wechseln jederzeit und verlieren nie Ihre Stelle.
+LexiPulse ist drei Arten, dasselbe Dokument zu lesen — und ein Werkzeugkasten für alles, was man mit einer PDF sonst noch tut. Nichts davon verlässt Ihr Gerät.
 
-IMPORT
-• EPUB (2 und 3) und FictionBook, mit Kapiteln und Metadaten
-• PDF mit Smart-Filter: Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen raus, getrennte Wörter zusammengesetzt
-• Web-Artikel per URL, ohne Menüs, Banner und Kommentarspalten
-• Text- und Markdown-Dateien, mit Kapiteln
-• Text direkt aus der Zwischenablage
+DREI ANSICHTEN, EINE LESEPOSITION
+• Original: die Seite, wie sie gesetzt wurde, mit Abbildungen, Tabellen und Formularen
+• Seite: dasselbe Dokument als Fließtext in Ihrer Schrift
+• Wortstrom: ein Wort nach dem anderen an fester Stelle, wenn es schnell gehen muss
+Sie wechseln jederzeit und verlieren nie Ihre Stelle.
+
+DIE PDF ALS PDF
+• Zoom, Seitenbreite, ganze Seite, Drehen, dunkle Darstellung
+• Miniaturen, Gliederung des Dokuments, Verweise
+• Volltextsuche mit Trefferliste und Sprung auf die Fundstelle
+• Geschützte Dateien mit Kennwort öffnen; das Kennwort wird nirgends gespeichert
+
+MARKIEREN UND KOMMENTIEREN
+• Markieren, Unterstreichen, Durchstreichen entlang der Zeile, nicht als Kasten
+• Freihand zeichnen, Stärke und Farbe frei; Rechteck, Ellipse, Linie und Pfeil
+• Textfelder an jeder Stelle, in jeder Größe
+• Notizzettel, die auch andere PDF-Programme anzeigen
+
+AUSFÜLLEN UND UNTERSCHREIBEN
+• Formularfelder: Text, Haken, Auswahl, Mehrfachauswahl
+• Halb ausgefüllt zumachen und morgen weitermachen
+• Antworten festschreiben, damit sie niemand mehr ändert
+• Unterschrift zeichnen, tippen oder als Foto; weißes Papier wird transparent
+
+SEITEN UND DATEIEN
+• Seiten drehen, löschen, verschieben
+• Leere Seite, andere PDF oder Bild einfügen — damit auch zusammenführen
+• Ausgewählte Seiten als neue Datei herauslösen
+• Mehrere Fotos werden zu einer PDF: abfotografieren, unterschreiben, senden
+• Schwärzen, das den Text wirklich entfernt statt ihn nur zu überdecken
+• Als neue Datei speichern oder das Original ersetzen
+
+SEITENMODUS
+• Das ganze Dokument als Fließtext, nicht nur ein Kapitel
+• Vier Schriften, darunter OpenDyslexic; Größe, Zeilenabstand, Ränder und Blocksatz frei
+• Blättern mit Seitenzahl oder scrollen, dazu Auto-Scroll
 
 WORTSTROM
 • 100 bis 1200 Wörter pro Minute, stufenlos
 • Jedes Wort sitzt am Erkennungspunkt, farbig hervorgehoben
-• Pacing-Matrix statt starrem Takt: lange Wörter 25 Prozent mehr Standzeit, Satzzeichen 75 Prozent, am Absatzende doppelt
-• Warm-up-Rampe: startet bei 40 Prozent und beschleunigt auf den vollen Wert
-• 10-Wort-Rewind, Sprung zu Satz, Absatz oder Kapitel
-• Vorlesefunktion synchron zum Stream
-
-SEITENMODUS
-• Das ganze Dokument als Fließtext, nicht nur ein Kapitel
-• Vier Schriften: Literata, Inter, Systemschrift und OpenDyslexic
-• Schriftgröße, Zeilenabstand, Seitenränder und Blocksatz frei einstellbar
-• Blättern mit Seitenzahl oder durchgehend scrollen, wie Sie möchten
-• Auto-Scroll mit einstellbarer Geschwindigkeit
-• Ein Wort antippen springt in den Wortstrom
+• Lange Wörter und Satzzeichen bekommen mehr Standzeit, Absatzenden doppelt
+• Warm-up nach jedem Start, Vorlesen im Takt
 
 LESEHILFEN
 • Bionic-Hervorhebung: fette Wortanfänge, Stärke einstellbar
-• Leselineal, das der Zeile folgt, auf der Sie gerade sind
-• Sechs Farbfilter über der Seite für Menschen mit visuellem Stress
-• OpenDyslexic ist vollständig mitgeliefert, nicht nachgeladen
+• Leselineal, das der Zeile folgt
+• Sechs Farbfilter für Menschen mit visuellem Stress
+• OpenDyslexic ist mitgeliefert, nicht nachgeladen
 
-SUCHEN UND MARKIEREN
-• Volltextsuche mit Trefferliste und Kapitelangabe
-• Wortübersicht: wo ein Wort im Dokument sonst noch steht
-• Umlauttolerant: „fur" findet „für"
-• Markierungen in fünf Farben, mit Notiz
-• Liste aller Markierungen, ein Tippen springt zur Stelle
-• Markierungen als Markdown ausgeben, nach Kapiteln geordnet
+SUCHEN UND MARKIEREN IM TEXT
+• Volltextsuche, umlauttolerant: „fur" findet „für"
+• Markierungen in fünf Farben mit Notiz, als Liste und als Markdown
 
-BEDIENUNG
-• Tippen startet und pausiert, Wischen springt zurück oder weiter
-• 4 Themes: OLED Black, Graphite, Sepia, Minimal White
-• 3 Akzentfarben für den Erkennungspunkt
+IMPORT
+• PDF, auch gescannt und ohne Textebene
+• EPUB (2 und 3) und FictionBook mit Kapiteln und Umschlag
+• Text, Markdown, HTML, Zwischenablage und Web-Artikel per Adresse
+• Smart-Filter entfernt Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen
 
 BIBLIOTHEK
-• Offline-Bibliothek mit Suche, Sortierung und Filtern
-• Lesefortschritt pro Dokument
-• Lesezeichen an beliebigen Stellen
-• Statistik mit Lese-Streak, gelesenen Wörtern und effektiver Geschwindigkeit
-• Tagesziel in Wörtern, wenn Sie eines wollen
-• Sichern und auf ein anderes Gerät übertragen, ohne Konto und ohne Server
-• Zwei Geräte zusammenführen: das Neuere gewinnt, nichts wird doppelt
+• Suchen, sortieren, filtern, Schlagwörter
+• Lesefortschritt, Lesezeichen, Statistik mit Serie und Tagesziel
+• Sichern und aufs andere Gerät übertragen, ohne Konto und ohne Server
 • Export aller eigenen Daten als JSON (Art. 20 DSGVO)
 
 DATENSCHUTZ
-Kein Konto, keine Registrierung. Ihre Dokumente werden ausschließlich auf Ihrem Gerät verarbeitet und gespeichert, nichts wird hochgeladen. Kein Tracking, keine Analyse-Werkzeuge, keine Werbung, keine Werbe-Identifikatoren.
-
-Die einzige Funktion, die überhaupt einen Server anspricht, ist der Import eines Web-Artikels über eine URL. Die Seite wird serverseitig abgerufen, nur der Text kommt zurück, die URL wird nicht protokolliert. Wer auch das vermeiden will, importiert über Datei oder Zwischenablage. Nach dem Import läuft die App ohne Internetverbindung.
+Kein Konto, kein Tracking, keine Werbung. Ihre Dokumente werden nur auf Ihrem Gerät verarbeitet und gespeichert — auch beim Bearbeiten, Ausfüllen und Unterschreiben. Die einzige Funktion, die einen Server anspricht, ist der Import eines Web-Artikels über eine Adresse.
 
 PREIS
-4,99 Euro einmalig. Kein Abo, keine In-App-Käufe, keine Werbung, keine Testphase mit Kostenfalle. Einmal kaufen, dauerhaft nutzen.
+4,99 Euro einmalig. Kein Abo, keine In-App-Käufe, keine Werbung. Zusätzlich gibt es eine kostenlose Web-Version unter lexipulse.de.
 
-Zusätzlich gibt es eine kostenlose Web-Version unter lexipulse.de.
-
-FÜR WEN
-Für alle, die viel lesen: Studierende, Berufstätige mit langen PDFs, und alle mit einer Reihe von E-Books. Durch die Lesehilfen auch für Menschen, denen normaler Fließtext schwerfällt.
+WAS LEXIPULSE NICHT TUT
+Keine Umwandlung nach Word, kein serverseitiges Verkleinern — beides hieße, Ihre Datei hochzuladen. Die gezeichnete Unterschrift ist ein Bild, wie ein unterschriebener und eingescannter Ausdruck; eine qualifizierte elektronische Signatur nach eIDAS ist sie nicht. Eine gescannte PDF lässt sich ansehen und bearbeiten, aber nicht durchsuchen.
 
 HINWEIS
-LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt und keine Therapie. Wie gut Sie einen Text erfassen, hängt vom Text, Ihrer Vorkenntnis und Ihrer Tagesform ab. Beginnen Sie bei 250 bis 300 Wörtern pro Minute und steigern Sie langsam.
+LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt. Beginnen Sie beim Wortstrom bei 250 bis 300 Wörtern pro Minute.
 
-Impressum, Datenschutzerklärung und Nutzungsbedingungen: lexipulse.de
+Impressum, Datenschutz und Nutzungsbedingungen: lexipulse.de

@@ -365,7 +365,15 @@ export function PdfSurface({
   const toStream = host.toStream;
 
   return (
-    <div className="flex h-[100dvh] flex-col">
+    /*
+     * The marker the store-screenshot driver looks for. It photographs the running app
+     * rather than a rebuilt mock, but only where a screen says which one it is — a route
+     * that happens to return 200 proves nothing about what is on it.
+     */
+    <div
+      className="flex h-[100dvh] flex-col"
+      data-lexipulse-screen={editing ? '08-tools' : '07-original'}
+    >
       <header className="flex h-12 shrink-0 items-center gap-3 border-b border-[var(--lx-border)] bg-[var(--lx-bg)] px-3">
         {onBack && (
           <button
@@ -481,9 +489,11 @@ export function PdfSurface({
                     <button
                       type="button"
                       onClick={() => toStream(page.current)}
-                      className="inline-flex h-8 items-center rounded-[6px] bg-[var(--lx-accent)] px-3 text-[13px] font-medium text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
+                      className="inline-flex h-8 shrink-0 items-center rounded-[6px] bg-[var(--lx-accent)] px-3 text-[13px] font-medium whitespace-nowrap text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
                     >
-                      Ab hier im Wortstrom
+                      {/* The long form needs room a phone does not have. */}
+                      <span className="sm:hidden">Wortstrom</span>
+                      <span className="hidden sm:inline">Ab hier im Wortstrom</span>
                     </button>
                   )}
                 </>

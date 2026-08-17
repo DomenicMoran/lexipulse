@@ -485,7 +485,14 @@ function Toolbar({
   const value = draft.page === page ? draft.text : String(page);
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5 border-b border-[var(--lx-border)] bg-[var(--lx-surface)] px-3 py-2">
+    /*
+     * One row that scrolls sideways on a phone, wrapping only where there is room.
+     *
+     * Wrapping unconditionally stacked eleven controls into three rows on a 390 px screen
+     * and pushed the page itself off the bottom of the display. A toolbar that takes a
+     * third of the height is not a toolbar.
+     */
+    <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto border-b border-[var(--lx-border)] bg-[var(--lx-surface)] px-3 py-2 [scrollbar-width:none] sm:flex-wrap sm:overflow-x-visible [&::-webkit-scrollbar]:hidden">
       <ToolButton
         label="Miniaturen"
         pressed={sidebar === 'thumbs'}
@@ -572,7 +579,7 @@ function Toolbar({
         ⌕
       </ToolButton>
 
-      {extra && <div className="ml-auto flex items-center gap-1.5">{extra}</div>}
+      {extra && <div className="flex shrink-0 items-center gap-1.5 sm:ml-auto">{extra}</div>}
     </div>
   );
 }

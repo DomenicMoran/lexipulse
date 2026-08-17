@@ -25,16 +25,26 @@ Das Google-Limit von 500 Zeichen für Versionshinweise ist die engste Grenze bei
 Release Notes. `release_notes.txt` bleibt deshalb unter 500 Zeichen, damit derselbe Text
 in beiden Stores funktioniert.
 
-## Aktuelle Zeichenzahl (gemessen 2026-08-17)
+## Diese Texte gehören zu Version 1.1
+
+**Nicht hochladen, solange 1.0 in Prüfung ist.** Sie beschreiben den Original-Modus, das
+Bearbeiten, Ausfüllen und Unterschreiben — Funktionen, die das geprüfte 1.0-Paket nicht
+enthält. Ein Eintrag, der etwas verspricht, das im Build fehlt, ist ein Ablehnungsgrund
+und gegenüber Käufern falsch. Und ein Eingriff in den Play-Eintrag bricht die laufende
+Prüfung ohnehin ab.
+
+Reihenfolge: 1.0 abwarten → 1.1 bauen und hochladen → diese Texte übertragen → einreichen.
+
+## Aktuelle Zeichenzahl (gemessen 2026-08-17, zweite Runde)
 
 | Datei | de-DE | en-US |
 |---|---|---|
-| title | 23 / 30 | 23 / 30 |
-| subtitle | 30 / 30 | 27 / 30 |
-| short_description | 79 / 80 | 73 / 80 |
-| keywords | 94 / 100 | 94 / 100 |
-| full_description | 3984 / 4000 | 3706 / 4000 |
-| release_notes | 475 / 500 | 453 / 500 |
+| title | 23 / 30 | 22 / 30 |
+| subtitle | 26 / 30 | 24 / 30 |
+| short_description | 77 / 80 | 71 / 80 |
+| keywords | 94 / 100 | 91 / 100 |
+| full_description | 3993 / 4000 | 3751 / 4000 |
+| release_notes | 496 / 500 | 489 / 500 |
 
 Nach jeder Textänderung neu messen:
 
@@ -48,9 +58,10 @@ Get-ChildItem store/metadata/*/*.txt | ForEach-Object {
 
 **Apple.** Der Suchindex wird aus Name, Untertitel und dem Keyword-Feld gebildet. Ein
 Wort, das schon im Namen oder Untertitel steht, gehört nicht noch einmal ins
-Keyword-Feld, das wäre verschenkter Platz. Deshalb enthält `keywords.txt` weder
-„Speed" noch „Reader" (aus dem Namen) und weder „EPUB" noch „PDF" noch „RSVP" (aus dem
-Untertitel). Keywords werden kommagetrennt und ohne Leerzeichen nach dem Komma
+Keyword-Feld, das wäre verschenkter Platz. Der Name trägt „PDF" und „E-Book", der
+Untertitel „Ausfüllen" und „Unterschreiben"; `keywords.txt` enthält deshalb keines
+dieser Wörter, sondern die Begriffe, die sonst nirgends stehen — bearbeiten, Formular,
+Scan, Leser, Markieren, Seiten. Keywords werden kommagetrennt und ohne Leerzeichen nach dem Komma
 eingetragen; jedes Leerzeichen kostet eines der 100 Zeichen. Die Beschreibung fließt bei
 Apple **nicht** in den Suchindex ein, sie dient allein der Überzeugung auf der
 Produktseite.

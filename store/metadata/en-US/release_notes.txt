@@ -1,14 +1,13 @@
-Version 1.0.0
+Version 1.1
 
-First release.
+A PDF is a PDF again.
 
-• Word stream with ORP fixation, 100 to 1200 WPM
-• Page mode with four typefaces, page turning and auto-scroll
-• One reading position for both modes
-• Import: EPUB, FictionBook, PDF, web articles, text, Markdown
-• Search, word overview, highlights with notes
-• Reading aids: bionic text, ruler, colour filters, OpenDyslexic
-• Library with tags, statistics and a daily goal
-• Back up and move to another device
+• New "Original" view: the page as it was laid out, with zoom, thumbnails, outline and full-text search
+• Highlight, underline, draw, add text boxes and notes
+• Fill in forms and flatten them when you are done
+• Sign by drawing, typing or photographing your signature
+• Rotate, delete, reorder, insert and extract pages
+• Redaction that really removes the text
+• Open scanned PDFs; several photos become one PDF
 
-All local. No account, no tracking, no ads.
+All on your device. No file is uploaded.

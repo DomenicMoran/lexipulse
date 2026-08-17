@@ -188,6 +188,22 @@ function appCss(): string {
 .pct{font-family:${FONT_STACKS.mono};font-size:11.5px;color:${oled.textMuted};flex:none;width:46px;text-align:right}
 .footnote{margin:20px 22px 0;font-size:11.5px;color:${oled.textFaint};text-align:center}
 
+/* --- original surface: a paper sheet with the toolbar above it --- */
+.pdf-bar{display:flex;align-items:center;gap:6px;margin:0 22px 10px;padding:7px 9px;border:1px solid ${oled.border};border-radius:10px;background:${oled.surface};font-size:12px;color:${oled.textMuted};overflow:hidden}
+.pdf-bar span{display:inline-flex;align-items:center;justify-content:center;min-width:19px;height:19px;border-radius:5px}
+.pdf-bar.is-tools span:nth-child(1){background:${coral.base};color:${coral.on}}
+.pdf-swatches{display:flex;gap:7px;margin:0 22px 12px}
+.pdf-swatches i{width:15px;height:15px;border-radius:50%;display:block}
+.pdf-swatches i:first-child{outline:2px solid ${oled.text};outline-offset:2px}
+.sheet{position:relative;margin:0 22px;padding:20px 22px 26px;border-radius:6px;background:#fdfdfb;color:#17171a;font-family:${FONT_STACKS.serif};font-size:10.5px;line-height:1.62;box-shadow:0 2px 10px rgba(0,0,0,.45)}
+.sheet p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet .sheet-h{font-weight:700;margin-top:2px}
+.sheet .sheet-gap{height:7px}
+.sheet-hl{position:absolute;height:13px;border-radius:2px;background:#ffd400;opacity:.42;mix-blend-mode:multiply}
+.sheet-note{position:absolute;width:14px;height:14px;border-radius:3px;background:#ffb224;border:1px solid rgba(0,0,0,.35);font-family:${FONT_STACKS.sans};font-size:9px;line-height:14px;text-align:center;color:#1a1a1a}
+.sheet-sign{margin-top:16px;font-size:9.5px;color:#6b6b72;border-top:1px solid #c9c9cf;padding-top:6px;width:62%}
+.sheet-ink{display:block;width:120px;height:30px;margin-top:-26px;margin-left:16px;color:#111}
+
 /* ---- stats ----------------------------------------------------------- */
 .kpis{display:flex;gap:10px;margin:0 22px 16px}
 .kpis div{flex:1;padding:14px 12px;border:1px solid ${oled.border};border-radius:12px;background:${oled.surface};text-align:center}

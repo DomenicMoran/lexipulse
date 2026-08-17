@@ -1,14 +1,13 @@
-Version 1.0.0
+Version 1.1
 
-Erste Veröffentlichung.
+Die PDF ist jetzt eine PDF.
 
-• Wortstrom mit ORP-Fixierung, 100 bis 1200 WPM
-• Seitenmodus mit vier Schriften, Blättern und Auto-Scroll
-• Eine Leseposition für beide Modi
-• Import: EPUB, FictionBook, PDF, Web-Artikel, Text, Markdown
-• Suche, Wortübersicht, Markierungen mit Notizen
-• Lesehilfen: Bionic, Lineal, Farbfilter, OpenDyslexic
-• Bibliothek mit Schlagwörtern, Statistik, Tagesziel
-• Sichern und auf ein Gerät übertragen
+• Neue Ansicht „Original": die Seite wie gesetzt, mit Zoom, Miniaturen, Gliederung und Volltextsuche
+• Markieren, unterstreichen, zeichnen, Textfelder, Notizen
+• Formulare ausfüllen und auf Wunsch festschreiben
+• Unterschreiben: zeichnen, tippen oder als Foto
+• Seiten drehen, löschen, verschieben, einfügen
+• Schwärzen, das den Text wirklich entfernt
+• Gescannte PDFs öffnen; Fotos werden zu einer PDF
 
-Alles lokal. Kein Konto, kein Tracking, keine Werbung.
+Alles auf dem Gerät. Keine Datei wird hochgeladen.

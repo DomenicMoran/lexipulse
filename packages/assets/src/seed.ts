@@ -11,6 +11,8 @@
  * The books are public domain.
  */
 
+import { SEED_PDF_DOCUMENT_ID, SEED_STAMP_ID } from './seed-pdf.js';
+
 const DAY = 86_400_000;
 
 /** `YYYY-MM-DD` in local time — the key format `LexiStore.dayKey` writes. */
@@ -143,6 +145,7 @@ function countWords(text: string): number {
  */
 export function seedEntries(now = Date.now()): [string, string][] {
   const entries: [string, string][] = [['lexi:schema', '1']];
+  entries.push(...pdfSeedEntries(now));
 
   let totalTokensRead = 0;
 
@@ -263,3 +266,115 @@ export function seedEntries(now = Date.now()): [string, string][] {
   return entries;
 }
 
+
+
+/* ------------------------------------------------------------------ the demo PDF */
+
+/**
+ * The record for the demo agreement, plus the marks the original-surface screenshots
+ * show: a highlighted clause, a note beside it and a signature on the line.
+ *
+ * The file itself is written into the `files` object store by the capture, because a PDF
+ * is bytes and this function returns strings. The two belong together: without the file
+ * the document opens on an error, and without the record the file is an orphan the first
+ * sweep removes.
+ */
+export function pdfSeedEntries(now: number): [string, string][] {
+  const id = SEED_PDF_DOCUMENT_ID;
+  const updatedAt = now - 2 * 3_600_000;
+
+  const text = [
+    'Diese Vereinbarung regelt die Zusammenarbeit zwischen der Musterwerk GmbH und der Beispiel Studio GbR für das Vorhaben „Blaupause". Sie tritt mit der Unterzeichnung durch beide Seiten in Kraft.',
+    'Die Beispiel Studio GbR erstellt ein Gestaltungskonzept einschließlich zweier Entwurfsrunden. Der Leistungsumfang ergibt sich aus der Anlage 1, die Bestandteil dieser Vereinbarung ist.',
+    'Der erste Entwurf wird innerhalb von vier Wochen nach Vertragsschluss vorgelegt. Rückmeldungen erfolgen jeweils innerhalb von zehn Werktagen.',
+  ].join('\n\n');
+  const wordCount = text.trim().split(/\s+/).length;
+
+  const mark = (
+    key: string,
+    kind: string,
+    rect: number[],
+    extra: Record<string, unknown> = {},
+  ): Record<string, unknown> => ({
+    id: `${id}-${key}`,
+    documentId: id,
+    page: kind === 'signature' ? 5 : 1,
+    kind,
+    rect,
+    color: kind === 'highlight' ? '#ffd400' : '#e5484d',
+    opacity: kind === 'highlight' ? 0.4 : 1,
+    strokeWidth: 2,
+    createdAt: updatedAt,
+    updatedAt,
+    ...extra,
+  });
+
+  return [
+    [
+      `lexi:doc:${id}`,
+      JSON.stringify({
+        id,
+        title: 'Vereinbarung Blaupause',
+        author: 'Musterwerk GmbH',
+        source: 'pdf',
+        origin: 'vereinbarung-blaupause.pdf',
+        language: 'de',
+        chapters: [{ id: 'c0', title: 'Vereinbarung', text, startToken: 0, tokenCount: 0 }],
+        totalTokens: wordCount,
+        wordCount,
+        coverDataUrl: null,
+        createdAt: updatedAt - 3 * DAY,
+        updatedAt,
+        original: {
+          fileId: `original:${id}`,
+          mime: 'application/pdf',
+          bytes: 0,
+          fileName: 'vereinbarung-blaupause.pdf',
+          pageCount: 5,
+        },
+        pageWordStarts: [0, 1, 2, 3, 4].map((page) => Math.round((wordCount * page) / 5)),
+        importReport: {
+          source: 'pdf',
+          rawSections: 5,
+          removed: { headers: 5, footers: 0, pageNumbers: 5, tableRows: 0, artifacts: 0 },
+          dehyphenated: 0,
+          notes: [],
+          durationMs: 240,
+        },
+      }),
+    ],
+    [
+      `lexi:progress:${id}`,
+      JSON.stringify({
+        documentId: id,
+        tokenIndex: Math.round(wordCount * 0.34),
+        chapterIndex: 0,
+        percent: 0.34,
+        updatedAt,
+        msRead: 96_000,
+      }),
+    ],
+    // Coordinates are PDF points against the page `buildSeedPdf` draws.
+    [
+      `lexi:mark:${id}:${id}-hl`,
+      JSON.stringify(mark('hl', 'highlight', [56, 604, 470, 620])),
+    ],
+    [
+      `lexi:mark:${id}:${id}-hl2`,
+      JSON.stringify(mark('hl2', 'highlight', [56, 587, 420, 603])),
+    ],
+    [
+      `lexi:mark:${id}:${id}-note`,
+      JSON.stringify(mark('note', 'note', [498, 596, 512, 610], {
+        color: '#ffb224',
+        text: 'Frist mit dem Team abstimmen',
+      })),
+    ],
+    [
+      `lexi:mark:${id}:${id}-sig`,
+      JSON.stringify(mark('sig', 'signature', [304, 330, 484, 388], {
+        imageId: SEED_STAMP_ID,
+      })),
+    ],
+  ];
+}

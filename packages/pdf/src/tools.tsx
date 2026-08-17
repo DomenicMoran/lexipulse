@@ -79,11 +79,13 @@ export function ToolPalette({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+    /* Same reason as the toolbar above: on a phone thirteen tools wrap into three rows
+       and push the page off the screen. One row that scrolls keeps them all reachable. */
+    <div className="flex flex-nowrap items-center gap-x-3 gap-y-1.5 overflow-x-auto [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
       {TOOL_GROUPS.map((group, index) => (
         <React.Fragment key={group.title}>
-          {index > 0 && <span aria-hidden="true" className="h-5 w-px bg-[var(--lx-border)]" />}
-          <div role="group" aria-label={group.title} className="flex items-center gap-1">
+          {index > 0 && <span aria-hidden="true" className="h-5 w-px shrink-0 bg-[var(--lx-border)]" />}
+          <div role="group" aria-label={group.title} className="flex shrink-0 items-center gap-1">
             {group.tools.map((definition) => (
               <button
                 key={definition.tool}
@@ -133,9 +135,9 @@ export function StyleBar({
   canDelete: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-nowrap items-center gap-3 overflow-x-auto [scrollbar-width:none] sm:flex-wrap [&::-webkit-scrollbar]:hidden">
       {usesColor(tool) && (
-        <div role="group" aria-label="Farbe" className="flex items-center gap-1">
+        <div role="group" aria-label="Farbe" className="flex shrink-0 items-center gap-1">
           {PALETTE.map((color) => (
             <button
               key={color}
