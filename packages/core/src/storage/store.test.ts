@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
+import { createMark, type PdfMark } from '../pdf-marks.js';
 import { DEFAULT_SETTINGS } from '../settings.js';
 import type { Annotation, Bookmark, LexiDocument, ReadingProgress } from '../types.js';
 import { MemoryDriver } from './driver.js';
+import { MemoryFileStore } from './files.js';
 import { LexiStore, SCHEMA_VERSION, computeStreak, dayKey, normalizeTags } from './store.js';
 
 function makeDoc(id: string, title = 'Buch'): LexiDocument {
@@ -428,5 +430,97 @@ describe('annotations', () => {
 
     expect(result.annotationsAdded).toBe(1);
     expect((await target.listAnnotations('doc-a')).map((a) => a.id)).toEqual(['a']);
+  });
+});
+
+describe('marks on original pages', () => {
+  const make = (id: string, page: number, kind: PdfMark['kind'] = 'highlight'): PdfMark =>
+    createMark({ id, documentId: 'doc-a', page, kind, rect: [10, 20, 110, 40] });
+
+  it('stores, lists oldest first, and deletes', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.saveMark({ ...make('b', 4), createdAt: 200 });
+    await store.saveMark({ ...make('a', 2), createdAt: 100 });
+
+    expect((await store.listMarks('doc-a')).map((m) => m.id)).toEqual(['a', 'b']);
+
+    await store.deleteMark('doc-a', 'a');
+    expect((await store.listMarks('doc-a')).map((m) => m.id)).toEqual(['b']);
+  });
+
+  it('goes when the document goes', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.saveDocument(makeDoc('doc-a'));
+    await store.saveMark(make('a', 1));
+    await store.setFormValues('doc-a', { name: 'Domenic' });
+
+    await store.deleteDocument('doc-a');
+    expect(await store.listMarks('doc-a')).toEqual([]);
+    expect(await store.getFormValues('doc-a')).toEqual({});
+  });
+
+  it('survives a round trip through export and import', async () => {
+    const source = new LexiStore(new MemoryDriver());
+    await source.init();
+    await source.saveDocument(makeDoc('doc-a'));
+    await source.saveMark(make('a', 3));
+    await source.setFormValues('doc-a', { name: 'Domenic', ok: true });
+
+    const target = new LexiStore(new MemoryDriver());
+    await target.init();
+    const result = await target.importAll(await source.exportAll());
+
+    expect(result.marksAdded).toBe(1);
+    expect(result.formsUpdated).toBe(1);
+    expect((await target.listMarks('doc-a'))[0]?.page).toBe(3);
+    expect(await target.getFormValues('doc-a')).toEqual({ name: 'Domenic', ok: true });
+  });
+
+  it('does not duplicate the same mark when the same backup is read twice', async () => {
+    const source = new LexiStore(new MemoryDriver());
+    await source.init();
+    await source.saveDocument(makeDoc('doc-a'));
+    await source.saveMark(make('a', 3));
+    const backup = await source.exportAll();
+
+    const target = new LexiStore(new MemoryDriver());
+    await target.init();
+    await target.importAll(backup);
+    const second = await target.importAll(backup);
+
+    expect(second.marksAdded).toBe(0);
+    expect(await target.listMarks('doc-a')).toHaveLength(1);
+  });
+
+  it('keeps both sides of a half-filled form, field by field', async () => {
+    const source = new LexiStore(new MemoryDriver());
+    await source.init();
+    await source.saveDocument(makeDoc('doc-a'));
+    await source.setFormValues('doc-a', { name: 'Domenic' });
+
+    const target = new LexiStore(new MemoryDriver());
+    await target.init();
+    await target.saveDocument(makeDoc('doc-a'));
+    await target.setFormValues('doc-a', { ort: 'Berlin' });
+    await target.importAll(await source.exportAll());
+
+    expect(await target.getFormValues('doc-a')).toEqual({ name: 'Domenic', ort: 'Berlin' });
+  });
+
+  it('never puts an original file into the backup', async () => {
+    const files = new MemoryFileStore();
+    const store = new LexiStore(new MemoryDriver(), files);
+    await store.init();
+    await store.saveDocument(makeDoc('doc-a'));
+    await store.putOriginal('doc-a', new Uint8Array([1, 2, 3, 4]), {
+      mime: 'application/pdf',
+      fileName: 'a.pdf',
+    });
+
+    const backup = await store.exportAll();
+    expect(backup).not.toContain('AQIDBA');
+    expect(JSON.parse(backup).files).toBeUndefined();
   });
 });

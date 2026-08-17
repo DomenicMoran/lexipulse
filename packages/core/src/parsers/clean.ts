@@ -53,6 +53,16 @@ export interface CleanResult {
   text: string;
   removed: ImportReport['removed'];
   dehyphenated: number;
+  /**
+   * Word offset in `text` at which each source page's first surviving word sits.
+   * One entry per input page; empty for sources that have no pages.
+   *
+   * This is what lets the original-page surface and the word stream share a position:
+   * page 12 of the PDF is word `pageWordStarts[11]` of the stream. A page whose every
+   * line was filtered away inherits the next page's offset, so jumping to it lands on
+   * the first thing that actually survived rather than at the start of the document.
+   */
+  pageWordStarts: number[];
 }
 
 const ROMAN = /^[ivxlcdm]+$/i;
@@ -208,24 +218,57 @@ export function reflowParagraphs(lines: readonly string[], dehyphenate: boolean)
   text: string;
   dehyphenated: number;
 } {
-  const measured = lines.filter((l) => l.trim().length > 0).map((l) => l.trim().length);
+  const { paragraphs, dehyphenated } = reflowTagged(
+    lines.map((text) => ({ text, page: 0 })),
+    dehyphenate,
+  );
+  return { text: paragraphs.map((p) => p.text).join('\n\n'), dehyphenated };
+}
+
+/** A kept line together with the source page it came off. */
+interface TaggedLine {
+  text: string;
+  page: number;
+}
+
+/** A finished paragraph together with the page its first line came off. */
+interface TaggedParagraph {
+  text: string;
+  page: number;
+}
+
+/**
+ * The reflow above, but carrying each line's source page through to the paragraph.
+ *
+ * Split out rather than duplicated: a second copy of this heuristic would drift from the
+ * first the moment either is touched, and the paragraph boundaries would then differ
+ * between the text the reader sees and the page offsets used to jump into it.
+ */
+function reflowTagged(
+  lines: readonly TaggedLine[],
+  dehyphenate: boolean,
+): { paragraphs: TaggedParagraph[]; dehyphenated: number } {
+  const measured = lines
+    .filter((l) => l.text.trim().length > 0)
+    .map((l) => l.text.trim().length);
   measured.sort((a, b) => a - b);
   const median = measured.length > 0 ? (measured[Math.floor(measured.length / 2)] as number) : 70;
   const shortLine = median * 0.75;
 
-  const paragraphs: string[] = [];
+  const paragraphs: TaggedParagraph[] = [];
   let current = '';
+  let currentPage = 0;
   let dehyphenated = 0;
 
   const flush = () => {
     const t = current.replace(/\s+/g, ' ').trim();
-    if (t.length > 0) paragraphs.push(t);
+    if (t.length > 0) paragraphs.push({ text: t, page: currentPage });
     current = '';
   };
 
   for (let i = 0; i < lines.length; i += 1) {
-    const raw = lines[i] as string;
-    const line = raw.trim();
+    const entry = lines[i] as TaggedLine;
+    const line = entry.text.trim();
 
     if (line.length === 0) {
       flush();
@@ -234,12 +277,13 @@ export function reflowParagraphs(lines: readonly string[], dehyphenate: boolean)
 
     if (looksLikeHeading(line)) {
       flush();
-      paragraphs.push(line);
+      paragraphs.push({ text: line, page: entry.page });
       continue;
     }
 
     if (current.length === 0) {
       current = line;
+      currentPage = entry.page;
     } else if (dehyphenate && /[\p{Ll}\p{Lu}]-$/u.test(current) && /^[\p{Ll}]/u.test(line)) {
       // "Doku-\nmentation" → "Dokumentation"
       current = current.slice(0, -1) + line;
@@ -251,14 +295,46 @@ export function reflowParagraphs(lines: readonly string[], dehyphenate: boolean)
 
     const endsSentence = /[.!?…]["'”’»)\]]?$/.test(line);
     const isShort = line.length < shortLine;
-    const next = lines[i + 1]?.trim() ?? '';
+    const next = lines[i + 1]?.text.trim() ?? '';
     const nextStartsUpper = next.length === 0 || /^["'“„«(]?[\p{Lu}\p{Nd}]/u.test(next);
 
     if (endsSentence && isShort && nextStartsUpper) flush();
   }
   flush();
 
-  return { text: paragraphs.join('\n\n'), dehyphenated };
+  return { paragraphs, dehyphenated };
+}
+
+/** Whitespace-delimited words, counted the way the tokenizer will split them. */
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return 0;
+  return trimmed.split(/\s+/).length;
+}
+
+/**
+ * Word offset of the first paragraph belonging to each page.
+ *
+ * Pages that lost everything to the filter — a full-page table, a plate, a blank verso —
+ * inherit the offset of the next page that kept something, so a jump to them still lands
+ * forwards rather than at word zero.
+ */
+function pageOffsets(paragraphs: readonly TaggedParagraph[], pageCount: number): number[] {
+  const firstWordOfPage = new Map<number, number>();
+  let words = 0;
+  for (const paragraph of paragraphs) {
+    if (!firstWordOfPage.has(paragraph.page)) firstWordOfPage.set(paragraph.page, words);
+    words += countWords(paragraph.text);
+  }
+
+  const starts = new Array<number>(pageCount);
+  let next = words;
+  for (let page = pageCount - 1; page >= 0; page -= 1) {
+    const own = firstWordOfPage.get(page);
+    if (own !== undefined) next = own;
+    starts[page] = next;
+  }
+  return starts;
 }
 
 /**
@@ -280,9 +356,10 @@ export function cleanPages(
     artifacts: 0,
   };
 
-  const kept: string[] = [];
+  const kept: TaggedLine[] = [];
 
-  for (const page of pages) {
+  for (let pageIndex = 0; pageIndex < pages.length; pageIndex += 1) {
+    const page = pages[pageIndex] as readonly string[];
     const pageKept: string[] = [];
     for (let i = 0; i < page.length; i += 1) {
       const line = page[i] as string;
@@ -317,14 +394,19 @@ export function cleanPages(
       pageKept.push(line);
     }
     if (pageKept.length > 0) {
-      kept.push(...pageKept);
+      for (const line of pageKept) kept.push({ text: line, page: pageIndex });
       // Page boundary is a soft break; reflow decides whether it becomes a paragraph.
-      kept.push('');
+      kept.push({ text: '', page: pageIndex });
     }
   }
 
-  const { text, dehyphenated } = reflowParagraphs(kept, opts.dehyphenate);
-  return { text, removed, dehyphenated };
+  const { paragraphs, dehyphenated } = reflowTagged(kept, opts.dehyphenate);
+  return {
+    text: paragraphs.map((p) => p.text).join('\n\n'),
+    removed,
+    dehyphenated,
+    pageWordStarts: pageOffsets(paragraphs, pages.length),
+  };
 }
 
 /** Convenience wrapper for sources that have no page structure (HTML, EPUB, TXT). */
@@ -346,7 +428,7 @@ export function cleanFlowText(input: string, options: Partial<CleanOptions> = {}
     lines.push(line);
   }
   const { text, dehyphenated } = reflowParagraphs(lines, opts.dehyphenate);
-  return { text, removed, dehyphenated };
+  return { text, removed, dehyphenated, pageWordStarts: [] };
 }
 
 export function emptyReport(): ImportReport['removed'] {

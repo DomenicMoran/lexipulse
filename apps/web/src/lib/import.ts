@@ -1,6 +1,7 @@
 import { importDocument, parseText, type ImportReport, type LexiDocument } from '@lexipulse/core';
 import { loadPdf } from './pdf-loader';
 import { formatNumber } from './format';
+import { getStore } from './store';
 
 /** Hard ceiling for a single file. Past this the browser tab, not the parser, is the limit. */
 export const MAX_FILE_BYTES = 80 * 1024 * 1024;
@@ -30,7 +31,7 @@ export async function importFromFile(
   const bytes = new Uint8Array(await file.arrayBuffer());
 
   onProgress({ label: 'Text wird ausgelesen', percent: null });
-  return importDocument(bytes, {
+  const document = await importDocument(bytes, {
     fileName: file.name,
     pdf: {
       loader: loadPdf,
@@ -41,7 +42,49 @@ export async function importFromFile(
         }),
     },
   });
+
+  if (!KEEP_ORIGINAL.has(document.source)) return document;
+
+  onProgress({ label: 'Original wird abgelegt', percent: null });
+  try {
+    /*
+     * Read from the file a second time rather than reuse `bytes`.
+     *
+     * pdf.js transfers the array it is handed to its worker thread, which leaves the
+     * buffer on this side detached — reading it afterwards throws. Copying it before the
+     * parse would mean holding the whole document twice in memory for the length of the
+     * parse; re-reading costs one more pass over a file that is still in the page cache.
+     */
+    const store = await getStore();
+    const pristine = new Uint8Array(await file.arrayBuffer());
+    const original = await store.putOriginal(document.id, pristine, {
+      mime: file.type || MIME_BY_SOURCE[document.source] || 'application/octet-stream',
+      fileName: file.name,
+      pageCount: document.source === 'pdf' ? document.importReport.rawSections : null,
+    });
+    return original ? { ...document, original } : document;
+  } catch {
+    // Out of quota, or a browser that refuses the file store. The text is already parsed
+    // and worth keeping — the reader loses the original page, not the document.
+    return document;
+  }
 }
+
+/**
+ * Sources whose original file is worth keeping.
+ *
+ * PDF because the page *is* the document: its figures, tables, forms and signature lines
+ * have no representation in extracted text. Nothing else qualifies yet — a text file
+ * loses nothing on the way in, and keeping a second copy of every EPUB would double what
+ * the library costs for no surface that could show it.
+ */
+const KEEP_ORIGINAL = new Set<LexiDocument['source']>(['pdf']);
+
+const MIME_BY_SOURCE: Partial<Record<LexiDocument['source'], string>> = {
+  pdf: 'application/pdf',
+  epub: 'application/epub+zip',
+  fb2: 'application/x-fictionbook+xml',
+};
 
 export function importFromText(text: string): LexiDocument {
   if (text.trim().length === 0) throw new Error('Der eingefügte Text ist leer.');

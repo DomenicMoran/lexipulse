@@ -81,6 +81,41 @@ export interface LexiDocument {
   updatedAt: number;
   /** Diagnostics produced by the import pipeline. */
   importReport: ImportReport;
+  /**
+   * The original file, when it was kept.
+   *
+   * Absent on every document imported before the original surface existed, and on
+   * sources that have no file at all (clipboard, URL). Code that renders the original
+   * must treat it as optional, never assume it.
+   */
+  original?: DocumentOriginal | null;
+  /**
+   * Word offset in the document text at which each source page begins.
+   * Only present for paged sources. Index 0 is page 1.
+   */
+  pageWordStarts?: number[] | null;
+}
+
+/**
+ * Where the untouched source file lives, and what it is.
+ *
+ * The bytes themselves are not in the document record: a 40 MB PDF inside a JSON blob
+ * would be read and rewritten on every progress update. They sit in the `FileStore`
+ * under `fileId`, which is deleted with the document.
+ */
+export interface DocumentOriginal {
+  /** Key in the platform's `FileStore`. */
+  fileId: string;
+  /** MIME type as reported by the picker, or derived from the extension. */
+  mime: string;
+  /** Size in bytes, for the library and for the storage warning. */
+  bytes: number;
+  /** File name the user knows it by. */
+  fileName: string | null;
+  /** Pages, for formats that have them. */
+  pageCount?: number | null;
+  /** True when the file needed a password to open. */
+  encrypted?: boolean;
 }
 
 /** Diagnostics about what the import pipeline did to the raw source. */

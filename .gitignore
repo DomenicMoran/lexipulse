@@ -40,6 +40,11 @@ credentials.json
 *.jks
 *.p8
 
+# pdf.js character maps and standard fonts, copied out of the pinned dependency by
+# `scripts/copy-pdfjs-assets.mjs` on every build. 2 MB that would otherwise have to be
+# re-committed on every pdf.js bump, and would silently go stale if anyone forgot.
+/apps/web/public/pdfjs/
+
 # vercel
 .vercel/
 

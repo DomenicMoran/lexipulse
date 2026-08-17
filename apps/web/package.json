@@ -12,11 +12,12 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "clean": "rimraf .next .turbo out",
-    "prebuild": "node scripts/generate-legal.mjs",
-    "predev": "node scripts/generate-legal.mjs",
+    "prebuild": "node scripts/generate-legal.mjs && node scripts/copy-pdfjs-assets.mjs",
+    "predev": "node scripts/generate-legal.mjs && node scripts/copy-pdfjs-assets.mjs",
     "pretypecheck": "node scripts/generate-legal.mjs"
   },
   "dependencies": {
+    "@cantoo/pdf-lib": "2.8.4",
     "@lexipulse/core": "workspace:*",
     "@lexipulse/ui": "workspace:*",
     "clsx": "2.1.1",
@@ -36,10 +37,10 @@
     "@types/react-dom": "19.2.1",
     "eslint": "9.39.5",
     "eslint-config-next": "15.5.23",
+    "eslint-plugin-react-hooks": "7.1.1",
     "rimraf": "6.0.1",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
-    "vitest": "4.1.10",
-    "eslint-plugin-react-hooks": "7.1.1"
+    "vitest": "4.1.10"
   }
 }

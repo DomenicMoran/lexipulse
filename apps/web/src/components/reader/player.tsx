@@ -10,6 +10,8 @@ import {
   contextAround,
   effectiveWpmFor,
   formatDuration,
+  pageForToken,
+  pageTokenStarts,
   paragraphsOf,
   sentenceText,
   sentenceTextAt,
@@ -23,11 +25,13 @@ import {
   type RsvpToken,
 } from '@lexipulse/core';
 import { Button, IconButton, RsvpStage } from '@lexipulse/ui';
+import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import {
   BookmarkIcon,
   ForwardIcon,
   KeyboardIcon,
+  OriginalIcon,
   PageIcon,
   PauseIcon,
   PlayIcon,
@@ -88,6 +92,19 @@ export function Player({
   onBookmarked,
 }: PlayerProps) {
   const { settings, update } = useSettings();
+  const router = useRouter();
+
+  /*
+   * Page anchors for the original surface.
+   *
+   * Computed here rather than on the other screen because it is the token stream that
+   * makes them meaningful, and the stream only exists once. `null` for every source that
+   * has no pages, which is what hides the button.
+   */
+  const pageStarts = React.useMemo(
+    () => (lexiDocument.original ? pageTokenStarts(lexiDocument, tokens) : null),
+    [lexiDocument, tokens],
+  );
 
   // Lazy state initialiser rather than a ref assigned during render: it runs exactly once
   // and hands back a stable instance, without writing to anything mid-render.
@@ -634,6 +651,21 @@ export function Player({
         >
           <PageIcon />
         </IconButton>
+        {lexiDocument.original ? (
+          <IconButton
+            label="Original anzeigen"
+            variant="secondary"
+            onClick={() => {
+              if (playing) engine.pause();
+              const page = pageForToken(pageStarts, index);
+              router.push(
+                `/reader/original?doc=${encodeURIComponent(lexiDocument.id)}&page=${page}`,
+              );
+            }}
+          >
+            <OriginalIcon />
+          </IconButton>
+        ) : null}
         <IconButton
           label="Im Dokument suchen"
           variant="secondary"

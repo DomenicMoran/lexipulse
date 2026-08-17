@@ -1,6 +1,13 @@
 'use client';
 
-import { tokenizeChapters, type LexiDocument, type LibraryEntry, type RsvpToken } from '@lexipulse/core';
+import {
+  pageTokenStarts,
+  tokenForPage,
+  tokenizeChapters,
+  type LexiDocument,
+  type LibraryEntry,
+  type RsvpToken,
+} from '@lexipulse/core';
 import { Button } from '@lexipulse/ui';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -30,6 +37,8 @@ export function ReaderApp() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const documentId = searchParams.get('doc');
+  /** Set when the reader came back from the original surface: open where they left it. */
+  const fromPage = searchParams.get('page');
   const { settings, hydrated } = useSettings();
 
   // Tokenising uses the current speed, but a later speed change must not rebuild the
@@ -65,10 +74,17 @@ export function ReaderApp() {
             const progress = await store.getProgress(documentId);
             const tokens = tokenizeChapters(document.chapters, { wpm: wpmRef.current });
             if (cancelled) return;
+
+            const requestedPage = fromPage === null ? null : Number.parseInt(fromPage, 10);
+            const startIndex =
+              requestedPage !== null && Number.isFinite(requestedPage)
+                ? tokenForPage(pageTokenStarts(document, tokens), requestedPage)
+                : (progress?.tokenIndex ?? 0);
+
             setLoaded({
               document,
               tokens,
-              startIndex: progress?.tokenIndex ?? 0,
+              startIndex,
               msRead: progress?.msRead ?? 0,
               firstOpen: progress === null,
             });
@@ -92,7 +108,7 @@ export function ReaderApp() {
     return () => {
       cancelled = true;
     };
-  }, [documentId, hydrated]);
+  }, [documentId, fromPage, hydrated]);
 
   React.useEffect(() => {
     if (sheet === 'none') return;

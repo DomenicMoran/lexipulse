@@ -1,8 +1,10 @@
+import { normalizeFormValues, type PdfFieldValue, type PdfFormState, type PdfMark } from '../pdf-marks.js';
 import { fold } from '../reader.js';
 import { normalizeSettings } from '../settings.js';
 import type {
   Annotation,
   Bookmark,
+  DocumentOriginal,
   DocumentTags,
   LexiDocument,
   LibraryEntry,
@@ -11,11 +13,13 @@ import type {
   RsvpSettings,
 } from '../types.js';
 import type { StorageDriver } from './driver.js';
+import { originalFileId, sweepOrphanedFiles, type FileStore } from './files.js';
 import {
   annotationKey,
   bookmarkKey,
   documentFingerprint,
   emptyImportResult,
+  markKey,
   mergeStats,
   newerProgress,
   type ImportMode,
@@ -41,6 +45,10 @@ const KEY = {
   tags: (docId: string) => `lexi:tags:${docId}`,
   lastBackup: 'lexi:lastBackup',
   tagsPrefix: 'lexi:tags:',
+  mark: (docId: string, id: string) => `lexi:mark:${docId}:${id}`,
+  markPrefix: (docId: string) => `lexi:mark:${docId}:`,
+  allMarks: 'lexi:mark:',
+  form: (docId: string) => `lexi:form:${docId}`,
 } as const;
 
 /** Longer than this is a note, not a label, and it would break every filter chip. */
@@ -119,7 +127,15 @@ export function computeStreak(daily: Record<string, number>, now = Date.now()): 
  * library on a schema change is worse than one that never had it.
  */
 export class LexiStore {
-  constructor(private readonly driver: StorageDriver) {}
+  /**
+   * `files` is optional because a platform may decline to keep originals — the reader
+   * still works, it just cannot show the untouched page. When it is supplied, deleting a
+   * document deletes its original in the same call, so the two can never drift apart.
+   */
+  constructor(
+    private readonly driver: StorageDriver,
+    private readonly files?: FileStore,
+  ) {}
 
   async init(): Promise<void> {
     const current = await this.driver.get(KEY.schema);
@@ -173,6 +189,12 @@ export class LexiStore {
     // Same orphan problem: a leftover tag record would keep feeding the library's filter
     // row a shelf that no longer holds anything.
     await this.driver.delete(KEY.tags(id));
+    const markKeys = await this.driver.keys(KEY.markPrefix(id));
+    for (const key of markKeys) await this.driver.delete(key);
+    await this.driver.delete(KEY.form(id));
+    // The original is the largest thing the app ever stores. Leaving it behind would fill
+    // the device with files no screen can reach any more.
+    await this.files?.remove(originalFileId(id));
   }
 
   async listDocuments(): Promise<LexiDocument[]> {
@@ -297,6 +319,60 @@ export class LexiStore {
     }
     out.sort((a, b) => b.createdAt - a.createdAt);
     return out;
+  }
+
+  // ------------------------------------------------------------ marks on a page
+
+  async saveMark(mark: PdfMark): Promise<void> {
+    await this.driver.set(KEY.mark(mark.documentId, mark.id), JSON.stringify(mark));
+  }
+
+  async deleteMark(documentId: string, id: string): Promise<void> {
+    await this.driver.delete(KEY.mark(documentId, id));
+  }
+
+  /** Oldest first: the order they were drawn is the order they have to be drawn again. */
+  async listMarks(documentId: string): Promise<PdfMark[]> {
+    const keys = await this.driver.keys(KEY.markPrefix(documentId));
+    const values = await this.readMany(keys);
+    const out: PdfMark[] = [];
+    for (const value of values) {
+      const item = safeParse<PdfMark | null>(value, null);
+      if (item && typeof item.id === 'string' && typeof item.page === 'number') out.push(item);
+    }
+    out.sort((a, b) => a.createdAt - b.createdAt);
+    return out;
+  }
+
+  async listAllMarks(): Promise<PdfMark[]> {
+    const keys = await this.driver.keys(KEY.allMarks);
+    const values = await this.readMany(keys);
+    const out: PdfMark[] = [];
+    for (const value of values) {
+      const item = safeParse<PdfMark | null>(value, null);
+      if (item && typeof item.id === 'string' && typeof item.page === 'number') out.push(item);
+    }
+    out.sort((a, b) => a.createdAt - b.createdAt);
+    return out;
+  }
+
+  // ------------------------------------------------------------------ form values
+
+  async getFormValues(documentId: string): Promise<Record<string, PdfFieldValue>> {
+    const raw = await this.driver.get(KEY.form(documentId));
+    return normalizeFormValues(safeParse<PdfFormState | null>(raw, null)?.values);
+  }
+
+  async setFormValues(
+    documentId: string,
+    values: Record<string, PdfFieldValue>,
+  ): Promise<void> {
+    const state: PdfFormState = {
+      documentId,
+      values: normalizeFormValues(values),
+      updatedAt: Date.now(),
+    };
+    await this.driver.set(KEY.form(documentId), JSON.stringify(state));
   }
 
   // ---------------------------------------------------------------------- tags
@@ -426,10 +502,37 @@ export class LexiStore {
         bookmarks: await this.listAllBookmarks(),
         annotations: await this.listAllAnnotations(),
         tags: await this.listAllTags(),
+        /*
+         * Marks and filled-in form fields, but never the original files themselves.
+         *
+         * A backup is a JSON file the reader mails to themselves or drops in a folder;
+         * base64 originals would turn a 40 MB library into a 55 MB text file that no
+         * editor can open. What is exported is everything the reader made — reopen the
+         * same PDF on the other device and the marks land back where they were.
+         */
+        marks: await this.listAllMarks(),
+        forms: await this.listAllFormStates(),
       },
       null,
       2,
     );
+  }
+
+  async listAllFormStates(): Promise<PdfFormState[]> {
+    const documents = await this.listDocuments();
+    const out: PdfFormState[] = [];
+    for (const document of documents) {
+      const raw = await this.driver.get(KEY.form(document.id));
+      const state = safeParse<PdfFormState | null>(raw, null);
+      if (state && Object.keys(normalizeFormValues(state.values)).length > 0) {
+        out.push({
+          documentId: document.id,
+          values: normalizeFormValues(state.values),
+          updatedAt: typeof state.updatedAt === 'number' ? state.updatedAt : Date.now(),
+        });
+      }
+    }
+    return out;
   }
 
   async listAllProgress(): Promise<ReadingProgress[]> {
@@ -566,6 +669,43 @@ export class LexiStore {
       }
     }
 
+    if (Array.isArray(data.marks)) {
+      const existing = mode === 'merge' ? await this.listAllMarks() : [];
+      const seen = new Set(existing.map(markKey));
+      const seenIds = new Set(existing.map((m) => m.id));
+      for (const raw of data.marks as PdfMark[]) {
+        if (!raw || typeof raw.id !== 'string' || typeof raw.documentId !== 'string') continue;
+        if (!Array.isArray(raw.rect) || raw.rect.length !== 4) continue;
+        const mark = { ...raw, documentId: mapId(raw.documentId) };
+        // Same two ways as a bookmark: the same backup read twice, and the same passage
+        // marked on both devices — the id catches the first, the position the second.
+        if (mode === 'merge' && (seenIds.has(mark.id) || seen.has(markKey(mark)))) continue;
+        await this.saveMark(mark);
+        seen.add(markKey(mark));
+        seenIds.add(mark.id);
+        result.marksAdded += 1;
+      }
+    }
+
+    if (Array.isArray(data.forms)) {
+      for (const raw of data.forms as PdfFormState[]) {
+        if (!raw || typeof raw.documentId !== 'string') continue;
+        const documentId = mapId(raw.documentId);
+        const incoming = normalizeFormValues(raw.values);
+        if (Object.keys(incoming).length === 0) continue;
+        /*
+         * Field by field, incoming wins.
+         *
+         * A half-filled form on each device is the case worth handling: taking the whole
+         * record from one side would throw away what was typed on the other, and there is
+         * no way to ask which of two answers to the same question is the right one.
+         */
+        const current = mode === 'merge' ? await this.getFormValues(documentId) : {};
+        await this.setFormValues(documentId, { ...current, ...incoming });
+        result.formsUpdated += 1;
+      }
+    }
+
     if (data.stats && typeof data.stats === 'object') {
       if (mode === 'replace') {
         await this.driver.set(KEY.stats, JSON.stringify(data.stats));
@@ -599,6 +739,73 @@ export class LexiStore {
         for (const key of keys) await this.driver.delete(key);
       }
     }
+    if (this.files) await sweepOrphanedFiles(this.files, []);
     await this.driver.set(KEY.schema, String(SCHEMA_VERSION));
+  }
+
+  // ------------------------------------------------------------------ originals
+
+  /** True when this platform keeps original files at all. */
+  get keepsOriginals(): boolean {
+    return this.files !== undefined;
+  }
+
+  /**
+   * Keep the untouched source file next to the document and record where it went.
+   *
+   * Returns null when the platform has no file store, which callers must handle rather
+   * than assume: the reader works without an original, it just cannot show the page as
+   * its author laid it out.
+   */
+  async putOriginal(
+    documentId: string,
+    bytes: Uint8Array,
+    input: { mime: string; fileName: string | null; pageCount?: number | null; encrypted?: boolean },
+  ): Promise<DocumentOriginal | null> {
+    if (!this.files) return null;
+    const fileId = originalFileId(documentId);
+    const meta = await this.files.put(fileId, bytes, input.mime);
+    return {
+      fileId,
+      mime: input.mime,
+      bytes: meta.bytes,
+      fileName: input.fileName,
+      pageCount: input.pageCount ?? null,
+      ...(input.encrypted ? { encrypted: true } : {}),
+    };
+  }
+
+  async getOriginal(documentId: string): Promise<Uint8Array | null> {
+    if (!this.files) return null;
+    return this.files.get(originalFileId(documentId));
+  }
+
+  /**
+   * Replace an original in place, keeping the size recorded on the document honest.
+   *
+   * This is the save path of the editor: the reader edited the PDF, and the file the app
+   * holds must become the file they see. The document record is rewritten too, because a
+   * stale byte count in the library is a small lie that grows with every edit.
+   */
+  async replaceOriginal(documentId: string, bytes: Uint8Array): Promise<DocumentOriginal | null> {
+    if (!this.files) return null;
+    const document = await this.getDocument(documentId);
+    const previous = document?.original;
+    if (!document || !previous) return null;
+
+    const meta = await this.files.put(previous.fileId, bytes, previous.mime);
+    const original: DocumentOriginal = { ...previous, bytes: meta.bytes };
+    await this.saveDocument({ ...document, original, updatedAt: Date.now() });
+    return original;
+  }
+
+  /** Drop every stored file no document claims. Safe to call at any time. */
+  async sweepOriginals(): Promise<number> {
+    if (!this.files) return 0;
+    const documents = await this.listDocuments();
+    const claimed = documents
+      .map((doc) => doc.original?.fileId)
+      .filter((id): id is string => typeof id === 'string');
+    return sweepOrphanedFiles(this.files, claimed);
   }
 }

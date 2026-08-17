@@ -277,6 +277,49 @@ describe('cleanPages', () => {
     expect(cleanPages([]).text).toBe('');
     expect(cleanPages([[]]).text).toBe('');
   });
+
+  describe('page anchors', () => {
+    it('reports one word offset per source page, rising', () => {
+      expect(result.pageWordStarts).toHaveLength(pages.length);
+      expect(result.pageWordStarts[0]).toBe(0);
+      for (let i = 1; i < result.pageWordStarts.length; i += 1) {
+        expect(result.pageWordStarts[i] as number).toBeGreaterThan(
+          result.pageWordStarts[i - 1] as number,
+        );
+      }
+    });
+
+    it('lands on the first word that page actually kept', () => {
+      const words = result.text.split(/\s+/);
+      // Page 3 opens with "Auffaellig", whatever the filter removed above it.
+      expect(words[result.pageWordStarts[2] as number]).toBe('Auffaellig');
+      expect(words[result.pageWordStarts[5] as number]).toBe('Abschliessend');
+    });
+
+    it('gives a page that lost everything the next page that kept something', () => {
+      const withBlank = [
+        ['Der erste Absatz steht auf der ersten Seite und wird vollstaendig behalten.'],
+        ['12'],
+        ['Der zweite Absatz folgt auf der dritten Seite und wird ebenfalls behalten.'],
+      ];
+      const cleaned = cleanPages(withBlank);
+
+      expect(cleaned.pageWordStarts).toHaveLength(3);
+      expect(cleaned.pageWordStarts[1]).toBe(cleaned.pageWordStarts[2]);
+      const words = cleaned.text.split(/\s+/);
+      expect(words[cleaned.pageWordStarts[2] as number]).toBe('Der');
+    });
+
+    it('points a trailing empty page past the end rather than back to the start', () => {
+      const cleaned = cleanPages([['Ein einzelner Satz steht hier und bleibt erhalten.'], ['7']]);
+      const total = cleaned.text.split(/\s+/).length;
+      expect(cleaned.pageWordStarts[1]).toBe(total);
+    });
+
+    it('is empty for sources without pages', () => {
+      expect(cleanFlowText('Ein Satz.').pageWordStarts).toEqual([]);
+    });
+  });
 });
 
 describe('cleanFlowText', () => {

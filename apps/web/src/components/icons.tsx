@@ -176,3 +176,28 @@ export const PulseIcon = (props: IconProps) => (
     <path d="M2.5 12h4l2.5-6 4 12 2.5-6h6" />
   </Icon>
 );
+
+/** A sheet with a turned corner — the original file, as opposed to the text in it. */
+export const OriginalIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+    <path d="M14 3v5h5" />
+    <path d="M8.5 13.5h7M8.5 16.5h4.5" />
+  </Icon>
+);
+
+/** A drawn line with a nib: the signature tool. */
+export const SignatureIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M3 17.5c3.5 0 4-9 6.5-9s1 7 3.5 7 3-4.5 5-4.5" />
+    <path d="M3 20.5h18" />
+  </Icon>
+);
+
+/** A pen over a page: the editing tools. */
+export const PenIcon = (props: IconProps) => (
+  <Icon {...props}>
+    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z" />
+    <path d="M14.5 5.5l3 3" />
+  </Icon>
+);

@@ -6,6 +6,8 @@ export * from './engine.js';
 export * from './settings.js';
 export * from './goal.js';
 export * from './reader.js';
+export * from './pagemap.js';
+export * from './pdf-marks.js';
 export * from './annotations-export.js';
 export * from './parsers/index.js';
 export * from './storage/index.js';

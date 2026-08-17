@@ -31,6 +31,7 @@ export interface FinalizeInput {
   chapters: DocumentChapter[];
   coverDataUrl: string | null;
   importReport: ImportReport;
+  pageWordStarts?: number[] | null;
 }
 
 /**

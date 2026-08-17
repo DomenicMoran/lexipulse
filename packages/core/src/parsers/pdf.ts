@@ -179,6 +179,7 @@ export async function parsePdf(
       language,
       chapters,
       coverDataUrl: null,
+      pageWordStarts: cleaned.pageWordStarts,
       importReport: {
         source: 'pdf',
         rawSections: pages.length,

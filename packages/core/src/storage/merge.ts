@@ -148,6 +148,10 @@ export interface ImportResult {
   progressUpdated: number;
   /** Positions where the local one was newer and therefore kept. */
   progressKept: number;
+  /** Marks drawn on original pages. */
+  marksAdded: number;
+  /** Documents whose filled-in form fields were taken over. */
+  formsUpdated: number;
 }
 
 export function emptyImportResult(mode: ImportMode): ImportResult {
@@ -160,7 +164,25 @@ export function emptyImportResult(mode: ImportMode): ImportResult {
     tagsUpdated: 0,
     progressUpdated: 0,
     progressKept: 0,
+    marksAdded: 0,
+    formsUpdated: 0,
   };
+}
+
+/**
+ * Identity of a mark as a reader would judge it: same page, same kind, same place.
+ *
+ * Coordinates are rounded to the point, because a mark drawn on one device and restored
+ * on another can differ in the third decimal without being a second mark.
+ */
+export function markKey(mark: {
+  documentId: string;
+  page: number;
+  kind: string;
+  rect: readonly number[];
+}): string {
+  const rect = mark.rect.map((value) => Math.round(value)).join(',');
+  return `${mark.documentId}|${mark.page}|${mark.kind}|${rect}`;
 }
 
 /**
