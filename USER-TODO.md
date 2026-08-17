@@ -22,7 +22,7 @@ keine. Das ist behoben, und es kann jetzt mehr als nur zurückspielen:
 - Das Ganze gibt es in der App und in der Web-Fassung.
 
 **Zum Stand:** Diese Runde ist in **beiden** Läden drin — bei Google Play als
-versionCode 9, bei Apple als Build 9.
+versionCode 9, bei Apple als Build 10.
 
 ---
 
@@ -68,7 +68,7 @@ gegenüber Käufern schlicht falsch.
 | Store | Stand | Was danach passiert |
 |---|---|---|
 | **Google Play** | Produktion auf **versionCode 9**, mit Sichern und Übertragen, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
-| **Apple App Store** | Version 1.0 mit **Build 9**, mit Sichern und Übertragen, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
+| **Apple App Store** | Version 1.0 mit **Build 10**, mit Sichern und Übertragen, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
 
 Damit zeigen beide Läden denselben Funktionsstand, und beide Beschreibungen
 nennen Sichern und Übertragen, weil beide geprüften Pakete es enthalten.
@@ -81,7 +81,7 @@ nennt, die er nicht hat.
 Bei Apple lief das über: Einreichung zurückziehen (Version geht dabei auf
 `DEVELOPER_REJECTED`, den bearbeitbaren Zustand), Beschreibung, Keywords und
 Untertitel setzen, alle 24 Bilder ersetzen, Build anhängen, neu einreichen.
-Zuletzt zurückgelesen: `WAITING_FOR_REVIEW`, Build 9, und beide Beschreibungen
+Zuletzt zurückgelesen: `WAITING_FOR_REVIEW`, Build 10, und beide Beschreibungen
 nennen Sichern und Übertragen.
 
 Dass Build 9 überhaupt entstehen konnte, lag an einem Irrtum meinerseits: Das
@@ -91,6 +91,37 @@ Projekt gehört. Vier deiner Konten liegen unter derselben Anmeldung, und
 Build-Nummer und zwei EAS-Schalter vorübergehend umgestellt und nach der
 Einreichung wieder zurückgesetzt — im Repo steht wieder der eigentliche Zustand.
 Details in `docs/PLAN_SICHERUNG.md`.
+
+---
+
+## Apples Hinweis zur Dokument-Konfiguration (ITMS-90737)
+
+Nach dem Hochladen von Build 9 kam von Apple eine **Warnung, keine Ablehnung**:
+Die App meldet über `CFBundleDocumentTypes`, dass sie Dateien öffnen kann, ohne
+einen der beiden dazugehörigen Schlüssel zu setzen.
+
+Behoben mit `LSSupportsOpeningDocumentsInPlace: false` — bewusst nicht mit dem
+von Apple empfohlenen `true`. „In place" heißt: Die App bearbeitet die
+Originaldatei dort, wo sie liegt, und muss dafür um jeden Lesezugriff eine
+Berechtigung klammern. LexiPulse macht das Gegenteil: einmal lesen, eigene
+Dokumente daraus bauen, nie zurückschreiben. `true` wäre ein Versprechen über
+eine Datei, die die App nie anfasst.
+
+Warum dafür ein neuer Build und nicht erst 1.0.1: Der Schlüssel gehört zu genau
+der Funktion, die seit heute in der Store-Beschreibung steht. Ohne Mac lässt
+sich nicht nachweisen, dass „Öffnen mit LexiPulse" auf einem iPhone auch ohne
+ihn tut, was der Text verspricht.
+
+Dabei fiel ein Folgefehler auf: Mit `false` reicht iOS nicht die getippte Datei
+durch, sondern legt eine Kopie in `Documents/Inbox` — und eine Sicherung trägt
+jedes Dokument im Volltext. Die bliebe unsichtbar liegen und würde mit jedem
+Zurückspielen um eine ganze Bibliothek wachsen. Das Aufräumen ist gebaut, samt
+der Normalisierung von `/private/var` gegen `/var`, ohne die es stillschweigend
+nie gelaufen wäre. Es steckt **nicht** in Build 10 — der lief bereits — und geht
+mit 1.0.1 raus. Bis dahin verhält sich die App dort wie bisher.
+
+**Play war nicht betroffen** und wurde nicht angefasst: Der Schlüssel ist
+iOS-spezifisch, das Aufräumen läuft auf Android sofort wieder heraus.
 
 ---
 
