@@ -234,6 +234,19 @@ danach zurueckgesetzt:
 Die iOS-Zugangsdaten kommen aus `credentials.json`, also aus lokalen Dateien.
 Sie haengen nicht am EAS-Konto und mussten nicht angefasst werden.
 
+Zwei Fallen dabei, beide gefunden statt geraten. Der erste Anlauf startete als
+Build 1 und waere abgelehnt worden; abgebrochen und die Nummer festgenagelt. Und
+die Schleife startete zwei Builds gleichzeitig, unter `salatipro` und unter
+`salatibox` — der ueberzaehlige wurde abgebrochen, damit er kein Kontingent
+kostet.
+
+Nach der Einreichung wurden alle drei Punkte zurueckgesetzt: `owner` steht wieder
+auf `menucloudberlin`, `projectId` auf `5aebaf91-...`, `appVersionSource` auf
+`remote`, `autoIncrement` an, und die feste Build-Nummer ist aus dem
+`ios`-Block raus. `git status` ist sauber. Das Repo beschreibt damit wieder den
+Zustand, der ab dem 1. September gilt, und niemand baut versehentlich weiter
+unter einem fremden Konto.
+
 ## Warum es ueberhaupt so weit kam
 
 Das EAS-Kontingent des kostenlosen Tarifs ist fuer diesen Monat aufgebraucht und

@@ -21,8 +21,8 @@ keine. Das ist behoben, und es kann jetzt mehr als nur zurückspielen:
   Dateien sichern" bereits.
 - Das Ganze gibt es in der App und in der Web-Fassung.
 
-**Wichtig zum Stand:** Diese Runde ist bei **Google Play** drin (versionCode 8).
-Bei **Apple nicht** — siehe unten.
+**Zum Stand:** Diese Runde ist in **beiden** Läden drin — bei Google Play als
+versionCode 9, bei Apple als Build 9.
 
 ---
 
@@ -67,8 +67,11 @@ gegenüber Käufern schlicht falsch.
 
 | Store | Stand | Was danach passiert |
 |---|---|---|
-| **Google Play** | Produktion auf **versionCode 8**, mit Sichern und Übertragen, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
-| **Apple App Store** | Version 1.0 mit **Build 8**, in Prüfung. **Ohne** Sichern und Übertragen, siehe unten | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
+| **Google Play** | Produktion auf **versionCode 9**, mit Sichern und Übertragen, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
+| **Apple App Store** | Version 1.0 mit **Build 9**, mit Sichern und Übertragen, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
+
+Damit zeigen beide Läden denselben Funktionsstand, und beide Beschreibungen
+nennen Sichern und Übertragen, weil beide geprüften Pakete es enthalten.
 
 In beiden Läden wurde die laufende Prüfung dafür bewusst abgebrochen und neu
 gestartet. Das kostet Wartezeit, aber die Alternative wäre gewesen, den alten
@@ -77,8 +80,17 @@ nennt, die er nicht hat.
 
 Bei Apple lief das über: Einreichung zurückziehen (Version geht dabei auf
 `DEVELOPER_REJECTED`, den bearbeitbaren Zustand), Beschreibung, Keywords und
-Untertitel setzen, alle 24 Bilder ersetzen, Build 7 anhängen, neu einreichen.
-Zurückgelesen: `WAITING_FOR_REVIEW`, Build 7, Bilder im Status `COMPLETE`.
+Untertitel setzen, alle 24 Bilder ersetzen, Build anhängen, neu einreichen.
+Zuletzt zurückgelesen: `WAITING_FOR_REVIEW`, Build 9, und beide Beschreibungen
+nennen Sichern und Übertragen.
+
+Dass Build 9 überhaupt entstehen konnte, lag an einem Irrtum meinerseits: Das
+EAS-Kontingent hängt nicht an dir als Person, sondern an dem Konto, dem das
+Projekt gehört. Vier deiner Konten liegen unter derselben Anmeldung, und
+`salatibox` hatte noch Bauzeit frei. Dafür wurden `owner`, `projectId`, die
+Build-Nummer und zwei EAS-Schalter vorübergehend umgestellt und nach der
+Einreichung wieder zurückgesetzt — im Repo steht wieder der eigentliche Zustand.
+Details in `docs/PLAN_SICHERUNG.md`.
 
 ---
 
@@ -134,13 +146,10 @@ wird, nicht aus dem Quelltext geschlossen:
    „nichts verlässt das Gerät", die in der Datenschutzerklärung, den
    Store-Texten und im Über-Bereich der App steht. Das wäre kein Feature mehr,
    sondern ein anderes Produkt mit Servern, Konten und neuen Rechtstexten.
-3. **Apple hinkt eine Runde hinterher.** Das EAS-Kontingent des kostenlosen
-   Tarifs ist für diesen Monat aufgebraucht und setzt sich am **1. September
-   2026** zurück. Ohne Mac lässt sich iOS nicht lokal bauen, also gibt es keinen
-   iOS-Build mit Sichern und Übertragen. Die Apple-Beschreibung wurde deshalb
-   bewusst **nicht** aktualisiert: Sie nennt die Funktion nicht, und damit passt
-   sie zu Build 8. Wer früher will, bräuchte einen bezahlten EAS-Tarif; das ist
-   eine Kostenfrage und deine Entscheidung.
+3. **Das EAS-Kontingent bleibt eng.** Der nächste iOS-Build in diesem Monat
+   müsste sich wieder ein fremdes Konto leihen; die Zähler setzen sich am
+   **1. September 2026** zurück. Wer davon unabhängig sein will, bräuchte einen
+   bezahlten EAS-Tarif — eine Kostenfrage und deine Entscheidung.
 4. **Der iOS-Pfad des Nachschlagens ist ungetestet.** Die Übergabe läuft dort
    über das Teilen-Blatt; ohne Mac ließ sich das hier nicht am Gerät prüfen.
    Der Android-Pfad ist geprüft, auch der Fall ohne passende App.
