@@ -11,7 +11,7 @@ import type { ExpoConfig } from 'expo/config';
 const config: ExpoConfig = {
   name: 'LexiPulse',
   slug: 'lexipulse',
-  owner: 'salatibox',
+  owner: 'menucloudberlin',
   version: '1.1.0',
   orientation: 'portrait',
   scheme: 'lexipulse',
@@ -30,7 +30,9 @@ const config: ExpoConfig = {
     // No `buildNumber`: `eas.json` sets appVersionSource to remote, so EAS owns the
     // build number. A value here would be ignored by the build and still show up in
     // `Constants.expoConfig`, which is exactly how a wrong version ends up on a screen.
-    // Read `Application.nativeBuildVersion` at runtime instead.
+    // Read `Application.nativeBuildVersion` at runtime instead. It has to be set, and
+    // `appVersionSource` set to local, for any build under a borrowed account — see
+    // `docs/PLAN_SICHERUNG.md`.
     // No tablet-specific layout exists, so claiming iPad support would ship a stretched
     // phone UI — App Review rejects exactly that.
     supportsTablet: false,
@@ -202,7 +204,7 @@ const config: ExpoConfig = {
    */
   extra: {
     eas: {
-      projectId: '660194c8-c524-4ba4-8dda-a9b700ce5b02',
+      projectId: '5aebaf91-fab9-4402-8b53-1a30052c9f14',
     },
   },
 };

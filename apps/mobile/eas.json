@@ -28,6 +28,16 @@
       "autoIncrement": true,
       "android": {
         "buildType": "app-bundle"
+        /*
+         * No `credentialsSource` here: the upload key Play knows lives on the
+         * `menucloudberlin` account and EAS hands it over by itself.
+         *
+         * It has to become "local" for the length of any build under a borrowed account —
+         * a foreign account has no such key, quietly generates a fresh one, builds
+         * successfully, and Play rejects the bundle at upload with a message about the
+         * certificate fingerprint that says nothing about the cause. The key and the
+         * procedure are in `docs/PLAN_SICHERUNG.md`.
+         */
       },
       "ios": {
         "simulator": false,

@@ -1,7 +1,15 @@
 # USER-TODO — LexiPulse
 
 Stand: 2026-08-17, abends. **Zu tun ist eines: Bescheid geben, wenn 1.0
-freigegeben ist.** Alles für 1.1 liegt fertig im Repo.
+freigegeben ist.** Alles für 1.1 liegt fertig im Repo — und die Pakete sind
+gebaut, nicht nur der Code:
+
+| | Version | Nummer | Stand |
+|---|---|---|---|
+| Android (AAB) | 1.1.0 | versionCode 10 | gebaut, mit dem Play-Upload-Schlüssel signiert |
+| iOS (IPA) | 1.1.0 | Build 11 | siehe „Die beiden Pakete für 1.1" weiter unten |
+
+Beide liegen unter `C:\Users\domen\Documents\mc-build\`. Hochgeladen ist nichts.
 
 ---
 
@@ -43,14 +51,33 @@ bricht ein Eingriff die laufende Prüfung ohnehin ab.
 
 Sobald 1.0 freigegeben ist, läuft es in dieser Reihenfolge:
 
-1. 1.1 bauen (Android und iOS)
+1. ~~1.1 bauen (Android und iOS)~~ — erledigt, siehe unten
 2. Texte und Bilder übertragen — sie liegen fertig unter `store/metadata/` und
    `store/screenshots/`
 3. Einreichen
 
-**Zum EAS-Kontingent:** Die Zähler setzen sich am **1. September 2026** zurück.
-Ein iOS-Bau davor müsste sich wieder ein fremdes Konto leihen, wie bei Build 9.
-Wenn 1.0 vorher durchgeht und Sie nicht warten wollen, sagen Sie Bescheid.
+## Die beiden Pakete für 1.1
+
+Gebaut wurden sie schon jetzt, damit nach der Freigabe von 1.0 nur noch
+hochgeladen werden muss. Das EAS-Kontingent von `menucloudberlin` ist bis zum
+**1. September 2026** aufgebraucht, also lief auch dieser Bau unter dem
+geliehenen Konto `salatibox` — wie bei Build 9, nach demselben Verfahren in
+`docs/PLAN_SICHERUNG.md`.
+
+Bei Android war dabei eine Falle, die es bei iOS nicht gab: Der Schlüssel, mit
+dem Play die App wiedererkennt, liegt auf dem eigenen Konto. Ein Bau unter einem
+fremden Konto legt sich stillschweigend einen neuen an, gelingt, und wird erst
+beim Hochladen abgelehnt. Der Bau wurde deshalb auf den lokalen Upload-Schlüssel
+umgestellt.
+
+Nachgewiesen ist es am fertigen Paket, nicht am Bau-Protokoll:
+
+- Fingerabdruck im AAB und im Upload-Schlüssel sind derselbe SHA-256
+  (`EA:E2:14:9E:…:48:A7`)
+- Im Manifest des Bundles stehen `versionCode 10` und `1.1.0`
+
+Die geliehenen Einstellungen sind danach zurückgesetzt; das Repo beschreibt
+wieder den eigenen Zustand.
 
 ## Am Gerät gelaufen — und drei Fehler gefunden, die nur dort auftreten
 

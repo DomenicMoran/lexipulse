@@ -234,6 +234,23 @@ danach zurueckgesetzt:
 Die iOS-Zugangsdaten kommen aus `credentials.json`, also aus lokalen Dateien.
 Sie haengen nicht am EAS-Konto und mussten nicht angefasst werden.
 
+### Android ist der gefaehrlichere Fall
+
+Fuer 1.1 wurde auch das Android-Paket unter dem geliehenen Konto gebaut, und
+dabei kam ein vierter Punkt dazu, den der iOS-Lauf nicht gezeigt hatte:
+
+4. `credentialsSource: "local"` auch im `android`-Block. Der Schluessel, den Play
+   kennt, liegt auf dem Konto `menucloudberlin`. Ein Bau unter einem fremden
+   Konto findet dort keinen und legt sich stillschweigend einen neuen an — der
+   Bau gelingt, und erst Play lehnt das Paket beim Hochladen ab, mit einer
+   Meldung ueber den Fingerabdruck, die nichts ueber die Ursache sagt.
+
+Der Schluessel liegt unter `C:\Users\domen\Documents\mc-build\lexipulse-android\`.
+Nachgewiesen wurde es nicht am Log, sondern am Artefakt: `keytool -printcert
+-jarfile` auf das fertige AAB und `keytool -list` auf den Upload-Schluessel
+liefern denselben SHA-256. Ebenso stammen `versionCode 10` und `1.1.0` aus dem
+Manifest im Bundle, nicht aus der Konfiguration, aus der sie gesetzt wurden.
+
 Zwei Fallen dabei, beide gefunden statt geraten. Der erste Anlauf startete als
 Build 1 und waere abgelehnt worden; abgebrochen und die Nummer festgenagelt. Und
 die Schleife startete zwei Builds gleichzeitig, unter `salatipro` und unter

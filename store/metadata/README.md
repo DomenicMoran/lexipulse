@@ -35,6 +35,10 @@ Prüfung ohnehin ab.
 
 Reihenfolge: 1.0 abwarten → 1.1 bauen und hochladen → diese Texte übertragen → einreichen.
 
+Der Bau ist bereits erledigt: Android als versionCode 10, iOS als Build 11, beide 1.1.0
+und beide unter `C:\Users\domen\Documents\mc-build\`. Nach der Freigabe von 1.0 bleibt
+also nur noch hochladen, Texte übertragen, einreichen.
+
 ## Aktuelle Zeichenzahl (gemessen 2026-08-17, zweite Runde)
 
 | Datei | de-DE | en-US |
