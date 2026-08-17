@@ -8,6 +8,34 @@ interface QuestionAnswer {
 
 const ITEMS: QuestionAnswer[] = [
   {
+    question: 'Ist LexiPulse ein Schnelllese-Programm oder ein Reader?',
+    answer: (
+      <>
+        Beides, und zwar in dieser Reihenfolge. LexiPulse öffnet PDF und E-Books wie jeder
+        andere Reader: die Originalseite mit Abbildungen und Formularen, oder Fließtext in
+        Ihrer Schrift, mit Suche, Markierungen, Lesezeichen und Bibliothek. Der Wortstrom
+        ist die dritte Ansicht — die ungewöhnliche, nicht die einzige. Alle drei teilen
+        sich eine Leseposition.
+      </>
+    ),
+  },
+  {
+    question: 'Kann ich PDFs bearbeiten und unterschreiben?',
+    answer: (
+      <>
+        Ja: markieren, kommentieren, zeichnen, Textfelder setzen, Formularfelder ausfüllen,
+        unterschreiben, Seiten drehen, löschen, verschieben und einfügen. Das Ergebnis
+        speichern Sie als neue PDF oder ersetzen das Original. Alles läuft im Browser, keine
+        Datei geht an einen Server. Die Einzelheiten stehen auf der{' '}
+        <a href="/pdf" className="text-[var(--lx-accent-text)] underline underline-offset-[3px]">
+          Seite zu den PDF-Werkzeugen
+        </a>
+        . Die gezeichnete Unterschrift ist ein Bild Ihrer Unterschrift, keine qualifizierte
+        elektronische Signatur nach eIDAS.
+      </>
+    ),
+  },
+  {
     question: 'Funktioniert LexiPulse offline?',
     answer: (
       <>
@@ -33,10 +61,11 @@ const ITEMS: QuestionAnswer[] = [
     question: 'Welche Formate kann ich importieren?',
     answer: (
       <>
-        EPUB, FictionBook, PDF, TXT, Markdown und HTML als Datei oder per Drag-and-drop. Dazu Text aus
-        der Zwischenablage und Artikel über eine Internetadresse. PDFs ohne Textebene —
-        also reine Scans — lassen sich nicht lesen; dafür brauchen Sie vorher eine
-        Texterkennung.
+        PDF, EPUB (2 und 3), FictionBook, TXT, Markdown und HTML als Datei oder per
+        Drag-and-drop. Dazu Text aus der Zwischenablage und Artikel über eine
+        Internetadresse. Bei einer PDF ohne Textebene — also einem reinen Scan — sehen und
+        bearbeiten Sie die Seiten ganz normal; für den Wortstrom und die Volltextsuche
+        fehlt der Text, dafür bräuchten Sie vorher eine Texterkennung.
       </>
     ),
   },
@@ -70,9 +99,10 @@ const ITEMS: QuestionAnswer[] = [
     answer: (
       <>
         Die Web-App verursacht kaum laufende Kosten und ist damit die ehrlichste Art,
-        LexiPulse auszuprobieren. Die mobilen Apps kosten 4,99 Euro einmalig — kein Abo,
-        keine In-App-Käufe, keine Werbung. Das deckt Entwicklung und Pflege der beiden
-        Store-Fassungen.
+        LexiPulse auszuprobieren — sie ist nicht beschnitten. Die mobilen Apps kosten 4,99
+        Euro einmalig und können, was ein Browser-Tab nicht kann: Dateien direkt aus dem
+        System öffnen, ins Teilen-Blatt, Vorlesen mit den Stimmen des Geräts, Haptik. Kein
+        Abo, keine In-App-Käufe, keine Werbung.
       </>
     ),
   },

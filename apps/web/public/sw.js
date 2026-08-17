@@ -18,7 +18,29 @@ const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const PAGE_CACHE = `${VERSION}-pages`;
 
-const SHELL = ['/', '/reader', '/reader/library', '/reader/stats', '/offline', '/manifest.webmanifest'];
+const SHELL = [
+  '/',
+  '/pdf',
+  '/reader',
+  '/reader/library',
+  '/reader/stats',
+  '/reader/original',
+  '/offline',
+  '/manifest.webmanifest',
+];
+
+/*
+ * pdf.js and its data directories.
+ *
+ * Cached under their own strategy because their names carry no content hash: `pdf.mjs` is
+ * `pdf.mjs` in every version. Cache-first would pin whatever version was current the first
+ * time the reader opened a PDF, for as long as the cache survives. Stale-while-revalidate
+ * serves the copy on disk straight away — which is what makes opening a PDF work with no
+ * network at all — and quietly replaces it when a newer one is deployed.
+ */
+function isPdfjsAsset(url) {
+  return url.pathname.startsWith('/pdfjs/');
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -70,6 +92,21 @@ async function networkFirst(request, cacheName) {
   }
 }
 
+async function staleWhileRevalidate(request, cacheName) {
+  const cached = await caches.match(request);
+  const fresh = fetch(request)
+    .then(async (response) => {
+      if (response && response.status === 200) {
+        const cache = await caches.open(cacheName);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    })
+    .catch(() => undefined);
+  // Offline and never fetched before: there is nothing to serve but the failure.
+  return cached ?? (await fresh) ?? fetch(request);
+}
+
 async function cacheFirst(request, cacheName) {
   const cached = await caches.match(request);
   if (cached) return cached;
@@ -92,6 +129,11 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(networkFirst(request, PAGE_CACHE));
+    return;
+  }
+
+  if (isPdfjsAsset(url)) {
+    event.respondWith(staleWhileRevalidate(request, ASSET_CACHE));
     return;
   }
 

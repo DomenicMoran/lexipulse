@@ -16,19 +16,19 @@ export function FeatureBento() {
           Funktionen
         </p>
         <h2 className="text-[31px] font-semibold tracking-[-0.03em] sm:text-[39px]">
-          Ein Lesewerkzeug, kein Demo-Spielzeug.
+          Alles, was ein Reader haben muss.
         </h2>
         <p className="mt-4 text-[17px] leading-relaxed text-[var(--lx-text-muted)]">
-          Import, Player, Bibliothek und Statistik gehören zusammen. Alles läuft im
-          Browser, auch ohne Netz.
+          Import, Suche, Markierungen, Lesehilfen, Bibliothek und Statistik gehören
+          zusammen. Alles läuft im Browser, auch ohne Netz.
         </p>
       </div>
 
       <BentoGrid rowHeight={190}>
         <BentoCell span={3} rows={1}>
           <BentoHeading
-            title="Fixierung am Erkennungspunkt"
-            description="Der markierte Buchstabe steht in jedem Wort auf derselben Bildschirmspalte. Das Auge muss nicht mehr springen — genau das kostet beim normalen Lesen die meiste Zeit."
+            title="Suchen, markieren, wiederfinden"
+            description="Volltextsuche über das ganze Dokument, umlauttolerant: „fur“ findet „für“. Markierungen in fünf Farben mit Notiz, eine Liste aller Stellen, ein Tippen springt hin. Ausgabe als Markdown, nach Kapiteln geordnet."
           />
           <div className="mt-auto flex items-end gap-1 pt-6">
             <span
@@ -48,7 +48,18 @@ export function FeatureBento() {
             description="Kopf- und Fußzeilen, Seitenzahlen, Inhaltsverzeichnis-Punktlinien und Tabellenzeilen fliegen raus. Getrennte Wörter am Zeilenende werden wieder zusammengesetzt, harte Umbrüche zu Absätzen verbunden."
           />
           <p className="mt-auto pt-6 text-[13px] text-[var(--lx-text-muted)]">
-            Nach dem Import sehen Sie, was entfernt wurde.
+            Nach dem Import sehen Sie, was entfernt wurde. Die Originalseite bleibt daneben
+            unberührt.
+          </p>
+        </BentoCell>
+
+        <BentoCell span={2} rows={1}>
+          <BentoHeading
+            title="Lesehilfen"
+            description="Bionic-Hervorhebung, Leselineal, sechs Farbfilter und OpenDyslexic — mitgeliefert, nicht nachgeladen."
+          />
+          <p className="mt-auto pt-6 text-[13px] text-[var(--lx-text-muted)]">
+            Jede Textfarbe in jedem Theme über 4,5:1 geprüft.
           </p>
         </BentoCell>
 
@@ -88,18 +99,18 @@ export function FeatureBento() {
 
         <BentoCell span={2} rows={1}>
           <BentoHeading
-            title="Offline-Bibliothek"
-            description="Dokumente, Lesefortschritt und Lesezeichen liegen in der IndexedDB Ihres Browsers. Nichts wird hochgeladen."
+            title="Bibliothek mit Schlagwörtern"
+            description="Suchen, sortieren, filtern und auf Schlagwörter legen. Dokumente, Fortschritt, Lesezeichen und Markierungen liegen in der Datenbank Ihres Browsers."
           />
           <p className="mt-auto pt-6 text-[13px] text-[var(--lx-text-muted)]">
-            Export als JSON-Datei jederzeit möglich.
+            Sichern und auf ein anderes Gerät übertragen — ohne Konto, ohne Server.
           </p>
         </BentoCell>
 
         <BentoCell span={2} rows={1}>
           <BentoHeading
-            title="Import-Formate"
-            description="EPUB, FictionBook, PDF, TXT, Markdown und HTML per Datei oder Drag-and-drop. Dazu Text einfügen und Web-Artikel per Adresse."
+            title="Formate"
+            description="PDF, EPUB 2 und 3, FictionBook, TXT, Markdown und HTML per Datei oder Drag-and-drop. Dazu Text einfügen und Web-Artikel per Adresse, ohne Menüs und Bannerspalten."
           />
           <div className="mt-auto flex flex-wrap gap-1.5 pt-6">
             {['EPUB', 'PDF', 'TXT', 'MD', 'HTML', 'URL'].map((format) => (

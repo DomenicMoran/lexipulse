@@ -3,16 +3,18 @@ import * as React from 'react';
 import { CheckIcon } from '@/components/icons';
 
 const WEB_FEATURES = [
-  'Alle Import-Formate: EPUB, FB2, PDF, TXT, Markdown, HTML, URL',
-  'Kompletter Player mit Pacing-Matrix und Tastatursteuerung',
-  'Bibliothek, Lesezeichen, Statistik, Datenexport',
+  'Alle drei Ansichten: Original, Seite, Wortstrom',
+  'PDF markieren, ausfüllen, unterschreiben, Seiten ordnen',
+  'Alle Formate: PDF, EPUB, FB2, TXT, Markdown, HTML, URL',
+  'Bibliothek, Suche, Lesehilfen, Statistik, Datenexport',
   'Offline nutzbar, als App installierbar',
 ];
 
 const APP_FEATURES = [
   'Alles aus der Web-App, nativ auf dem Gerät',
-  'Lokale SQLite-Bibliothek statt Browser-Speicher',
-  'Gesten: Tippen zum Starten, Wischen zum Zurückspringen',
+  'Dateien direkt aus dem System öffnen, Teilen-Blatt inklusive',
+  'Vorlesen mit den Stimmen des Betriebssystems',
+  'Gesten und Haptik: Tippen zum Starten, Wischen zum Zurückspringen',
   'Einmalzahlung, kein Abo, keine In-App-Käufe',
 ];
 
@@ -66,7 +68,7 @@ export function Pricing() {
             href="/reader"
             className="mt-8 inline-flex h-11 items-center justify-center rounded-[10px] bg-[var(--lx-accent)] px-5 text-[15px] font-medium text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
           >
-            Reader jetzt öffnen
+            Jetzt im Browser öffnen
           </Link>
         </div>
 

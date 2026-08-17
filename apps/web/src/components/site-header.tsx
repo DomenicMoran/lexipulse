@@ -3,8 +3,9 @@ import * as React from 'react';
 import { Wordmark } from './wordmark';
 
 const LINKS = [
+  { href: '/#ansichten', label: 'Ansichten' },
+  { href: '/pdf', label: 'PDF-Werkzeuge' },
   { href: '/#funktionen', label: 'Funktionen' },
-  { href: '/#so-funktionierts', label: 'So funktioniert es' },
   { href: '/#preis', label: 'Preis' },
   { href: '/#faq', label: 'FAQ' },
 ];
@@ -36,7 +37,7 @@ export function SiteHeader() {
           href="/reader"
           className="inline-flex h-9 items-center rounded-[10px] bg-[var(--lx-accent)] px-4 text-[14px] font-medium text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
         >
-          Reader öffnen
+          Datei öffnen
         </Link>
       </div>
     </header>

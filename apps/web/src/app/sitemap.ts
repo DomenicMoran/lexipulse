@@ -4,6 +4,7 @@ const SITE_URL = 'https://lexipulse.de';
 
 const ROUTES: { path: string; priority: number; changeFrequency: 'monthly' | 'yearly' }[] = [
   { path: '/', priority: 1, changeFrequency: 'monthly' },
+  { path: '/pdf', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/reader', priority: 0.9, changeFrequency: 'monthly' },
   { path: '/reader/library', priority: 0.5, changeFrequency: 'monthly' },
   { path: '/reader/stats', priority: 0.5, changeFrequency: 'monthly' },
