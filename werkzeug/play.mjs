@@ -39,7 +39,7 @@ function umgebung() {
 
 const ENV = umgebung();
 const PAKET = ENV.PLAY_PACKAGE;
-const AAB = process.env.PLAY_AAB ?? 'C:/Users/domen/Documents/mc-build/lexipulse-android/lexipulse-1.1.0.aab';
+const AAB = process.env.PLAY_AAB ?? 'C:/Users/domen/Documents/90_Werkstatt/mc-build/lexipulse-android/lexipulse-1.1.0.aab';
 
 async function zugang() {
   const konto = JSON.parse(readFileSync(ENV.PLAY_SERVICE_ACCOUNT, 'utf8'));

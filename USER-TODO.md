@@ -8,8 +8,14 @@ zurückgezogen, 1.1 ist eingereicht und liegt bei den Prüfern.
 | Apple | 1.1, Build 11, `WAITING_FOR_REVIEW` | Freigabe `AFTER_APPROVAL` — geht ohne weiteren Klick live |
 | Play | 1.1.0, versionCode 10, Produktionsspur | Verwaltete Veröffentlichung war für 1.0 aus und wurde nicht angefasst — geht nach der Prüfung direkt live |
 
+<!-- OFFEN:START -->
+<!-- Diese Liste liest `00_Zentrale/werkzeug/sammle-todos.mjs`. Zum Einreichen
+     ist nichts offen; der Punkt unten ist eine Kostenentscheidung mit Datum. -->
+- [ ] **Entscheiden, ob ein bezahlter EAS-Tarif kommt** — der naechste iOS-Bau in diesem Monat muesste sich wieder ein fremdes Konto leihen; die Zaehler setzen sich am 1. September 2026 von selbst zurueck · Kostenfrage, kein Eilfall
+<!-- OFFEN:END -->
+
 Beide Prüfuhren fangen von vorn an: Apple meist 1–2 Tage, Google bis zu 7. Die
-Pakete liegen zusätzlich unter `C:\Users\domen\Documents\mc-build\`.
+Pakete liegen zusätzlich unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\`.
 
 ---
 
@@ -341,6 +347,6 @@ wird, nicht aus dem Quelltext geschlossen:
 Überall `lexipulse@menucloud-berlin.de`, ein Alias auf `info@menucloud-berlin.de`
 mit Sieve-Sortierung nach `Projekte/LexiPulse`.
 
-Signaturmaterial liegt unter `C:\Users\domen\Documents\mc-build\lexipulse-ios\`
+Signaturmaterial liegt unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\lexipulse-ios\`
 und `...\lexipulse-android\`; `apps/mobile/credentials.json` zeigt darauf und ist
 per `.gitignore` ausgeschlossen.

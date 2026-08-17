@@ -245,7 +245,7 @@ dabei kam ein vierter Punkt dazu, den der iOS-Lauf nicht gezeigt hatte:
    Bau gelingt, und erst Play lehnt das Paket beim Hochladen ab, mit einer
    Meldung ueber den Fingerabdruck, die nichts ueber die Ursache sagt.
 
-Der Schluessel liegt unter `C:\Users\domen\Documents\mc-build\lexipulse-android\`.
+Der Schluessel liegt unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\lexipulse-android\`.
 Nachgewiesen wurde es nicht am Log, sondern am Artefakt: `keytool -printcert
 -jarfile` auf das fertige AAB und `keytool -list` auf den Upload-Schluessel
 liefern denselben SHA-256. Ebenso stammen `versionCode 10` und `1.1.0` aus dem
