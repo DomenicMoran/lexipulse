@@ -26,6 +26,25 @@ function openLexiDb(): Promise<IDBPDatabase<LexiDb>> {
       if (!database.objectStoreNames.contains(STORE)) database.createObjectStore(STORE);
       if (!database.objectStoreNames.contains(FILES)) database.createObjectStore(FILES);
     },
+    /*
+     * A version change needs every other connection to let go first.
+     *
+     * Without these two the reader hangs silently the moment a second tab is open: the
+     * old tab keeps its connection, the new one waits for it forever, and nothing on
+     * screen says why. `blocking` fires in the tab that is in the way and closes it —
+     * that tab's store then reopens on its next call, at the new version.
+     */
+    blocking(_currentVersion, _blockedVersion, event) {
+      (event.target as IDBDatabase | null)?.close();
+    },
+    blocked() {
+      // The other tab is older than this change and has no `blocking` handler to run.
+      // Nothing to do but let the promise resolve once it is closed; saying so beats a
+      // spinner that never stops.
+      console.warn(
+        'LexiPulse: Ein anderer Tab hält die Datenbank offen. Bitte schließen Sie ihn.',
+      );
+    },
   });
 }
 
