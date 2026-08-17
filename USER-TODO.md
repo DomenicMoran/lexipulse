@@ -4,6 +4,28 @@ Stand: 2026-08-17. **Offen ist nichts mehr, was jemand tun müsste.**
 
 ---
 
+## Dritte Runde: Sichern und Übertragen, ohne Server
+
+Die App konnte exportieren, aber nicht importieren. Der Knopf hieß „Vollständige
+JSON-Sicherung", und eine Sicherung, die man nicht zurückspielen kann, ist
+keine. Das ist behoben, und es kann jetzt mehr als nur zurückspielen:
+
+- **Sicherung einlesen** zeigt erst, was in der Datei steht, dann die Wahl
+  zwischen **Zusammenführen** und **Alles ersetzen**, danach einen Bericht aus
+  Zahlen statt einer Erfolgsmeldung.
+- **Zusammenführen** erkennt dasselbe Buch über seinen Inhalt, nicht über die
+  Kennung. Nichts wird doppelt, die Leseposition springt nicht zurück, die
+  Statistik wächst nicht künstlich.
+- **In Ordner speichern** auf Android, damit die Datei direkt in einen Ordner
+  deiner Wahl geht, auch in eine Cloud. Auf iOS enthält das Teilen-Blatt „In
+  Dateien sichern" bereits.
+- Das Ganze gibt es in der App und in der Web-Fassung.
+
+**Wichtig zum Stand:** Diese Runde ist bei **Google Play** drin (versionCode 8).
+Bei **Apple nicht** — siehe unten.
+
+---
+
 ## Zweite Runde: was noch dazugekommen ist
 
 Nach der ersten Einreichung kamen die letzten offenen Punkte dazu:
@@ -45,8 +67,8 @@ gegenüber Käufern schlicht falsch.
 
 | Store | Stand | Was danach passiert |
 |---|---|---|
-| **Google Play** | Produktion auf **versionCode 7**, Ladentext und 12 Bilder aktuell, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
-| **Apple App Store** | Version 1.0 mit **Build 8**, neuen Texten und 24 Bildern, am 17.08. eingereicht | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
+| **Google Play** | Produktion auf **versionCode 8**, mit Sichern und Übertragen, am 17.08. eingereicht | Verwaltete Veröffentlichung ist aus: nach der Prüfung geht die App direkt live. Google nennt in der Regel bis zu 7 Tage |
+| **Apple App Store** | Version 1.0 mit **Build 8**, in Prüfung. **Ohne** Sichern und Übertragen, siehe unten | Freigabemodus **AFTER_APPROVAL**: Apple genehmigt, die App geht ohne weiteren Klick live |
 
 In beiden Läden wurde die laufende Prüfung dafür bewusst abgebrochen und neu
 gestartet. Das kostet Wartezeit, aber die Alternative wäre gewesen, den alten
@@ -112,7 +134,14 @@ wird, nicht aus dem Quelltext geschlossen:
    „nichts verlässt das Gerät", die in der Datenschutzerklärung, den
    Store-Texten und im Über-Bereich der App steht. Das wäre kein Feature mehr,
    sondern ein anderes Produkt mit Servern, Konten und neuen Rechtstexten.
-3. **Der iOS-Pfad des Nachschlagens ist ungetestet.** Die Übergabe läuft dort
+3. **Apple hinkt eine Runde hinterher.** Das EAS-Kontingent des kostenlosen
+   Tarifs ist für diesen Monat aufgebraucht und setzt sich am **1. September
+   2026** zurück. Ohne Mac lässt sich iOS nicht lokal bauen, also gibt es keinen
+   iOS-Build mit Sichern und Übertragen. Die Apple-Beschreibung wurde deshalb
+   bewusst **nicht** aktualisiert: Sie nennt die Funktion nicht, und damit passt
+   sie zu Build 8. Wer früher will, bräuchte einen bezahlten EAS-Tarif; das ist
+   eine Kostenfrage und deine Entscheidung.
+4. **Der iOS-Pfad des Nachschlagens ist ungetestet.** Die Übergabe läuft dort
    über das Teilen-Blatt; ohne Mac ließ sich das hier nicht am Gerät prüfen.
    Der Android-Pfad ist geprüft, auch der Fall ohne passende App.
 
