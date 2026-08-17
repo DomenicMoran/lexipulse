@@ -44,6 +44,21 @@ const config: ExpoConfig = {
       // "Open with LexiPulse" for a backup file sitting in Files, iCloud or Dropbox.
       // Viewer, not Editor: the app reads the file once and never writes back into it,
       // and Editor would make iOS offer LexiPulse as a place to save JSON.
+      /*
+       * Required alongside `CFBundleDocumentTypes`; Apple returns ITMS-90737 without it.
+       *
+       * `false`, not the recommended `true`. "In place" means the app is handed the
+       * user's own file and edits it where it lies, which needs a security-scoped
+       * resource to be claimed and released around every read. LexiPulse does the
+       * opposite: it reads the file once, builds its own documents from it and never
+       * writes back. With `false` the system copies the file into the app's Inbox and
+       * hands over the copy, which is exactly what the import already expects — and the
+       * copy is thrown away again in `BackupImportProvider`.
+       *
+       * Claiming `true` would be a promise about a file the app never touches, and the
+       * read would go through an URL nothing ever asked permission for.
+       */
+      LSSupportsOpeningDocumentsInPlace: false,
       CFBundleDocumentTypes: [
         {
           CFBundleTypeName: 'LexiPulse backup',
