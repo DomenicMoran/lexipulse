@@ -1,6 +1,6 @@
 # LexiPulse als Dokumenten-Werkzeug
 
-Stand: 2026-08-17. Grundlage: `MARKTANALYSE_2026-08-16.md`, `ROADMAP_READER.md`.
+Stand: 2026-08-17, zweite Runde. Grundlage: `MARKTANALYSE_2026-08-16.md`, `ROADMAP_READER.md`.
 Status: **fertig** · **in Arbeit** · **offen**
 
 ---
@@ -48,15 +48,15 @@ Drei Oberflächen auf einem Dokument, eine Leseposition:
 
 | # | Funktion | Status |
 |---|---|---|
-| 6.1 | Originalbytes werden gespeichert, nicht weggeworfen | **offen** |
-| 6.2 | Seiten rendern (Canvas, Geräteauflösung, virtualisiert) | **offen** |
-| 6.3 | Zoom: Breite, Seite, freie Stufen, Doppelseite | **offen** |
-| 6.4 | Textebene: markieren, kopieren, suchen im Original | **offen** |
-| 6.5 | Miniaturenleiste und Gliederung (Outline/Lesezeichen des PDF) | **offen** |
-| 6.6 | Sprungziele und Links im Dokument | **offen** |
-| 6.7 | Drehen, Nachtmodus (invertiert), Vollbild | **offen** |
-| 6.8 | Seite ↔ Wortstrom: eine Position, in beide Richtungen | **offen** |
-| 6.9 | Passwortgeschützte PDFs öffnen | **offen** |
+| 6.1 | Originalbytes werden gespeichert, nicht weggeworfen | **fertig** |
+| 6.2 | Seiten rendern (Canvas, Geräteauflösung, virtualisiert) | **fertig** |
+| 6.3 | Zoom: Breite, Seite, freie Stufen | **fertig**, Doppelseite offen |
+| 6.4 | Textebene: markieren, kopieren, suchen im Original | **fertig** |
+| 6.5 | Miniaturenleiste und Gliederung (Outline/Lesezeichen des PDF) | **fertig** |
+| 6.6 | Sprungziele und Links im Dokument | **fertig** |
+| 6.7 | Drehen, Nachtmodus (invertiert) | **fertig**, Vollbild offen |
+| 6.8 | Seite ↔ Wortstrom: eine Position, in beide Richtungen | **fertig** |
+| 6.9 | Passwortgeschützte PDFs öffnen | **fertig**, am Gerät ungeprüft |
 
 ## Stufe 7 — PDF bearbeiten
 
@@ -65,19 +65,19 @@ das Produkt steht, und sie gilt hier genauso.
 
 | # | Funktion | Status |
 |---|---|---|
-| 7.1 | Markieren, Unterstreichen, Durchstreichen auf der Originalseite | **offen** |
-| 7.2 | Freihand zeichnen, Stiftstärke und Farbe | **offen** |
-| 7.3 | Textkasten setzen, Schriftgröße und Farbe | **offen** |
-| 7.4 | Notizzettel (Kommentar) an einer Stelle | **offen** |
-| 7.5 | Formen: Rechteck, Ellipse, Pfeil, Linie | **offen** |
-| 7.6 | Übermalen (Whiteout) und echtes Schwärzen | **offen** |
-| 7.7 | **Unterschreiben**: zeichnen, Bild einsetzen oder tippen, dann platzieren | **offen** |
-| 7.8 | **Formulare ausfüllen**: Textfelder, Haken, Auswahl, danach festschreiben | **offen** |
-| 7.9 | Seiten: drehen, löschen, verschieben, einfügen, herauslösen | **offen** |
-| 7.10 | Dokumente zusammenführen und teilen | **offen** |
-| 7.11 | Bilder zu einem PDF machen | **offen** |
-| 7.12 | Dokumenteigenschaften bearbeiten | **offen** |
-| 7.13 | Als PDF ausgeben — herunterladen, teilen, ersetzen | **offen** |
+| 7.1 | Markieren, Unterstreichen, Durchstreichen auf der Originalseite | **fertig** |
+| 7.2 | Freihand zeichnen, Stiftstärke und Farbe | **fertig** |
+| 7.3 | Textkasten setzen, Schriftgröße und Farbe | **fertig** |
+| 7.4 | Notizzettel (Kommentar) an einer Stelle | **fertig** |
+| 7.5 | Formen: Rechteck, Ellipse, Pfeil, Linie | **fertig** |
+| 7.6 | Übermalen und echtes Schwärzen (Seite wird Bild) | **fertig** |
+| 7.7 | **Unterschreiben**: zeichnen, Bild einsetzen oder tippen, dann platzieren | **fertig** |
+| 7.8 | **Formulare ausfüllen**: Textfelder, Haken, Auswahl, danach festschreiben | **fertig** |
+| 7.9 | Seiten: drehen, löschen, verschieben, einfügen | **fertig**; Herauslösen offen |
+| 7.10 | Dokumente zusammenführen und teilen | **in Arbeit** — Kern da (`mergePdfs`, `extractPages`), ohne Oberfläche |
+| 7.11 | Bilder zu einem PDF machen | **in Arbeit** — `imagesToPdf` da, ohne Oberfläche |
+| 7.12 | Dokumenteigenschaften bearbeiten | **in Arbeit** — `setProperties` da, ohne Oberfläche |
+| 7.13 | Als PDF ausgeben — herunterladen oder Original ersetzen | **fertig** |
 
 ## Stufe 8 — Der Reader, wie er sein müsste
 
@@ -92,11 +92,11 @@ das Produkt steht, und sie gilt hier genauso.
 
 | # | Funktion | Status |
 |---|---|---|
-| 9.1 | Landingpage: Reader und PDF-Werkzeug vorn, Wortstrom als Argument | **offen** |
-| 9.2 | Eigene Seiten für die Werkzeuge, mit eigenen Suchbegriffen | **offen** |
+| 9.1 | Landingpage: Reader und PDF-Werkzeug vorn, Wortstrom als Argument | **fertig** |
+| 9.2 | Eigene Seite `/pdf` mit eigenen Suchbegriffen | **fertig** |
 | 9.3 | Store-Titel, Untertitel, Beschreibung, Suchbegriffe neu | **offen** |
 | 9.4 | Neue Bildschirmfotos aus der laufenden App | **offen** |
-| 9.5 | Rechtstexte nachziehen, wo sich etwas ändert | **offen** |
+| 9.5 | Rechtstexte nachziehen, wo sich etwas ändert | **fertig** (Datenschutz DE+EN) |
 
 ---
 
@@ -148,3 +148,35 @@ Seite.
 - **Lizenzen:** `pdf.js` (Apache-2.0) ist bereits im Einsatz, `pdf-lib` (MIT)
   kommt dazu. Beides erlaubt die Nutzung in einem verkauften Produkt; die
   Hinweise gehören zu den Schriftlizenzen in der App.
+
+---
+
+## Was am 17.08. belegt ist
+
+Alles Folgende an der veröffentlichten Fassung auf `lexipulse.de` geprüft, nicht am
+Entwicklungsserver und nicht aus dem Quelltext geschlossen:
+
+- 16-seitige PDF importiert, Originalseiten gerendert, 0 Konsolenfehler
+- Suche nach „Traeumerei" springt auf Seite 8, Treffer farbig auf dem Wort
+- „Ab hier im Wortstrom" von Seite 8 landet auf `Fuer` — dem ersten Wort dieser Seite
+- Markierung entlang der Textauswahl, Freihandstrich, beides in der exportierten Datei
+  von pdf.js zurückgelesen und gerendert
+- Seite 2 nach vorne verschoben; beide Markierungen sind mit ihr auf Seite 2 gewandert
+- Formular ausgefüllt (Text, Haken, Auswahl), Unterschrift getippt und platziert,
+  festgeschrieben gespeichert: in der Datei stehen alle drei Werte, kein Formularfeld
+  ist mehr veränderbar, die Unterschrift steht auf der Linie
+
+Zwei Fehler kamen erst dabei heraus, beide nur in der veröffentlichten Fassung sichtbar:
+Die Feldtypen wurden am Klassennamen erkannt, den der Produktionsbau wegminifiziert — jede
+Datei meldete „kein Formular". Und drei schnelle Eingaben im Formular überschrieben sich
+gegenseitig, weil der Bearbeiter das ganze Wertepaket zurückgab. Beide sind behoben, für
+den ersten steht ein Test, der die Klassen zur Laufzeit genauso umbenennt wie ein Minifier.
+
+## Was als Nächstes ansteht
+
+1. **Mobil nachziehen.** Die App kann von alldem nichts. Der Weg ist die mitgelieferte
+   WebView, die heute schon pdf.js für den Import fährt — eine Umsetzung, zwei Hosts.
+2. **Store-Auftritt** zusammen mit dem Build, der die Funktionen enthält. Vorher nicht:
+   beide Läden prüfen gerade, und ein Eingriff bricht die Prüfung ab.
+3. **Reste der Werkzeuge**: Zusammenführen, Teilen, Bilder-zu-PDF und
+   Dokumenteigenschaften haben ihren Kern, aber noch keine Oberfläche.

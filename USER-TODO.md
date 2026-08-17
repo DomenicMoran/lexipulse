@@ -1,6 +1,61 @@
 # USER-TODO — LexiPulse
 
-Stand: 2026-08-17. **Offen ist nichts mehr, was jemand tun müsste.**
+Stand: 2026-08-17. **Zu tun ist nichts. Eine Entscheidung steht an, aber sie hat
+Zeit — siehe „Was Sie entscheiden müssen, wenn 1.0 durch ist".**
+
+---
+
+## Vierte Runde: Die PDF ist jetzt eine PDF
+
+Bisher hat LexiPulse aus einem PDF den Text herausgelesen und die Seite
+weggeworfen. Für den Wortstrom ist das richtig; für alles andere, was man mit
+einer PDF tut, fehlte damit alles. Neu ist eine dritte Ansicht neben Wortstrom
+und Seitenmodus — das **Original**, so gesetzt wie es ist — und ein
+Werkzeugkasten dazu:
+
+- **Lesen:** Seiten rendern, Zoom, Drehen, dunkle Darstellung, Miniaturen,
+  Gliederung, Verweise, Volltextsuche mit Sprung auf die Fundstelle
+- **Markieren:** entlang der echten Textauswahl, nicht als selbst gezogener
+  Kasten. Dazu Freihand, Rechteck, Ellipse, Linie, Pfeil, Textfelder, Notizen
+- **Unterschreiben:** zeichnen, tippen oder ein Foto Ihrer Unterschrift; weißes
+  Papier im Foto wird transparent, die Tinte bleibt
+- **Formulare:** Felder werden ausgelesen und in einer Liste ausgefüllt. Beim
+  Speichern können Sie sie festschreiben, damit sie niemand mehr ändert
+- **Seiten:** drehen, löschen, verschieben, leere Seite / andere PDF / Bild
+  einfügen. Ihre Markierungen wandern mit
+- **Schwärzen:** auf Wunsch wird der Text wirklich entfernt und nicht nur
+  überdeckt. Der Unterschied steht im Speichern-Dialog, weil er einer ist
+- **Speichern:** als neue Datei oder das Original in der Bibliothek ersetzen
+
+Alles läuft im Browser. Keine Datei geht an einen Server, auch beim Bearbeiten
+nicht. Die Datenschutzerklärung sagt das jetzt ausdrücklich, in beiden Sprachen.
+
+**Wo es läuft:** in der **Web-Fassung**, seit heute live auf lexipulse.de. Die
+mobilen Apps können davon noch nichts.
+
+**Die Webseite sagt es endlich auch.** Titel und Beschreibung nennen jetzt
+PDF-Reader, E-Book-Reader und PDF-Werkzeug; es gibt einen Abschnitt „Drei
+Ansichten" und einen über die PDF-Werkzeuge, dazu eine eigene Seite
+`lexipulse.de/pdf` für Leute, die gar keinen Reader suchen, sondern eine Aufgabe
+haben.
+
+## Was Sie entscheiden müssen, wenn 1.0 durch ist
+
+Die Store-Texte bleiben **unangetastet**, solange beide Läden prüfen: ein
+Eingriff bei Play bricht die Prüfung ab, bei Apple müsste die Einreichung
+zurückgezogen werden. Beides ist in dieser Woche schon einmal passiert.
+
+Sobald 1.0 freigegeben ist, stellt sich die Frage, wie es weitergeht:
+
+1. **Erst mobil nachziehen, dann Store-Texte.** Die App bekommt dieselben
+   Werkzeuge über die mitgelieferte WebView, die heute schon pdf.js fährt. Danach
+   werden Titel, Untertitel, Beschreibung, Suchbegriffe und alle Bildschirmfotos
+   neu gemacht und als 1.1 eingereicht. Das ist der ehrliche Weg und der längere.
+2. **Store-Texte schon vorher anfassen.** Ginge nur für das, was die App heute
+   kann — also nichts von den PDF-Werkzeugen. Bringt wenig und kostet eine
+   Prüfrunde.
+
+Empfehlung ist 1. Bis dahin ist an den Läden nichts zu tun.
 
 ---
 

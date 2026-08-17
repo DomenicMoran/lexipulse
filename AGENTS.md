@@ -15,13 +15,32 @@ The moment `window`, `document`, `AsyncStorage` or `node:fs` appears in
 it is gone silently: the tests still pass, because they run under Node.
 
 ```
-apps/web/         Next.js 15 App Router — landing page, reader, PWA
+apps/web/         Next.js 15 App Router — landing page, reader, PDF surface, PWA
 apps/mobile/      Expo SDK 57 — iOS and Android
-packages/core/    RSVP engine, parsers, storage. Platform-free.
+packages/core/    RSVP engine, parsers, page marks, storage. Platform-free.
 packages/ui/      Design tokens, player geometry, shared React components
 packages/assets/  Icon, logo and store-screenshot generation
 store/            Legal texts, ASO metadata, store screenshots
 ```
+
+## The original surface
+
+A PDF is kept byte for byte next to the text extracted from it, and rendered by pdf.js on
+`/reader/original`. Everything the reader adds — highlights, drawings, signatures, form
+answers — is stored beside the document as editable records (`packages/core/pdf-marks.ts`),
+never written into the file until an export is asked for. That is what makes a mark
+movable a week later, and what keeps the original untouched until the reader says
+otherwise.
+
+Two rules hold that together:
+
+**Coordinates are PDF points, never screen pixels.** `apps/web/src/components/pdf/geometry.ts`
+is the one place that crosses between them, and it is tested at all four rotations. A sign
+error there puts a highlight a page-width from its word, and only on rotated pages.
+
+**Never identify a class by `constructor.name`.** The production build renames every class
+to a letter. Form-field detection did exactly that, passed every test, and told every
+visitor to the deployed site that their document had no form.
 
 ## Language
 

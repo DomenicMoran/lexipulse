@@ -1,25 +1,30 @@
 # LexiPulse
 
-**Ultimate RSVP & Document Reader.** Import an EPUB, a PDF or a web article and read it
-word by word at a fixed position, with the Optimal Recognition Point highlighted. Runs
-offline, needs no account, and never uploads a document.
+**Document reader and PDF toolkit.** Open a PDF, an EPUB or a web article and read it
+three ways: the original page as it was laid out, flowing text in a typeface you choose,
+or word by word at a fixed position with the Optimal Recognition Point highlighted. On a
+PDF you can also highlight, comment, fill in forms, sign, and reorder pages. Runs offline,
+needs no account, and never uploads a document.
 
 - Web app: [lexipulse.de](https://lexipulse.de) — free
 - iOS and Android: 4,99 € once. No subscription, no ads, no tracking.
 
-## Why another speed reader
+## Why another reader
 
-Most RSVP apps fail on two things, and both are solved here.
+Two things decide whether this is usable, and both are solved here.
 
 **The pivot drifts.** If the highlighted character does not land on the same physical
 column every time, the eye has to re-acquire it and the whole point is lost. LexiPulse
 pins it with `translateX((focusColumn − orp)ch)` on a monospace face, so alignment is
 arithmetic, not approximation.
 
-**PDFs arrive as garbage.** A PDF is a page description: running heads repeat on every
-page, footers carry page numbers, tables come through as space-aligned noise, and words
-are cut in half at the line break. The import pipeline detects and removes all of it
-before a single word reaches the player.
+**PDFs arrive as garbage — and are also more than text.** A PDF is a page description:
+running heads repeat on every page, footers carry page numbers, tables come through as
+space-aligned noise, and words are cut in half at the line break. The import pipeline
+detects and removes all of it before a single word reaches the player. The original file
+is kept beside the extracted text, because the figures, tables, forms and signature lines
+have no representation in it — that is what the original surface renders, and what the
+editor writes back to.
 
 ## Structure
 
@@ -28,7 +33,7 @@ apps/
   web/        Next.js 15 App Router — landing page, reader, PWA
   mobile/     Expo SDK 57 — iOS and Android
 packages/
-  core/       RSVP engine, document parsers, storage. Platform-free, 202 tests.
+  core/       RSVP engine, document parsers, page marks, storage. Platform-free.
   ui/         Design tokens, player geometry, shared React components
   assets/     Programmatic icon, logo and store-screenshot generation
 store/        Legal texts, ASO metadata, store screenshots
