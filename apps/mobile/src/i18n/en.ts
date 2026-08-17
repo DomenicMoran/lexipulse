@@ -156,6 +156,8 @@ export const en: Record<keyof typeof de, string> = {
 
   'backup.restore': 'Read a backup',
   'backup.restore.hint': 'From a file made on this device or another one',
+  'backup.last.never': 'No backup has been made on this device yet.',
+  'backup.last.at': 'Last backed up on {when}.',
   'backup.restore.failed': 'Reading the backup failed',
   'backup.restore.unreadable.title': 'Not a LexiPulse backup',
   'backup.restore.unreadable.body':

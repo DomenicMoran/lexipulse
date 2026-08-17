@@ -41,6 +41,20 @@ const config: ExpoConfig = {
       ITSAppUsesNonExemptEncryption: false,
       CFBundleLocalizations: ['de', 'en'],
       CFBundleDevelopmentRegion: 'de',
+      // "Open with LexiPulse" for a backup file sitting in Files, iCloud or Dropbox.
+      // Viewer, not Editor: the app reads the file once and never writes back into it,
+      // and Editor would make iOS offer LexiPulse as a place to save JSON.
+      CFBundleDocumentTypes: [
+        {
+          CFBundleTypeName: 'LexiPulse backup',
+          CFBundleTypeRole: 'Viewer',
+          LSItemContentTypes: ['public.json'],
+          // Alternate rather than Owner: `public.json` is a system type LexiPulse does
+          // not own, and claiming Owner would make it the default handler for every
+          // JSON file on the device.
+          LSHandlerRank: 'Alternate',
+        },
+      ],
     },
   },
   android: {
@@ -49,6 +63,27 @@ const config: ExpoConfig = {
     // No `edgeToEdgeEnabled` flag: SDK 57 dropped it because edge-to-edge is now always
     // on, which is why every screen pads itself with `useSafeAreaInsets`.
     predictiveBackGestureEnabled: false,
+    /*
+     * "Open with LexiPulse" for a backup file in a file manager or a cloud app.
+     *
+     * Only `content`. Since API 24 an app that hands out a `file://` URI to another app
+     * throws FileUriExposedException, so nothing on a current Android sends one; the
+     * scheme would only make LexiPulse appear in the chooser for files it then cannot
+     * read, because the app deliberately holds no storage permission. A chooser entry
+     * that always ends in "not a backup" is worse than no entry.
+     *
+     * `application/json` only, for the same reason: several providers report an unknown
+     * type for a `.json` file, but claiming `application/octet-stream` would offer
+     * LexiPulse for every unrecognised binary on the device. Those files still reach the
+     * app through Settings, where the picker does accept the wider list.
+     */
+    intentFilters: [
+      {
+        action: 'VIEW',
+        category: ['DEFAULT', 'BROWSABLE'],
+        data: [{ scheme: 'content', mimeType: 'application/json' }],
+      },
+    ],
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#000000',

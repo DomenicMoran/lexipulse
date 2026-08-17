@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlertProvider } from '../src/components/alert';
+import { BackupImportProvider } from '../src/components/backup';
 import { AnnotationsGate } from '../src/state/annotations-gate';
 import { t } from '../src/i18n';
 import { PdfBridgeProvider } from '../src/pdf/bridge';
@@ -58,7 +59,15 @@ export default function RootLayout() {
               <PdfBridgeProvider>
                 <AnnotationsGate>
                   <AlertProvider>
-                    <Shell ready={fontsLoaded || fontError !== null} />
+                    {/*
+                     * Above the navigator, because a backup file tapped in another app can
+                     * arrive while any screen is showing or before the first one exists.
+                     * Inside `AlertProvider`, because the "not a backup" answer is one of
+                     * its dialogs.
+                     */}
+                    <BackupImportProvider>
+                      <Shell ready={fontsLoaded || fontError !== null} />
+                    </BackupImportProvider>
                   </AlertProvider>
                 </AnnotationsGate>
               </PdfBridgeProvider>

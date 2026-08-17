@@ -34,6 +34,8 @@ Gerät geprüft, bevor die nächste beginnt.
 | 2.9 | FictionBook (.fb2) importieren | **fertig** |
 | 2.10 | Markierungen als Markdown ausgeben | **fertig** |
 | 2.11 | Tagesziel in Wörtern | **fertig** |
+| 2.12 | Sicherung erstellen und wieder einlesen | **fertig** |
+| 2.13 | Zwei Geräte zusammenführen, ohne Server | **fertig** |
 
 ## Stufe 3 — Der Unterschied zum Rest des Marktes
 
@@ -68,6 +70,7 @@ zusammen.
 | 5.3 | Suche | **fertig** |
 | 5.4 | Markierungen | **fertig** |
 | 5.5 | Leselineal, Auto-Scroll, Blättern, Schlagwörter | **fertig** |
+| 5.6 | Sicherung einlesen mit Zusammenführen | **fertig** |
 
 Die Web-Fassung ist damit auf dem Stand der App. Das Blättern löst sie über
 CSS-Spalten statt über gemessene Zeilenkästen, weil der Browser den Umbruch
@@ -86,7 +89,9 @@ Nicht aus Bequemlichkeit weggelassen, sondern weil es dem Produkt schadet:
   verlässt das Gerät", die in der Datenschutzerklärung, den Store-Texten und im
   Über-Bereich der App steht. Ließe sich nur mit neuen Rechtstexten und einer
   neuen Datenschutz-Erklärung im Store einführen.
-- **Konto und Geräte-Sync.** Dasselbe, plus: Die App hat bewusst keine Anmeldung.
+- **Konto und Geräte-Sync über unsere Server.** Dasselbe, plus: Die App hat
+  bewusst keine Anmeldung. Der Abgleich zwischen zwei Geräten läuft stattdessen
+  über eine Datei, die der Nutzer selbst bewegt; siehe `PLAN_SICHERUNG.md`.
 - **CBZ/CBR (Comics).** RSVP ergibt bei Bildern keinen Sinn.
 - **Plugin-System wie KOReader.** Ein Wartungsversprechen, das eine App mit einem
   Entwickler nicht halten kann.

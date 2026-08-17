@@ -10,12 +10,18 @@
  * Everything the user is told comes out of the store: `inspectBackup` before the import so
  * the choice is informed, and `ImportResult` after it so the report states what happened
  * instead of claiming success.
+ *
+ * A backup can arrive two ways: picked in Settings, or handed to the app by a file manager
+ * or a cloud app through "Open with LexiPulse". Both end up in `BackupImportProvider`,
+ * which owns the preview, the mode choice and the report. Two entrances, one flow.
  */
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import { StorageAccessFramework } from 'expo-file-system/legacy';
+import * as Linking from 'expo-linking';
+import { useFocusEffect } from 'expo-router';
 import * as Sharing from 'expo-sharing';
-import { useCallback, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Modal, Platform, ScrollView, View } from 'react-native';
 
 import {
@@ -110,12 +116,39 @@ interface Pending {
 }
 
 /**
- * The rows of the "back up and transfer" section.
+ * Only a link that points at a file is a candidate for an import.
  *
- * One component rather than three so the dividers between the rows stay correct when the
- * Android-only folder row is absent.
+ * The app's own `lexipulse://` scheme uses the same channel, and so does every route link
+ * expo-router handles. Trying to read one of those as a file would end in "not a backup"
+ * for something that was never meant to be one, so they are simply not ours. `file://` is
+ * accepted because iOS copies an incoming document into the app's own Inbox and hands over
+ * exactly that; on Android nothing sends it.
  */
-export function BackupRows() {
+export function isFileLink(url: string): boolean {
+  return /^(content|file):/i.test(url);
+}
+
+interface BackupImportValue {
+  /** True while a file is being read or written back into the store. */
+  busy: boolean;
+  /** Read the file at `uri` and, if it is a backup, open the shared preview. */
+  open: (uri: string) => void;
+}
+
+const BackupImportContext = createContext<BackupImportValue | null>(null);
+
+/**
+ * The one place a backup is looked at and imported.
+ *
+ * It sits at the root rather than inside the settings screen for two reasons. A file tapped
+ * in another app can arrive while any screen is showing, or before any screen exists at
+ * all, so the preview has to live above the navigator. And routing the incoming link into
+ * the existing flow needs shared state, which a module-level variable could not provide
+ * safely: reading a mutable global during render is exactly what the React Compiler rules
+ * out, and it would also give no way to re-render once the value arrives. A context is the
+ * smallest thing that does both.
+ */
+export function BackupImportProvider({ children }: { children: React.ReactNode }) {
   const alert = useAlert();
   const { refresh } = useLibrary();
   const { discard } = useReader();
@@ -123,105 +156,60 @@ export function BackupRows() {
   const [pending, setPending] = useState<Pending | null>(null);
   const [busy, setBusy] = useState(false);
 
-  // ------------------------------------------------------------------------ writing
-
-  const onShare = useCallback(() => {
-    setBusy(true);
-    void (async () => {
-      try {
-        const json = await store.exportAll();
-        const file = new FileSystem.File(FileSystem.Paths.cache, `${backupBaseName()}.json`);
-        if (file.exists) file.delete();
-        file.create();
-        file.write(json);
-
-        if (!(await Sharing.isAvailableAsync())) {
-          alert(t('backup.failed'), t('backup.share.unavailable'));
-          return;
-        }
-        await Sharing.shareAsync(file.uri, {
-          mimeType: 'application/json',
-          dialogTitle: t('backup.create'),
-          UTI: 'public.json',
-        });
-      } catch (error) {
-        alert(t('backup.failed'), String(error));
-      } finally {
-        setBusy(false);
-      }
-    })();
-  }, [alert]);
-
-  /**
-   * Android only: write straight into a folder the user picks.
-   *
-   * iOS needs nothing here, its share sheet already offers "Save to Files". Android's does
-   * not reliably, so without this the only way out of the app is a messenger.
-   */
-  const onSaveToFolder = useCallback(() => {
-    setBusy(true);
-    void (async () => {
-      try {
-        const permission = await StorageAccessFramework.requestDirectoryPermissionsAsync();
-        // Declining is an answer, not a failure. Saying nothing is the correct response.
-        if (!permission.granted) return;
-
-        const json = await store.exportAll();
-        const name = backupBaseName();
-        // SAF appends the extension belonging to the MIME type, so the name goes in bare;
-        // passing "…json" here would produce "….json.json".
-        const uri = await StorageAccessFramework.createFileAsync(
-          permission.directoryUri,
-          name,
-          'application/json',
-        );
-        await StorageAccessFramework.writeAsStringAsync(uri, json);
-        alert(t('backup.folder.done'), t('backup.folder.doneBody', { name: `${name}.json` }));
-      } catch (error) {
-        alert(t('backup.failed'), String(error));
-      } finally {
-        setBusy(false);
-      }
-    })();
-  }, [alert]);
-
-  // ------------------------------------------------------------------------ reading
-
-  const onPick = useCallback(() => {
-    setBusy(true);
-    void (async () => {
-      try {
-        const picked = await DocumentPicker.getDocumentAsync({
-          type: BACKUP_MIME,
-          copyToCacheDirectory: true,
-          multiple: false,
-        });
-        if (picked.canceled) return;
-        const asset = picked.assets[0];
-        if (!asset) return;
-
-        const json = await new FileSystem.File(asset.uri).text();
-        const summary = inspectBackup(json, SCHEMA_VERSION);
-        if (summary === 'unreadable') {
+  const open = useCallback(
+    (uri: string) => {
+      setBusy(true);
+      void (async () => {
+        try {
+          // Same read as the picker path. `File.text()` resolves a `content://` URI
+          // through the ContentResolver, so a document handed over by another app needs
+          // no copy and no storage permission of our own.
+          const json = await new FileSystem.File(uri).text();
+          const summary = inspectBackup(json, SCHEMA_VERSION);
+          if (summary === 'unreadable') {
+            alert(t('backup.restore.unreadable.title'), t('backup.restore.unreadable.body'));
+            return;
+          }
+          if (summary === 'too-new') {
+            alert(t('backup.restore.tooNew.title'), t('backup.restore.tooNew.body'));
+            return;
+          }
+          setPending({ json, summary });
+        } catch (error) {
+          // Anything that cannot even be read as text ends here: a provider URI that went
+          // stale, a file the app has no access to. From the reader's side that is the same
+          // mistake as picking the wrong file, so it gets the same answer.
+          console.warn('[LexiPulse] could not read backup file', error);
           alert(t('backup.restore.unreadable.title'), t('backup.restore.unreadable.body'));
-          return;
+        } finally {
+          setBusy(false);
         }
-        if (summary === 'too-new') {
-          alert(t('backup.restore.tooNew.title'), t('backup.restore.tooNew.body'));
-          return;
-        }
-        setPending({ json, summary });
-      } catch (error) {
-        // Anything that cannot even be read as text ends here: a provider URI that went
-        // stale, a file the app has no access to. From the reader's side that is the same
-        // mistake as picking the wrong file, so it gets the same answer.
-        console.warn('[LexiPulse] could not read backup file', error);
-        alert(t('backup.restore.unreadable.title'), t('backup.restore.unreadable.body'));
-      } finally {
-        setBusy(false);
-      }
-    })();
-  }, [alert]);
+      })();
+    },
+    [alert],
+  );
+
+  /*
+   * Both doors into the app from outside.
+   *
+   * `getInitialURL` covers the cold start, where the file was tapped while LexiPulse was
+   * not running; the listener covers the app that is already open, which Android delivers
+   * through `onNewIntent` and iOS through the app delegate. Only one of the two fires for
+   * a given tap, so handling both cannot double up.
+   */
+  useEffect(() => {
+    const subscription = Linking.addEventListener('url', (event) => {
+      if (isFileLink(event.url)) open(event.url);
+    });
+    Linking.getInitialURL()
+      .then((url) => {
+        if (url && isFileLink(url)) open(url);
+      })
+      .catch((error: unknown) => {
+        console.warn('[LexiPulse] could not read the launch link', error);
+      });
+    return () => subscription.remove();
+  }, [open]);
 
   const runImport = useCallback(
     (json: string, mode: ImportMode) => {
@@ -278,13 +266,169 @@ export function BackupRows() {
     ]);
   }, [alert, pending, runImport]);
 
+  const onCancel = useCallback(() => setPending(null), []);
+
+  const value = useMemo<BackupImportValue>(() => ({ busy, open }), [busy, open]);
+
+  return (
+    <BackupImportContext.Provider value={value}>
+      {children}
+      {pending ? (
+        <BackupPreview
+          summary={pending.summary}
+          onCancel={onCancel}
+          onMerge={onMerge}
+          onReplace={onReplace}
+        />
+      ) : null}
+    </BackupImportContext.Provider>
+  );
+}
+
+function useBackupImport(): BackupImportValue {
+  const value = useContext(BackupImportContext);
+  if (!value) throw new Error('useBackupImport must be used inside <BackupImportProvider>');
+  return value;
+}
+
+/**
+ * The rows of the "back up and transfer" section.
+ *
+ * One component rather than three so the dividers between the rows stay correct when the
+ * Android-only folder row is absent.
+ */
+export function BackupRows() {
+  const alert = useAlert();
+  const theme = useTheme();
+  const { busy: importing, open } = useBackupImport();
+  const [busy, setBusy] = useState(false);
+  const [lastBackup, setLastBackup] = useState<number | null>(null);
+  const disabled = busy || importing;
+
+  /*
+   * Without a server nobody but the reader can make a backup, so the honest thing is to
+   * say when they last did. Re-read on focus rather than once on mount: an import or a
+   * wipe changes the answer, and a stale date here would be worse than none.
+   */
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      void (async () => {
+        const at = await store.getLastBackupAt();
+        if (!cancelled) setLastBackup(at);
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, []),
+  );
+
+  // ------------------------------------------------------------------------ writing
+
+  const onShare = useCallback(() => {
+    setBusy(true);
+    void (async () => {
+      try {
+        const json = await store.exportAll();
+        const file = new FileSystem.File(FileSystem.Paths.cache, `${backupBaseName()}.json`);
+        if (file.exists) file.delete();
+        file.create();
+        file.write(json);
+
+        if (!(await Sharing.isAvailableAsync())) {
+          alert(t('backup.failed'), t('backup.share.unavailable'));
+          return;
+        }
+        await Sharing.shareAsync(file.uri, {
+          mimeType: 'application/json',
+          dialogTitle: t('backup.create'),
+          UTI: 'public.json',
+        });
+        // Marked once the file exists and the sheet opened. Whether the reader then kept
+        // it is not something the app can see, so this says "a backup was made", nothing
+        // stronger.
+        await store.markBackupCreated();
+        setLastBackup(await store.getLastBackupAt());
+      } catch (error) {
+        alert(t('backup.failed'), String(error));
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, [alert]);
+
+  /**
+   * Android only: write straight into a folder the user picks.
+   *
+   * iOS needs nothing here, its share sheet already offers "Save to Files". Android's does
+   * not reliably, so without this the only way out of the app is a messenger.
+   */
+  const onSaveToFolder = useCallback(() => {
+    setBusy(true);
+    void (async () => {
+      try {
+        const permission = await StorageAccessFramework.requestDirectoryPermissionsAsync();
+        // Declining is an answer, not a failure. Saying nothing is the correct response.
+        if (!permission.granted) return;
+
+        const json = await store.exportAll();
+        const name = backupBaseName();
+        // SAF appends the extension belonging to the MIME type, so the name goes in bare;
+        // passing "…json" here would produce "….json.json".
+        const uri = await StorageAccessFramework.createFileAsync(
+          permission.directoryUri,
+          name,
+          'application/json',
+        );
+        await StorageAccessFramework.writeAsStringAsync(uri, json);
+        await store.markBackupCreated();
+        setLastBackup(await store.getLastBackupAt());
+        alert(t('backup.folder.done'), t('backup.folder.doneBody', { name: `${name}.json` }));
+      } catch (error) {
+        alert(t('backup.failed'), String(error));
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, [alert]);
+
+  // ------------------------------------------------------------------------ reading
+
+  /**
+   * Pick a file, then hand it to the shared flow.
+   *
+   * Everything after the picker closes belongs to the provider, so this path and the one
+   * that starts in another app cannot drift apart.
+   */
+  const onPick = useCallback(() => {
+    setBusy(true);
+    void (async () => {
+      try {
+        const picked = await DocumentPicker.getDocumentAsync({
+          type: BACKUP_MIME,
+          copyToCacheDirectory: true,
+          multiple: false,
+        });
+        if (picked.canceled) return;
+        const asset = picked.assets[0];
+        if (!asset) return;
+        open(asset.uri);
+      } catch (error) {
+        console.warn('[LexiPulse] the document picker failed', error);
+        alert(t('backup.restore.unreadable.title'), t('backup.restore.unreadable.body'));
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, [alert, open]);
+
   return (
     <>
       <Row
         label={t('backup.create')}
         hint={t('backup.create.hint')}
         icon="download-outline"
-        onPress={busy ? undefined : onShare}
+        onPress={disabled ? undefined : onShare}
       />
       {Platform.OS === 'android' ? (
         <>
@@ -293,7 +437,7 @@ export function BackupRows() {
             label={t('backup.folder')}
             hint={t('backup.folder.hint')}
             icon="folder-open-outline"
-            onPress={busy ? undefined : onSaveToFolder}
+            onPress={disabled ? undefined : onSaveToFolder}
           />
         </>
       ) : null}
@@ -302,16 +446,18 @@ export function BackupRows() {
         label={t('backup.restore')}
         hint={t('backup.restore.hint')}
         icon="push-outline"
-        onPress={busy ? undefined : onPick}
+        onPress={disabled ? undefined : onPick}
       />
-      {pending ? (
-        <BackupPreview
-          summary={pending.summary}
-          onCancel={() => setPending(null)}
-          onMerge={onMerge}
-          onReplace={onReplace}
-        />
-      ) : null}
+      {/* An answer, not a nag: it lives here and nowhere else, with no badge and no
+          colour. The reader is the only one who can act on it. */}
+      <Divider />
+      <View style={{ paddingHorizontal: theme.space[4], paddingVertical: theme.space[3] }}>
+        <T variant="small" tone="faint">
+          {lastBackup === null
+            ? t('backup.last.never')
+            : t('backup.last.at', { when: formatDate(lastBackup) })}
+        </T>
+      </View>
     </>
   );
 }

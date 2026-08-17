@@ -162,6 +162,8 @@ export const de = {
 
   'backup.restore': 'Sicherung einlesen',
   'backup.restore.hint': 'Aus einer Datei von diesem oder einem anderen Gerät',
+  'backup.last.never': 'Auf diesem Gerät wurde noch keine Sicherung erstellt.',
+  'backup.last.at': 'Zuletzt gesichert am {when}.',
   'backup.restore.failed': 'Einlesen fehlgeschlagen',
   'backup.restore.unreadable.title': 'Keine LexiPulse-Sicherung',
   'backup.restore.unreadable.body':
