@@ -204,9 +204,19 @@ cover data we actually hold, for example email correspondence.
 ## 13. Data export under Art. 20 GDPR
 
 LexiPulse includes an export function that saves all locally stored data as a JSON file:
-library, reading progress, bookmarks, settings and statistics. The export runs entirely
-on your device and the file is written there directly. You can take your data with you
-at any time without contacting us.
+library, reading progress, bookmarks, highlights, tags, settings and statistics. The
+export runs entirely on your device and the file is written there directly. You can take
+your data with you at any time without contacting us.
+
+The same file can be read back on another device. That, too, happens entirely locally;
+the file is never transmitted to us or to anyone else. Where you put it is your choice:
+on the device, over a cable, or into a storage service you use. If you use such a
+service, its privacy policy applies to the file.
+
+One note, because it matters: the backup file contains the **complete text** of every
+document you imported, along with your notes and reading positions. It deserves the same
+care as the documents themselves. Do not share it with anyone you would not show your
+library to.
 
 ## 14. Right to lodge a complaint
 

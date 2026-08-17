@@ -1,13 +1,14 @@
 Version 1.0.0
 
-First release of LexiPulse.
+First release.
 
-• Word stream with ORP fixation, 100 to 1200 words per minute
+• Word stream with ORP fixation, 100 to 1200 WPM
 • Page mode with four typefaces, page turning and auto-scroll
 • One reading position for both modes
 • Import: EPUB, FictionBook, PDF, web articles, text, Markdown
 • Search, word overview, highlights with notes
 • Reading aids: bionic text, ruler, colour filters, OpenDyslexic
-• Library with tags, statistics, a daily goal and export
+• Library with tags, statistics and a daily goal
+• Back up and move to another device
 
 All local. No account, no tracking, no ads.

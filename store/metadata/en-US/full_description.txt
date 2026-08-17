@@ -48,7 +48,9 @@ LIBRARY
 • Bookmarks anywhere
 • Statistics with a reading streak, words read and effective speed
 • A daily goal in words, if you want one
-• Export all your own data as JSON, at any time and without going through us (GDPR Art. 20)
+• Back up and move to another device, no account and no server
+• Merge two devices: the newer side wins and nothing is duplicated
+• Export all your own data as JSON (GDPR Art. 20)
 
 PRIVACY
 No account, no registration. Your documents are processed and stored on your device only, nothing is uploaded. No tracking, no analytics, no ads, no advertising identifiers.

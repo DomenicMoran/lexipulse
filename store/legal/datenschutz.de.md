@@ -211,10 +211,20 @@ tatsächlich vorliegen, etwa eine E-Mail-Korrespondenz.
 ## 13. Datenexport nach Art. 20 DSGVO
 
 LexiPulse enthält eine Exportfunktion, mit der Sie sämtliche lokal gespeicherten Daten
-als JSON-Datei sichern: Bibliothek, Lesefortschritt, Lesezeichen, Einstellungen und
-Statistik. Der Export läuft vollständig auf Ihrem Gerät, die Datei wird direkt dort
-abgelegt. Damit können Sie Ihre Daten jederzeit selbst mitnehmen, ohne uns
-kontaktieren zu müssen.
+als JSON-Datei sichern: Bibliothek, Lesefortschritt, Lesezeichen, Markierungen,
+Schlagwörter, Einstellungen und Statistik. Der Export läuft vollständig auf Ihrem Gerät,
+die Datei wird direkt dort abgelegt. Damit können Sie Ihre Daten jederzeit selbst
+mitnehmen, ohne uns kontaktieren zu müssen.
+
+Dieselbe Datei können Sie auf einem anderen Gerät wieder einlesen. Auch das geschieht
+ausschließlich lokal; die Datei wird nicht an uns oder an Dritte übertragen. Wohin Sie
+sie ablegen, entscheiden Sie: auf dem Gerät, per Kabel, oder in einen Speicherdienst
+Ihrer Wahl. Wenn Sie einen solchen Dienst nutzen, gilt dessen Datenschutzerklärung.
+
+Ein Hinweis dazu, weil er wichtig ist: Die Sicherungsdatei enthält den **vollständigen
+Text** aller importierten Dokumente sowie Ihre Notizen und Lesestände. Sie ist damit
+genauso schützenswert wie die Dokumente selbst. Behandeln Sie sie entsprechend und
+teilen Sie sie nicht mit Personen, denen Sie Ihre Bibliothek nicht zeigen würden.
 
 ## 14. Beschwerderecht bei einer Aufsichtsbehörde
 

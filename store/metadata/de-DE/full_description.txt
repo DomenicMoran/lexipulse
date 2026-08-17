@@ -4,14 +4,14 @@ IMPORT
 • EPUB (2 und 3) und FictionBook, mit Kapiteln und Metadaten
 • PDF mit Smart-Filter: Kopf- und Fußzeilen, Seitenzahlen und Tabellenzeilen raus, getrennte Wörter zusammengesetzt
 • Web-Artikel per URL, ohne Menüs, Banner und Kommentarspalten
-• Text- und Markdown-Dateien, Markdown auch mit Kapiteln
+• Text- und Markdown-Dateien, mit Kapiteln
 • Text direkt aus der Zwischenablage
 
 WORTSTROM
 • 100 bis 1200 Wörter pro Minute, stufenlos
-• Jedes Wort sitzt am Erkennungspunkt (Optimal Recognition Point), farbig hervorgehoben
-• Dynamische Pacing-Matrix statt starrem Takt: lange Wörter bekommen 25 Prozent mehr Standzeit, Satzzeichen 75 Prozent, am Absatzende verdoppelt sie sich
-• Warm-up-Rampe: Der Stream startet bei 40 Prozent und beschleunigt auf den vollen Wert
+• Jedes Wort sitzt am Erkennungspunkt, farbig hervorgehoben
+• Pacing-Matrix statt starrem Takt: lange Wörter 25 Prozent mehr Standzeit, Satzzeichen 75 Prozent, am Absatzende doppelt
+• Warm-up-Rampe: startet bei 40 Prozent und beschleunigt auf den vollen Wert
 • 10-Wort-Rewind, Sprung zu Satz, Absatz oder Kapitel
 • Vorlesefunktion synchron zum Stream
 
@@ -21,10 +21,10 @@ SEITENMODUS
 • Schriftgröße, Zeilenabstand, Seitenränder und Blocksatz frei einstellbar
 • Blättern mit Seitenzahl oder durchgehend scrollen, wie Sie möchten
 • Auto-Scroll mit einstellbarer Geschwindigkeit
-• Ein Wort antippen springt damit in den Wortstrom
+• Ein Wort antippen springt in den Wortstrom
 
 LESEHILFEN
-• Bionic-Hervorhebung: Wortanfänge werden fett gesetzt, Stärke einstellbar
+• Bionic-Hervorhebung: fette Wortanfänge, Stärke einstellbar
 • Leselineal, das der Zeile folgt, auf der Sie gerade sind
 • Sechs Farbfilter über der Seite für Menschen mit visuellem Stress
 • OpenDyslexic ist vollständig mitgeliefert, nicht nachgeladen
@@ -32,7 +32,7 @@ LESEHILFEN
 SUCHEN UND MARKIEREN
 • Volltextsuche mit Trefferliste und Kapitelangabe
 • Wortübersicht: wo ein Wort im Dokument sonst noch steht
-• Umlauttolerant: „fur" findet „für", „traumen" findet „Träume"
+• Umlauttolerant: „fur" findet „für"
 • Markierungen in fünf Farben, mit Notiz
 • Liste aller Markierungen, ein Tippen springt zur Stelle
 • Markierungen als Markdown ausgeben, nach Kapiteln geordnet
@@ -48,6 +48,8 @@ BIBLIOTHEK
 • Lesezeichen an beliebigen Stellen
 • Statistik mit Lese-Streak, gelesenen Wörtern und effektiver Geschwindigkeit
 • Tagesziel in Wörtern, wenn Sie eines wollen
+• Sichern und auf ein anderes Gerät übertragen, ohne Konto und ohne Server
+• Zwei Geräte zusammenführen: das Neuere gewinnt, nichts wird doppelt
 • Export aller eigenen Daten als JSON (Art. 20 DSGVO)
 
 DATENSCHUTZ
