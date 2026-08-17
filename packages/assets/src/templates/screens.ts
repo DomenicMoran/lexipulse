@@ -576,7 +576,7 @@ export const SCREENS: readonly ScreenDef[] = [
     body: library,
   },
   {
-    id: '07-original',
+    id: '06-original',
     headline: t('Die PDF, wie sie gesetzt wurde.', 'The PDF exactly as it was laid out.'),
     sub: t(
       'Abbildungen, Tabellen, Formulare. Mit Zoom, Miniaturen und Volltextsuche.',
@@ -587,7 +587,7 @@ export const SCREENS: readonly ScreenDef[] = [
     body: original,
   },
   {
-    id: '08-tools',
+    id: '07-tools',
     headline: t('Markieren, ausfüllen, unterschreiben.', 'Annotate, fill in, sign.'),
     sub: t(
       'Alles im Gerät. Keine Datei wird hochgeladen, auch beim Bearbeiten nicht.',
@@ -598,7 +598,7 @@ export const SCREENS: readonly ScreenDef[] = [
     body: originalTools,
   },
   {
-    id: '06-stats',
+    id: '08-stats',
     headline: t('Sieh, wie viel du wirklich liest.', 'See how much you actually read.'),
     sub: t(
       'Wörter, Tempo und Lesezeit, nur für dich, nur auf diesem Gerät.',

@@ -52,14 +52,29 @@ Sobald 1.0 freigegeben ist, läuft es in dieser Reihenfolge:
 Ein iOS-Bau davor müsste sich wieder ein fremdes Konto leihen, wie bei Build 9.
 Wenn 1.0 vorher durchgeht und Sie nicht warten wollen, sagen Sie Bescheid.
 
-## Was noch nicht am Gerät gelaufen ist
+## Am Gerät gelaufen — und drei Fehler gefunden, die nur dort auftreten
 
-Die Oberfläche in der WebView ist als gebautes Bündel im Browser geprüft: Seiten
-gerendert, gesucht, markiert, gespeichert, die ausgelieferte Datei zurückgelesen.
-Das Protokoll zwischen App und WebView hat eigene Tests. Was fehlt, ist ein Lauf
-auf einem echten Telefon — die Emulatoren auf diesem Rechner waren von anderen
-Läufen belegt und haben nicht mehr geantwortet. Das gehört vor die Einreichung
-von 1.1, zusammen mit dem ohnehin nötigen Bau.
+Der Lauf auf dem Emulator hat stattgefunden, in einer gebauten App und nicht im
+Entwicklungsserver: PDF importiert, Original geöffnet, Seite gerendert,
+gezeichnet, gespeichert, und die fertige Datei kam im Android-Teilen-Blatt an.
+
+Drei Fehler waren im Browser nicht zu sehen und wären mit 1.1 ausgeliefert
+worden:
+
+- Die Werkzeugleisten brachen auf **drei Zeilen** um. Die WebView meldet rund
+  900 CSS-Pixel Breite, also greift der Umbruchpunkt für große Bildschirme —
+  auf einem Telefon. Jetzt immer eine Zeile, die scrollt.
+- Das Zeichen für „Speichern" (`⭳`) hat in der Android-WebView **keine Glyphe**
+  und stand als leerer Kasten da. Ersetzt durch `↑` und `↓`.
+- Der Speichern-Dialog sagte „als neue Datei **herunterladen**". Auf einem
+  Telefon lädt nichts herunter, dort öffnet das Teilen-Blatt. Der Text kommt
+  jetzt von der Plattform, nicht aus dem Dialog.
+
+Belege liegen als Bildschirmfotos in `.verify/` (`dev-08` vorher, `dev-10`
+nachher, `dev-15` das Teilen-Blatt mit `handbuch-bearbeitet.pdf`).
+
+Ungeprüft bleibt der **iOS**-Pfad: ohne Mac lässt sich das hier nicht am Gerät
+zeigen. Die WebView ist dort dieselbe Bibliothek, der Teilen-Weg ein anderer.
 
 ---
 

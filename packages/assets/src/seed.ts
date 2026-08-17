@@ -372,7 +372,17 @@ export function pdfSeedEntries(now: number): [string, string][] {
     ],
     [
       `lexi:mark:${id}:${id}-sig`,
-      JSON.stringify(mark('sig', 'signature', [304, 330, 484, 388], {
+      /*
+       * On the line, not under it.
+       *
+       * The signature line on page 5 sits at y = 411.89 pt (`buildSeedPdf` draws it 46 pt
+       * below the "Unterschrift" label). The drawn stroke fills the middle of its picture
+       * and stops about a fifth short of the bottom edge, so the box has to reach past the
+       * line for the ink to rest on it. The earlier box ended at 388 and the signature
+       * floated a good two centimetres below the line — in a screenshot captioned
+       * "unterschreiben".
+       */
+      JSON.stringify(mark('sig', 'signature', [304, 402, 474, 460], {
         imageId: SEED_STAMP_ID,
       })),
     ],

@@ -85,7 +85,7 @@ export function StatsView() {
   return (
     <>
       <ReaderNav />
-      <main id="inhalt" data-lexipulse-screen="06-stats" className="mx-auto max-w-4xl px-4 py-8 sm:px-5 sm:py-12">
+      <main id="inhalt" data-lexipulse-screen="08-stats" className="mx-auto max-w-4xl px-4 py-8 sm:px-5 sm:py-12">
         <h1 className="text-[31px] font-semibold tracking-[-0.03em]">Statistik</h1>
         <p className="mt-2 max-w-[62ch] text-[15px] leading-relaxed text-[var(--lx-text-muted)]">
           Berechnet aus den Sitzungen auf diesem Gerät. Nichts davon wird übertragen oder

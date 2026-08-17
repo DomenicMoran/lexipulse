@@ -376,7 +376,7 @@ export function PdfSurface({
      */
     <div
       className="flex h-[100dvh] flex-col"
-      data-lexipulse-screen={editing ? '08-tools' : '07-original'}
+      data-lexipulse-screen={editing ? '07-tools' : '06-original'}
     >
       <header className="flex h-12 shrink-0 items-center gap-3 border-b border-[var(--lx-border)] bg-[var(--lx-bg)] px-3">
         {onBack && (

@@ -299,7 +299,7 @@ const AFTER_LOAD: Record<string, (page: Page) => Promise<void>> = {
     await page.getByRole('button', { name: 'Einstellungen öffnen' }).click();
     await page.waitForSelector('[data-lexipulse-screen="04-settings"]', { timeout: 5_000 });
   },
-  '07-original': async (page) => {
+  '06-original': async (page) => {
     // The first page has to have finished drawing, or the sheet is photographed blank.
     await page.waitForFunction(
       () => {
@@ -310,7 +310,7 @@ const AFTER_LOAD: Record<string, (page: Page) => Promise<void>> = {
       { timeout: 20_000 },
     );
   },
-  '08-tools': async (page) => {
+  '07-tools': async (page) => {
     await page.waitForFunction(
       () => {
         const canvas = document.querySelector('[data-pdf-page="5"] canvas');
@@ -320,7 +320,7 @@ const AFTER_LOAD: Record<string, (page: Page) => Promise<void>> = {
       { timeout: 20_000 },
     );
     await page.getByRole('button', { name: 'Bearbeiten', exact: true }).click();
-    await page.waitForSelector('[data-lexipulse-screen="08-tools"]', { timeout: 5_000 });
+    await page.waitForSelector('[data-lexipulse-screen="07-tools"]', { timeout: 5_000 });
 
     // The tool rows change the height above the page, and clicking scrolled the toolbar
     // sideways. Both leave the shot showing the wrong thing, so land on the page again
@@ -333,7 +333,59 @@ const AFTER_LOAD: Record<string, (page: Page) => Promise<void>> = {
       });
       (document.activeElement as HTMLElement | null)?.blur();
     });
+
+    /*
+     * And land on the page itself, measured rather than assumed.
+     *
+     * Typing the page number alone left the shot showing the blank tail of page 4 across
+     * the upper half of the frame, with the signature pushed to the very bottom edge. The
+     * check below fails the capture instead of shipping that.
+     */
+    await page.waitForTimeout(400);
+
+    /*
+     * One step closer, then all the way down.
+     *
+     * At the width-fitted 60 % the last page is shorter than the visible area, so the
+     * scroller runs out with the blank foot of page 4 filling the top fifth of the frame —
+     * a screenshot captioned "unterschreiben" that spends a fifth of itself on an empty
+     * page. One zoom step makes page 5 taller than the view, and the end of the scroll is
+     * then the signature.
+     */
+    await page.getByRole('button', { name: 'Vergrößern' }).click();
+    await page.waitForTimeout(400);
+    await page.evaluate(() => {
+      const scroller = document.querySelector('[aria-label="Originalseiten"]');
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+    });
+    await page.waitForFunction(
+      () => {
+        const canvas = document.querySelector('[data-pdf-page="5"] canvas');
+        return canvas instanceof HTMLCanvasElement && canvas.style.opacity === '1';
+      },
+      undefined,
+      { timeout: 20_000 },
+    );
     await page.waitForTimeout(600);
+
+    /*
+     * And the signature has to be in the picture, measured rather than trusted.
+     *
+     * `buildSeedPdf` puts the signature line 411.89 pt up a 841.89 pt page and the mark
+     * spans 402–460 pt, so the band sits between 45 % and 53 % of the way down. Both edges
+     * of it have to be inside the visible box.
+     */
+    const band = await page.evaluate(() => {
+      const element = document.querySelector('[data-pdf-page="5"]');
+      const scroller = document.querySelector('[aria-label="Originalseiten"]');
+      if (!element || !scroller) return null;
+      const a = element.getBoundingClientRect();
+      const b = scroller.getBoundingClientRect();
+      return { top: a.top + a.height * 0.45 - b.top, bottom: b.bottom - (a.top + a.height * 0.53) };
+    });
+    if (!band || band.top < 0 || band.bottom < 0) {
+      throw new Error(`07-tools: the signature is outside the frame (${JSON.stringify(band)})`);
+    }
   },
 };
 
@@ -369,8 +421,14 @@ async function probeDevServer(browser: Browser): Promise<Map<string, string>> {
         FORCE_LIVE || (await page.locator(`[data-lexipulse-screen="${screen.id}"]`).count()) > 0;
       await context.close();
       if (marked) available.set(screen.id, `${url}#${screen.id}`);
-    } catch {
-      // A route that throws while loading is not a route we ship a screenshot of.
+      else console.log(`  --  ${screen.id}: the route did not identify itself`);
+    } catch (error) {
+      /*
+       * A route that throws while loading is not a route we ship a screenshot of — but say
+       * so out loud. Swallowed silently, a broken interaction turns into a mock-up in the
+       * store listing and the run still reports "ok" on every line.
+       */
+      console.log(`  --  ${screen.id}: ${(error as Error).message.split(/\r?\n/)[0]}`);
     }
   }
   return available;
@@ -456,7 +514,20 @@ async function main(): Promise<void> {
           await page.setContent(html, { waitUntil: 'load' });
           await page.evaluate(() => document.fonts.ready);
 
-          const name = `${String(index + 1).padStart(2, '0')}-${screen.id.replace(/^\d+-/, '')}.png`;
+          /*
+           * The id verbatim, not the position.
+           *
+           * Numbering by position while the id carried a number of its own meant `06-stats`
+           * was written as `08-stats.png`, and the six files under the old number stayed
+           * behind for good — nothing regenerates a name no longer produced, so a stale
+           * screenshot sat in the upload folder. The check below keeps the two aligned.
+           */
+          if (screen.id !== `${String(index + 1).padStart(2, '0')}-${screen.id.replace(/^\d+-/, '')}`) {
+            throw new Error(
+              `screen "${screen.id}" sits at position ${index + 1}; renumber it or move it`,
+            );
+          }
+          const name = `${screen.id}.png`;
           const file = join(dir, name);
           const buffer = await page.screenshot({ type: 'png' });
           writeFileSync(file, buffer);
