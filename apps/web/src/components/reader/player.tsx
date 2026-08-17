@@ -22,7 +22,7 @@ import {
   type ReaderFontKey,
   type RsvpToken,
 } from '@lexipulse/core';
-import { IconButton, RsvpStage } from '@lexipulse/ui';
+import { Button, IconButton, RsvpStage } from '@lexipulse/ui';
 import * as React from 'react';
 import {
   BookmarkIcon,
@@ -769,6 +769,19 @@ const OVERLAY_TINTS: Record<OverlayKey, string | null> = {
 };
 
 /**
+ * Auto-scroll step, in milliseconds.
+ *
+ * A reader scrolls at twenty to sixty pixels a second. Driving that from the animation
+ * frame would ask for sixty repaints to move a single pixel, which is battery spent on
+ * something nobody can see. One step every eighth of a second moves a visible amount and
+ * costs the compositor almost nothing.
+ */
+const AUTO_SCROLL_STEP_MS = 120;
+
+/** Pixels the ruler grows on each side per step above the first. */
+const RULER_GROWTH = 2;
+
+/**
  * The document as a page, with the current word marked.
  *
  * RSVP takes the page away, which is what makes it fast and also what makes losing the
@@ -796,7 +809,13 @@ function PageView({
   const { settings } = useSettings();
   const active = React.useRef<HTMLButtonElement | null>(null);
   const page = React.useRef<HTMLDivElement>(null);
+  const band = React.useRef<HTMLDivElement>(null);
   const [selection, setSelection] = React.useState<TokenRange | null>(null);
+  const [paging, setPaging] = React.useState({ index: 0, count: 1 });
+
+  const paged = settings.readerPaged;
+  const margin = settings.readerMargin;
+  const ruler = settings.readerRuler;
 
   // Grouping depends on the token stream, nothing else. Keying this on `activeIndex`
   // walked the whole array again for every word the stream advanced.
@@ -819,11 +838,169 @@ function PageView({
     return map;
   }, [paragraphs, annotations]);
 
-  // `block: 'nearest'` keeps the page still while the stream is paused on a word that is
-  // already visible; without it every re-render would yank the scroll position.
+  /**
+   * Bring the marked word into view.
+   *
+   * `block: 'nearest'` keeps the page still while the stream is paused on a word that is
+   * already visible; without it every re-render would yank the scroll position. Paged mode
+   * moves in whole pages instead, never to a spot halfway across one, and it moves without
+   * animation: a smooth scroll would run the reader past every page in between.
+   */
+  const showActive = React.useCallback(() => {
+    const container = page.current;
+    const word = active.current;
+    if (container === null || word === null) return;
+    if (!paged) {
+      word.scrollIntoView({ block: 'nearest' });
+      return;
+    }
+    const width = container.clientWidth;
+    if (width === 0) return;
+    const target = Math.floor(offsetInScroller(container, word).left / width) * width;
+    if (Math.abs(container.scrollLeft - target) > 1) container.scrollLeft = target;
+  }, [paged]);
+
+  /**
+   * Put the ruler on the line the reading position falls on.
+   *
+   * The band is an absolutely positioned child of the scroll container, so it belongs to
+   * the scrolled content and follows the text without a scroll listener. Its place is
+   * measured off the marked word rather than off the paragraph: a paragraph wraps where
+   * the browser decides, and its top edge is the start of the paragraph, not of the line
+   * being read. The word's own box is exactly one line tall, because an inline-block takes
+   * the line height of its content.
+   */
+  const drawRuler = React.useCallback(() => {
+    const layer = band.current;
+    if (layer === null) return;
+    const container = page.current;
+    const word = active.current;
+    const width = container?.clientWidth ?? 0;
+    if (ruler === 0 || container === null || word === null || width === 0) {
+      layer.style.display = 'none';
+      return;
+    }
+    const { top, left } = offsetInScroller(container, word);
+    // Grown symmetrically around the line, so a stronger setting gives a wider band
+    // without shifting it off the words it is meant to mark.
+    const grow = (ruler - 1) * RULER_GROWTH;
+    const height = word.getBoundingClientRect().height;
+    layer.style.display = 'block';
+    layer.style.top = `${top - grow}px`;
+    layer.style.height = `${height + grow * 2}px`;
+    // Every page is exactly one container width wide, so the page a word sits on is that
+    // division and nothing else. While scrolling there is no horizontal overflow and the
+    // term is always zero, which is why both modes share the line.
+    layer.style.left = `${Math.floor(left / width) * width}px`;
+    layer.style.width = `${width}px`;
+  }, [ruler]);
+
+  /**
+   * Read the page number off the scroll offset.
+   *
+   * Pagination is the browser's: the text is laid out as a single column with a definite
+   * height, so everything that does not fit spills into further columns beside it. That is
+   * one CSS declaration against a reimplementation of line breaking in JavaScript, it
+   * never splits a line, and it leaves selection and highlights working because the words
+   * are still ordinary elements in ordinary paragraphs. The container's own padding
+   * supplies the margin on both sides of every page, which makes each page boundary a
+   * whole multiple of the container width.
+   */
+  const measurePages = React.useCallback(() => {
+    const container = page.current;
+    if (container === null) return;
+    const width = container.clientWidth;
+    if (width === 0) return;
+    const count = Math.max(1, Math.round(container.scrollWidth / width));
+    const index = Math.min(count - 1, Math.max(0, Math.round(container.scrollLeft / width)));
+    setPaging((previous) =>
+      previous.index === index && previous.count === count ? previous : { index, count },
+    );
+  }, []);
+
+  const turnPage = React.useCallback(
+    (delta: number) => {
+      const container = page.current;
+      if (container === null) return;
+      const width = container.clientWidth;
+      if (width === 0) return;
+      const count = Math.max(1, Math.round(container.scrollWidth / width));
+      const next = Math.min(count - 1, Math.max(0, Math.round(container.scrollLeft / width) + delta));
+      // The scroll event that follows updates the counter, so the offset stays the one
+      // source of truth for which page is on screen.
+      container.scrollLeft = next * width;
+    },
+    [],
+  );
+
   React.useEffect(() => {
-    active.current?.scrollIntoView({ block: 'nearest' });
-  }, [activeIndex]);
+    showActive();
+    drawRuler();
+    // A paragraph that was off screen a moment ago has no laid-out lines yet, so the first
+    // measurement can land on a box that does not exist. One frame later it does.
+    const frame = requestAnimationFrame(drawRuler);
+    return () => cancelAnimationFrame(frame);
+  }, [activeIndex, showActive, drawRuler]);
+
+  /*
+   * Typography decides where the lines break, so a change to it invalidates both the band
+   * and the page count. Taken one frame later, because the new metrics only exist once the
+   * browser has laid the text out again.
+   */
+  React.useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      measurePages();
+      drawRuler();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [
+    drawRuler,
+    measurePages,
+    paragraphs,
+    paged,
+    margin,
+    settings.readerFont,
+    settings.readerFontSize,
+    settings.readerLineHeight,
+    settings.readerJustify,
+  ]);
+
+  React.useEffect(() => {
+    const container = page.current;
+    if (container === null) return;
+    // Fires once when the observation starts, which is also how the first page count is
+    // taken without writing state from an effect body.
+    const observer = new ResizeObserver(() => {
+      measurePages();
+      drawRuler();
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [measurePages, drawRuler]);
+
+  /*
+   * Auto-scroll, in pixels per second.
+   *
+   * Page turning is the opposite of scrolling, which is what its own setting says:
+   * "Blättern statt Scrollen". Letting both run would drift the page out from under the
+   * reader while a page number counts along, so paged mode wins here as well as in the
+   * settings sheet, where the slider is hidden outright.
+   */
+  React.useEffect(() => {
+    const speed = settings.readerAutoScroll;
+    if (speed === 0 || paged) return;
+    const container = page.current;
+    if (container === null) return;
+    const timer = window.setInterval(() => {
+      const remaining = container.scrollHeight - container.clientHeight - container.scrollTop;
+      if (remaining <= 0.5) {
+        window.clearInterval(timer);
+        return;
+      }
+      container.scrollTop += (speed * AUTO_SCROLL_STEP_MS) / 1000;
+    }, AUTO_SCROLL_STEP_MS);
+    return () => window.clearInterval(timer);
+  }, [paged, settings.readerAutoScroll]);
 
   // Stable, because the paragraphs below must not see a new handler on every render.
   const readSelection = React.useCallback(() => {
@@ -864,38 +1041,68 @@ function PageView({
           onMouseUp={readSelection}
           onKeyUp={readSelection}
           onTouchEnd={readSelection}
-          className="max-h-[46vh] select-text overflow-y-auto rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] py-4 text-[var(--lx-text)]"
+          onScroll={paged ? measurePages : undefined}
+          className={
+            'relative select-text rounded-[14px] border border-[var(--lx-border)] bg-[var(--lx-surface)] py-4 text-[var(--lx-text)] ' +
+            (paged ? 'h-[46vh] overflow-x-auto overflow-y-hidden' : 'max-h-[46vh] overflow-y-auto')
+          }
           style={{
             fontFamily: READER_FONT_STACKS[settings.readerFont],
             fontSize: `${settings.readerFontSize}px`,
             lineHeight: settings.readerLineHeight,
-            paddingInline: `${settings.readerMargin}px`,
+            paddingInline: `${margin}px`,
             textAlign: settings.readerJustify ? 'justify' : 'left',
           }}
         >
-          <p className="mb-3 text-left text-[12px] leading-normal text-[var(--lx-text-muted)]">
-            Ein Wort anklicken, um dort weiterzulesen. Eine Passage mit der Maus auswählen, um
-            sie zu markieren.
-          </p>
-          {paragraphs.map((paragraph) => (
-            <PageParagraph
-              key={paragraph.key}
-              tokens={paragraph.tokens}
-              // Every other paragraph gets the same `-1` on every word the stream
-              // advances, so memo sees no change and skips it. Without this the whole
-              // document re-rendered several times a second — thousands of buttons at
-              // 350 words per minute, which froze the tab outright.
-              activeIndex={
-                activeIndex >= paragraph.firstToken && activeIndex <= paragraph.lastToken
-                  ? activeIndex
-                  : -1
-              }
-              activeRef={active}
-              bionic={settings.readerBionic}
-              marks={marksByParagraph.get(paragraph.key) ?? NO_MARKS}
-              onSelect={onSelect}
-            />
-          ))}
+          {/* Positioned and drawn before the text, which is the only way it stays under it:
+              two positioned siblings paint in tree order, an unpositioned one always
+              below both. Sized from the measurement, so it carries no layout of its own. */}
+          <div
+            ref={band}
+            aria-hidden="true"
+            className="pointer-events-none absolute rounded-[3px] bg-[var(--lx-accent-soft)]"
+            style={{ display: 'none' }}
+          />
+          <div
+            className="relative"
+            style={
+              paged
+                ? {
+                    // One column of exactly the container's inner width, with a definite
+                    // height: everything that does not fit spills into the next column
+                    // beside it, and the gap becomes the facing margins of two pages.
+                    height: '100%',
+                    columnCount: 1,
+                    columnGap: `${margin * 2}px`,
+                  }
+                : undefined
+            }
+          >
+            <p className="mb-3 text-left text-[12px] leading-normal text-[var(--lx-text-muted)]">
+              Ein Wort anklicken, um dort weiterzulesen. Eine Passage mit der Maus auswählen, um
+              sie zu markieren.
+            </p>
+            {paragraphs.map((paragraph) => (
+              <PageParagraph
+                key={paragraph.key}
+                tokens={paragraph.tokens}
+                // Every other paragraph gets the same `-1` on every word the stream
+                // advances, so memo sees no change and skips it. Without this the whole
+                // document re-rendered several times a second — thousands of buttons at
+                // 350 words per minute, which froze the tab outright.
+                activeIndex={
+                  activeIndex >= paragraph.firstToken && activeIndex <= paragraph.lastToken
+                    ? activeIndex
+                    : -1
+                }
+                activeRef={active}
+                bionic={settings.readerBionic}
+                marks={marksByParagraph.get(paragraph.key) ?? NO_MARKS}
+                paged={paged}
+                onSelect={onSelect}
+              />
+            ))}
+          </div>
         </div>
         {tint !== null && (
           <div
@@ -906,11 +1113,49 @@ function PageView({
         )}
       </div>
 
+      {paged && (
+        <div className="mt-2 flex items-center justify-center gap-3">
+          <Button size="sm" variant="ghost" disabled={paging.index === 0} onClick={() => turnPage(-1)}>
+            Seite zurück
+          </Button>
+          {/* Announced politely: a page turn is worth hearing, but not over the reader. */}
+          <span
+            aria-live="polite"
+            className="font-mono text-[12px] tabular-nums text-[var(--lx-text-muted)]"
+          >
+            Seite {formatNumber(paging.index + 1)} von {formatNumber(paging.count)}
+          </span>
+          <Button
+            size="sm"
+            variant="ghost"
+            disabled={paging.index >= paging.count - 1}
+            onClick={() => turnPage(1)}
+          >
+            Seite vor
+          </Button>
+        </div>
+      )}
+
       {selection !== null && (
         <HighlightBar preview={preview} onColor={mark} onCancel={dropSelection} />
       )}
     </div>
   );
+}
+
+/** A descendant's top-left corner in the scroll container's own coordinates. */
+function offsetInScroller(
+  container: HTMLElement,
+  element: HTMLElement,
+): { top: number; left: number } {
+  const box = container.getBoundingClientRect();
+  const target = element.getBoundingClientRect();
+  // `clientTop`/`clientLeft` are the border widths: the rectangle is measured from the
+  // border edge, the scroll offset from the padding edge.
+  return {
+    top: target.top - box.top - container.clientTop + container.scrollTop,
+    left: target.left - box.left - container.clientLeft + container.scrollLeft,
+  };
 }
 
 /** One frozen instance: an unmarked paragraph must keep the prop it had last render. */
@@ -922,6 +1167,7 @@ const PageParagraph = React.memo(function PageParagraph({
   activeRef,
   bionic,
   marks,
+  paged,
   onSelect,
 }: {
   tokens: RsvpToken[];
@@ -931,6 +1177,8 @@ const PageParagraph = React.memo(function PageParagraph({
   bionic: number;
   /** Only the highlights that reach into this paragraph, empty for almost all of them. */
   marks: Annotation[];
+  /** True while the page is broken into columns, which changes what may be skipped. */
+  paged: boolean;
   onSelect: (index: number) => void;
 }) {
   return (
@@ -938,7 +1186,15 @@ const PageParagraph = React.memo(function PageParagraph({
     // the gap between paragraphs has to grow with the type or the page loses its rhythm.
     // `content-visibility` lets the browser skip layout and paint for the paragraphs that
     // are off screen, which is what makes a whole book affordable instead of a chapter.
-    <p className="mb-[0.9em] [contain-intrinsic-size:auto_6em] [content-visibility:auto]">
+    // Paged mode cannot have it: the column break needs every paragraph's real height, and
+    // a placeholder height would put the page breaks in the wrong places.
+    <p
+      className={
+        paged
+          ? 'mb-[0.9em]'
+          : 'mb-[0.9em] [contain-intrinsic-size:auto_6em] [content-visibility:auto]'
+      }
+    >
       {tokens.map((token, position) => {
         const isActive = token.index === activeIndex;
         // Bionic reading fixes the eye on word openings; core decides how far in the

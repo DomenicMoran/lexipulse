@@ -42,7 +42,7 @@ export default function ImportScreen() {
           title: document.title,
           count: formatNumber(document.wordCount),
         }),
-        document.importReport.notes.join('\n'),
+        describeReport(document.importReport),
       );
     },
     [add, alert, open, router],
@@ -171,4 +171,46 @@ export default function ImportScreen() {
       </Card>
     </Screen>
   );
+}
+
+/**
+ * The import report in the language of the interface.
+ *
+ * The parsers write their notes in English, because they live in a package that knows
+ * nothing about an interface. The numbers behind those notes are on the report as
+ * fields, so the sentence gets built here instead of shipped from there: a German app
+ * answering "2 sections" reads like a machine talking to itself.
+ */
+function describeReport(report: LexiDocument['importReport']): string {
+  const lines: string[] = [];
+
+  const sections = report.rawSections;
+  if (sections > 0) {
+    lines.push(
+      sections === 1
+        ? t('import.report.sections.one')
+        : t('import.report.sections', { count: formatNumber(sections) }),
+    );
+  }
+
+  const heads = report.removed.headers + report.removed.footers;
+  if (heads > 0) lines.push(t('import.report.runningHeads', { count: formatNumber(heads) }));
+  if (report.removed.pageNumbers > 0) {
+    lines.push(t('import.report.pageNumbers', { count: formatNumber(report.removed.pageNumbers) }));
+  }
+  if (report.removed.tableRows > 0) {
+    lines.push(t('import.report.tableRows', { count: formatNumber(report.removed.tableRows) }));
+  }
+  if (report.removed.artifacts > 0) {
+    lines.push(t('import.report.artifacts', { count: formatNumber(report.removed.artifacts) }));
+  }
+  if (report.dehyphenated > 0) {
+    lines.push(t('import.report.dehyphenated', { count: formatNumber(report.dehyphenated) }));
+  }
+
+  // Saying that nothing was removed is worth a line: it tells the reader the filter ran
+  // and found the text already clean, rather than leaving them wondering whether it ran.
+  if (lines.length <= 1) lines.push(t('import.report.clean'));
+
+  return lines.join('\n');
 }

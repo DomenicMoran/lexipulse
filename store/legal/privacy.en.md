@@ -2,12 +2,12 @@
 title: Privacy Policy
 description: How LexiPulse handles data. In short, your documents stay on your device, there is no tracking and no user account.
 lang: en
-updated: 2026-08-16
+updated: 2026-08-17
 ---
 
 # Privacy Policy
 
-Last updated: 16 August 2026
+Last updated: 17 August 2026
 
 This is the English translation of our German privacy policy. In case of any
 discrepancy, the German version published at lexipulse.de is authoritative.
@@ -25,6 +25,8 @@ place.
   cookie banner.
 - The only feature that contacts a server at all is importing a web article by URL. See
   section 5.
+- Looking a word up hands that single word to an app of your choice, on your explicit
+  action. LexiPulse itself transmits nothing. See section 7.
 
 ## 2. Controller
 
@@ -117,7 +119,24 @@ speech locally or contacts a service run by the device manufacturer depends on y
 operating system and its settings, which are outside our control. If you want to avoid
 this, use LexiPulse without the read-aloud feature.
 
-## 7. Cookies and local storage
+## 7. Looking a word up
+
+In page mode you can look up a selected word. LexiPulse ships no dictionary of its own and
+contacts no server for this. The word overview, meaning the word together with every
+occurrence in the open document, is computed entirely on your device.
+
+The "Look up" entry hands the selected word to an app of your choice on your explicit
+action, on Android through the system's text processing function and on iOS through the
+share sheet. Only with that choice does the word leave LexiPulse. What is handed over is
+the word itself and nothing else: not the surrounding text, not the title of the document
+and nothing about you or your device.
+
+What the app you picked does with the word is governed by that app's privacy policy and is
+outside our control. LexiPulse itself transmits nothing to any server of ours and logs
+neither the word nor your use of this feature. If you would rather avoid this, use the word
+overview and not the "Look up" entry.
+
+## 8. Cookies and local storage
 
 We set no cookies for analytics, marketing or profiling. We only use local storage that
 is strictly necessary for operation:
@@ -132,7 +151,7 @@ Access to this storage does not require consent under Section 25(2) no. 2 TDDDG 
 it is strictly necessary to provide the service you explicitly requested. No cookie
 banner is required and none is shown.
 
-## 8. Purchases via the App Store and Google Play
+## 9. Purchases via the App Store and Google Play
 
 The mobile apps are distributed through the Apple App Store and Google Play. Purchase,
 payment, invoicing and licence management are handled entirely by Apple and Google.
@@ -149,7 +168,7 @@ If you send a crash report to Apple or Google, this happens through their system
 function. We only receive anonymised technical reports from it, no names and no device
 identifiers.
 
-## 9. Contacting us by email
+## 10. Contacting us by email
 
 If you write to us, we process your email address and the content of your message in
 order to handle your request.
@@ -158,14 +177,14 @@ GDPR with our legitimate interest in responding.
 **Retention:** until the enquiry has been dealt with, then according to statutory
 retention periods where applicable.
 
-## 10. Recipients and international transfers
+## 11. Recipients and international transfers
 
 Apart from the host Vercel named in section 4, we use no processors. There is no
 analytics tool, no ad network, no crash reporting service and no chat service. Your
 document content is never transferred to a third country because it never leaves your
 device.
 
-## 11. Your rights
+## 12. Your rights
 
 Under the GDPR you have the right to:
 
@@ -182,14 +201,14 @@ An informal message to lexipulse@menucloud-berlin.de is sufficient.
 hold no such data and cannot provide information about it. An access request can only
 cover data we actually hold, for example email correspondence.
 
-## 12. Data export under Art. 20 GDPR
+## 13. Data export under Art. 20 GDPR
 
 LexiPulse includes an export function that saves all locally stored data as a JSON file:
 library, reading progress, bookmarks, settings and statistics. The export runs entirely
 on your device and the file is written there directly. You can take your data with you
 at any time without contacting us.
 
-## 13. Right to lodge a complaint
+## 14. Right to lodge a complaint
 
 If you believe that the processing of your personal data infringes the GDPR, you may
 lodge a complaint with a supervisory authority under Art. 77 GDPR. The authority
@@ -202,22 +221,22 @@ Phone: +49 30 13889-0
 Email: mailbox@datenschutz-berlin.de
 Web: https://www.datenschutz-berlin.de
 
-## 14. Encryption
+## 15. Encryption
 
 The website and all server requests use TLS exclusively. You can recognise an encrypted
 connection by "https://" in the address bar and the padlock icon in your browser.
 
-## 15. No automated decision-making
+## 16. No automated decision-making
 
 There is no automated decision-making, including profiling, within the meaning of
 Art. 22 GDPR.
 
-## 16. Children
+## 17. Children
 
 LexiPulse is not directed at children under 16. Since we collect no data, no data set
 about this age group arises on our side either.
 
-## 17. Changes to this policy
+## 18. Changes to this policy
 
 We update this policy when the features of LexiPulse or the legal situation change. The
 version published at lexipulse.de applies. The date of the last change is shown at the

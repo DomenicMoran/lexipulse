@@ -10,7 +10,7 @@ import { Pressable, TextInput, View } from 'react-native';
 
 import { HIGHLIGHT_COLORS, type Annotation, type HighlightColor } from '@lexipulse/core';
 
-import { Divider, IconButton, T } from '../components/ui';
+import { Button, Divider, IconButton, T } from '../components/ui';
 import { t } from '../i18n';
 import { useTheme } from '../state/settings';
 
@@ -30,6 +30,7 @@ export function HighlightBar({
   onNote,
   onRemove,
   onCancel,
+  onOverview,
 }: {
   /** Token range currently selected, or null when an existing highlight is tapped. */
   selection: { start: number; end: number } | null;
@@ -38,6 +39,8 @@ export function HighlightBar({
   onNote: (note: string) => void;
   onRemove: () => void;
   onCancel: () => void;
+  /** Opens the word overview for whatever is selected. */
+  onOverview: () => void;
 }) {
   const theme = useTheme();
   const [note, setNote] = useState(existing?.note ?? '');
@@ -88,6 +91,16 @@ export function HighlightBar({
           );
         })}
       </View>
+
+      {/* The way into the word overview. It lives with the selection because that is the
+          moment the reader has already said which word they mean; a tap in the text still
+          means "read on from here". */}
+      <Button
+        label={t('lookup.open')}
+        icon="search-outline"
+        variant="secondary"
+        onPress={onOverview}
+      />
 
       {existing ? (
         <>

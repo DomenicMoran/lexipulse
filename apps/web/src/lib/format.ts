@@ -40,5 +40,6 @@ export const SOURCE_LABELS: Record<string, string> = {
   html: 'Web-Artikel',
   text: 'Text',
   markdown: 'Markdown',
+  fb2: 'FictionBook',
   clipboard: 'Eingefügt',
 };

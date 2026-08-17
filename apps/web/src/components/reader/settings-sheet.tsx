@@ -340,6 +340,16 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
               onValueChange={(readerBionic) => update({ readerBionic })}
             />
 
+            <Stepper
+              label="Leselineal"
+              min={0}
+              max={3}
+              step={1}
+              value={settings.readerRuler}
+              format={(value) => (value === 0 ? 'aus' : `Stufe ${value}`)}
+              onValueChange={(readerRuler) => update({ readerRuler })}
+            />
+
             <Field label="Farbfilter">
               <SegmentedControl<OverlayKey>
                 className="flex-wrap"
@@ -371,6 +381,32 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
               checked={settings.readerJustify}
               onCheckedChange={(readerJustify) => update({ readerJustify })}
             />
+
+            <Switch
+              label="Blättern statt Scrollen"
+              description="Seitenweise umbrechen, mit Seitenzahl unter dem Text."
+              checked={settings.readerPaged}
+              onCheckedChange={(readerPaged) => update({ readerPaged })}
+            />
+
+            {/* Hidden while paging is on, because the two move the text against each
+                other. The reader effect refuses the combination as well: a control that
+                is merely out of sight must not still be doing something. */}
+            {!settings.readerPaged && (
+              <Slider
+                label="Automatisch scrollen"
+                min={0}
+                max={200}
+                step={5}
+                value={settings.readerAutoScroll}
+                valueLabel={
+                  settings.readerAutoScroll === 0
+                    ? 'aus'
+                    : `${settings.readerAutoScroll} px/s`
+                }
+                onValueChange={(readerAutoScroll) => update({ readerAutoScroll })}
+              />
+            )}
           </Section>
 
           <Divider />

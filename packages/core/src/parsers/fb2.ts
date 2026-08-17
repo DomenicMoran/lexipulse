@@ -23,13 +23,32 @@ export interface Fb2ParseOptions {
 }
 
 /**
+ * The first `length` bytes read as ASCII, without going through `TextDecoder`.
+ *
+ * Hermes, the engine the app runs on, rejects the label `ascii` outright and throws
+ * `Unknown encoding: ascii`. Node accepts it, so the test suite was perfectly happy while
+ * every import on a phone failed, which is how this was found. Bytes above 127 become a
+ * placeholder, which is fine because everything this is used to find is ASCII by
+ * specification.
+ */
+export function asciiHead(bytes: Uint8Array, length: number): string {
+  let out = '';
+  const end = Math.min(length, bytes.length);
+  for (let i = 0; i < end; i += 1) {
+    const byte = bytes[i] as number;
+    out += byte < 128 ? String.fromCharCode(byte) : '�';
+  }
+  return out;
+}
+
+/**
  * FB2 predates UTF-8 being a given, and Russian-language files are routinely
  * windows-1251. The declaration is the only thing that says so, and it is plain ASCII in
  * every encoding worth supporting, so it can be read off the head of the file before
  * committing to a decoder.
  */
 export function decodeFb2(bytes: Uint8Array): string {
-  const head = new TextDecoder('ascii').decode(bytes.subarray(0, 200));
+  const head = asciiHead(bytes, 200);
   const declared = /encoding\s*=\s*["']([\w-]+)["']/i.exec(head)?.[1]?.toLowerCase();
   if (declared && declared !== 'utf-8' && declared !== 'utf8') {
     try {
@@ -61,7 +80,10 @@ function stripInline(xml: string): string {
   return decodeEntities(
     xml
       .replace(/<empty-line\s*\/?>/gi, '\n\n')
-      .replace(/<\/p\s*>/gi, '\n\n')
+      // `<v>` is a line of verse and `<subtitle>` a heading inside a section. Both are
+      // block level, and dropping their tags without a break runs a whole poem into one
+      // paragraph, which the stream then reads as a single endless sentence.
+      .replace(/<\/(p|v|subtitle|stanza|cite|text-author)\s*>/gi, '\n\n')
       .replace(/<[^>]+>/g, ''),
   );
 }
@@ -164,6 +186,9 @@ export function parseFb2(bytes: Uint8Array, options: Fb2ParseOptions = {}): Lexi
   }
 
   const report = emptyImportReport('fb2');
+  // Structured as well as written out: the app builds its own sentence from the number
+  // so the report reads in the language of the interface.
+  report.rawSections = chapters.length;
   report.notes.push(`${chapters.length} ${chapters.length === 1 ? 'section' : 'sections'}`);
 
   return finalizeDocument({

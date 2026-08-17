@@ -9,6 +9,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   ACCENT_LABELS,
+  GOAL_PRESETS,
+  highlightsFileName,
+  highlightsToMarkdown,
   OVERLAYS,
   READER_FONTS,
   SPEED_PRESETS,
@@ -34,7 +37,7 @@ import {
 } from '../../src/components/ui';
 import { useAlert } from '../../src/components/alert';
 import { FontLicences } from '../../src/components/font-licences';
-import { language, t } from '../../src/i18n';
+import { formatNumber, language, t } from '../../src/i18n';
 import { OVERLAY_LABELS } from '../../src/reader/typography';
 import { store } from '../../src/lib/store';
 import { useLibrary } from '../../src/state/library';
@@ -365,9 +368,35 @@ export default function SettingsScreen() {
         ) : null}
       </Section>
 
+      {/* ------------------------------------------------------------------- goal */}
+      <Section title={t('stats.goal')}>
+        <View style={{ padding: theme.space[4], gap: theme.space[3] }}>
+          <View style={{ gap: 2 }}>
+            <T variant="small" tone="muted">
+              {t('settings.goal')}
+            </T>
+            <T variant="small" tone="faint">
+              {t('settings.goal.hint')}
+            </T>
+          </View>
+          {/* Presets rather than a slider: a goal is picked once and then lived with,
+              and a slider invites fiddling with a number that only matters as a habit. */}
+          <Segmented
+            options={GOAL_PRESETS.map((words) => ({
+              value: String(words),
+              label: words === 0 ? t('settings.goal.off') : formatNumber(words),
+            }))}
+            value={String(settings.dailyGoalWords)}
+            onChange={(value) => update({ dailyGoalWords: Number(value) })}
+          />
+        </View>
+      </Section>
+
       {/* ------------------------------------------------------------------- data */}
       <Section title={t('settings.section.data')}>
         <ExportRow />
+        <Divider />
+        <HighlightExportRow />
         <Divider />
         <Row
           label={t('settings.wipe')}
@@ -666,6 +695,69 @@ function ExportRow() {
       label={t('settings.export')}
       hint={t('settings.export.hint')}
       icon="download-outline"
+      onPress={busy ? undefined : onExport}
+    />
+  );
+}
+
+/**
+ * The highlights of the open document, as Markdown.
+ *
+ * Separate from the JSON export because the two answer different questions. JSON is a
+ * backup a program restores; this is what somebody actually marked, in a form they can
+ * paste into a note or an essay. It covers the document that is open, since highlights
+ * belong to a text rather than to a library.
+ */
+function HighlightExportRow() {
+  const alert = useAlert();
+  const { document } = useReader();
+  const [busy, setBusy] = useState(false);
+
+  const onExport = useCallback(() => {
+    if (!document) {
+      alert(t('settings.exportHighlights'), t('settings.exportHighlights.noDoc'));
+      return;
+    }
+    setBusy(true);
+    void (async () => {
+      try {
+        const annotations = await store.listAnnotations(document.id);
+        if (annotations.length === 0) {
+          alert(t('settings.exportHighlights'), t('settings.exportHighlights.empty'));
+          return;
+        }
+        const markdown = highlightsToMarkdown(document, annotations, {
+          language,
+          exportedAt: Date.now(),
+        });
+        const file = new FileSystem.File(
+          FileSystem.Paths.cache,
+          highlightsFileName(document.title),
+        );
+        if (file.exists) file.delete();
+        file.create();
+        file.write(markdown);
+
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(file.uri, {
+            mimeType: 'text/markdown',
+            dialogTitle: t('settings.exportHighlights'),
+            UTI: 'net.daringfireball.markdown',
+          });
+        }
+      } catch (error) {
+        alert(t('settings.export.failed'), String(error));
+      } finally {
+        setBusy(false);
+      }
+    })();
+  }, [alert, document]);
+
+  return (
+    <Row
+      label={t('settings.exportHighlights')}
+      hint={t('settings.exportHighlights.hint')}
+      icon="color-wand-outline"
       onPress={busy ? undefined : onExport}
     />
   );

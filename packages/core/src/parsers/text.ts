@@ -134,7 +134,10 @@ export function parseText(input: string, options: TextParseOptions = {}): LexiDo
     coverDataUrl: null,
     importReport: {
       source,
-      rawSections: 1,
+      // The number of chapters, not a constant 1: the interface builds its own sentence
+      // from this field, and a Markdown file cut into three chapters that reports one
+      // section contradicts the outline the reader is looking at.
+      rawSections: chapters.length,
       removed: cleaned.removed,
       dehyphenated: cleaned.dehyphenated,
       notes: [`${chapters.length} ${chapters.length === 1 ? 'section' : 'sections'}`],

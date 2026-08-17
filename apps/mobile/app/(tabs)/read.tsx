@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { contextAround, formatDuration, type Annotation } from '@lexipulse/core';
+import { contextAround, formatDuration, textOfRange, type Annotation } from '@lexipulse/core';
 import { computeStageGeometry, fitFontSize } from '@lexipulse/ui/geometry';
 
 import {
@@ -26,6 +26,7 @@ import { HighlightBar } from '../../src/reader/highlight-bar';
 import { HighlightsSheet } from '../../src/reader/highlights-sheet';
 import { PageView } from '../../src/reader/page-view';
 import { SearchSheet } from '../../src/reader/search-sheet';
+import { WordSheet } from '../../src/reader/word-sheet';
 import { RsvpStage } from '../../src/player/stage';
 import { Scrubber } from '../../src/player/scrubber';
 import { useAnnotations } from '../../src/state/annotations';
@@ -66,6 +67,8 @@ export default function ReadScreen() {
     useAnnotations();
   const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
   const [openAnnotation, setOpenAnnotation] = useState<Annotation | null>(null);
+  /** The selected text the word overview is open on, or null. */
+  const [lookup, setLookup] = useState<string | null>(null);
   const onboarding = useOnboarding();
 
   useSentenceClick(settings.soundEnabled && document !== null);
@@ -256,6 +259,22 @@ export default function ReadScreen() {
                 setSelection(null);
                 setOpenAnnotation(null);
               }}
+              onOverview={() => {
+                // An existing highlight already carries its own text; a fresh selection is
+                // still just a token range, so the words are read back out of the stream.
+                if (openAnnotation) {
+                  setLookup(openAnnotation.text);
+                  return;
+                }
+                if (!selection) return;
+                setLookup(
+                  textOfRange(
+                    tokens,
+                    Math.min(selection.start, selection.end),
+                    Math.max(selection.start, selection.end),
+                  ),
+                );
+              }}
             />
           ) : null}
         </>
@@ -364,6 +383,20 @@ export default function ReadScreen() {
           if (!pageMode) void update({ readerMode: 'page' });
         }}
         onRemove={(id) => void removeAnnotation(document.id, id)}
+      />
+
+      <WordSheet
+        word={lookup}
+        tokens={tokens}
+        onClose={() => setLookup(null)}
+        onSelect={(index) => {
+          seek(index);
+          // Jumping elsewhere ends the selection this started from: leaving the bar up
+          // would offer to highlight a passage that is no longer on screen.
+          setLookup(null);
+          setSelection(null);
+          setOpenAnnotation(null);
+        }}
       />
 
       <SearchSheet

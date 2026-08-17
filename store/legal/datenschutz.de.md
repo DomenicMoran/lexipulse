@@ -2,12 +2,12 @@
 title: Datenschutzerklärung
 description: Wie LexiPulse mit Daten umgeht. Kurz gesagt: Dokumente bleiben auf dem Gerät, es gibt kein Tracking und kein Nutzerkonto.
 lang: de
-updated: 2026-08-16
+updated: 2026-08-17
 ---
 
 # Datenschutzerklärung
 
-Stand: 16. August 2026
+Stand: 17. August 2026
 
 ## 1. Das Wichtigste zuerst
 
@@ -22,6 +22,8 @@ LexiPulse ist so gebaut, dass möglichst gar keine personenbezogenen Daten anfal
   auch kein Cookie-Banner.
 - Die einzige Funktion, die überhaupt einen Server anspricht, ist der Import eines
   Web-Artikels über eine URL. Details dazu in Abschnitt 5.
+- Beim Nachschlagen eines Wortes geben Sie dieses eine Wort ausdrücklich an eine App Ihrer
+  Wahl weiter. LexiPulse selbst überträgt dabei nichts. Details dazu in Abschnitt 7.
 
 ## 2. Verantwortlicher
 
@@ -119,7 +121,26 @@ Sprachausgabe lokal berechnet oder dafür einen Dienst des Geräteherstellers an
 hängt von Ihrem Betriebssystem und Ihren Systemeinstellungen ab. Darauf haben wir keinen
 Einfluss. Wenn Sie das vermeiden möchten, nutzen Sie LexiPulse ohne die Vorlesefunktion.
 
-## 7. Cookies und lokale Speicher
+## 7. Nachschlagen eines Wortes
+
+Im Seitenmodus können Sie ein ausgewähltes Wort nachschlagen. LexiPulse bringt dafür kein
+eigenes Wörterbuch mit und fragt dafür auch keinen Server. Die Wortübersicht, also das
+Wort mit allen Fundstellen im geöffneten Dokument, wird vollständig auf Ihrem Gerät
+berechnet.
+
+Der Eintrag „Nachschlagen" übergibt das ausgewählte Wort auf Ihre ausdrückliche Aktion hin
+an eine App Ihrer Wahl, unter Android über die Systemfunktion zur Textverarbeitung, unter
+iOS über das Teilen-Blatt. Erst mit dieser Auswahl verlässt das Wort LexiPulse. Übergeben
+wird ausschließlich das Wort selbst, nicht der übrige Text, nicht der Titel des Dokuments
+und nichts über Sie oder Ihr Gerät.
+
+Was die von Ihnen gewählte App mit dem Wort macht, richtet sich nach deren
+Datenschutzerklärung und liegt außerhalb unseres Einflusses. LexiPulse überträgt dabei
+selbst nichts an eigene Server und protokolliert weder das Wort noch die Nutzung dieser
+Funktion. Wenn Sie das vermeiden möchten, nutzen Sie die Wortübersicht und nicht den
+Eintrag „Nachschlagen".
+
+## 8. Cookies und lokale Speicher
 
 Wir setzen keine Cookies zu Analyse-, Marketing- oder Profilbildungszwecken. Verwendet
 werden ausschließlich lokale Speicher, die für den Betrieb unbedingt erforderlich sind:
@@ -134,7 +155,7 @@ Der Zugriff auf diese Speicher ist nach § 25 Abs. 2 Nr. 2 TDDDG einwilligungsfr
 er für die von Ihnen ausdrücklich gewünschte Funktion unbedingt erforderlich ist. Ein
 Cookie-Banner ist deshalb nicht erforderlich und wird nicht angezeigt.
 
-## 8. Kauf über App Store und Google Play
+## 9. Kauf über App Store und Google Play
 
 Die mobilen Apps werden über den Apple App Store und Google Play vertrieben. Kauf,
 Bezahlung, Rechnungsstellung und Lizenzverwaltung wickeln allein Apple und Google ab.
@@ -152,7 +173,7 @@ Wenn Sie eine Absturzmeldung an Apple oder Google senden, geschieht das über de
 Systemfunktion. Wir erhalten daraus nur anonymisierte technische Berichte, keine
 Klarnamen und keine Geräte-Identifikatoren.
 
-## 9. Kontaktaufnahme per E-Mail
+## 10. Kontaktaufnahme per E-Mail
 
 Wenn Sie uns schreiben, verarbeiten wir Ihre E-Mail-Adresse und den Inhalt Ihrer
 Nachricht, um die Anfrage zu bearbeiten.
@@ -161,14 +182,14 @@ Art. 6 Abs. 1 lit. f DSGVO mit dem berechtigten Interesse an der Beantwortung.
 **Speicherdauer:** bis zur abschließenden Bearbeitung, danach nach den gesetzlichen
 Aufbewahrungsfristen, soweit solche greifen.
 
-## 10. Empfänger und Drittlandübermittlung
+## 11. Empfänger und Drittlandübermittlung
 
 Außer dem in Abschnitt 4 genannten Hoster Vercel setzen wir keine Auftragsverarbeiter
 ein. Es gibt kein Analyse-Werkzeug, kein Werbenetzwerk, keinen Fehler-Tracker und keinen
 Chat-Dienst. Eine Übermittlung Ihrer Dokumentinhalte in Drittländer findet nicht statt,
 weil diese Inhalte Ihr Gerät nicht verlassen.
 
-## 11. Ihre Rechte
+## 12. Ihre Rechte
 
 Sie haben nach der DSGVO folgende Rechte:
 
@@ -187,7 +208,7 @@ ausschließlich auf Ihrem Gerät liegen, haben wir dazu keine Daten, über die w
 erteilen könnten. Ein Auskunftsersuchen kann sich nur auf Daten beziehen, die uns
 tatsächlich vorliegen, etwa eine E-Mail-Korrespondenz.
 
-## 12. Datenexport nach Art. 20 DSGVO
+## 13. Datenexport nach Art. 20 DSGVO
 
 LexiPulse enthält eine Exportfunktion, mit der Sie sämtliche lokal gespeicherten Daten
 als JSON-Datei sichern: Bibliothek, Lesefortschritt, Lesezeichen, Einstellungen und
@@ -195,7 +216,7 @@ Statistik. Der Export läuft vollständig auf Ihrem Gerät, die Datei wird direk
 abgelegt. Damit können Sie Ihre Daten jederzeit selbst mitnehmen, ohne uns
 kontaktieren zu müssen.
 
-## 13. Beschwerderecht bei einer Aufsichtsbehörde
+## 14. Beschwerderecht bei einer Aufsichtsbehörde
 
 Wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer personenbezogenen Daten gegen die
 DSGVO verstößt, können Sie sich nach Art. 77 DSGVO bei einer Aufsichtsbehörde
@@ -208,23 +229,23 @@ Telefon: +49 30 13889-0
 E-Mail: mailbox@datenschutz-berlin.de
 Web: https://www.datenschutz-berlin.de
 
-## 14. Verschlüsselung
+## 15. Verschlüsselung
 
 Die Website und alle Serveraufrufe laufen ausschließlich über TLS. Eine verschlüsselte
 Verbindung erkennen Sie an „https://" in der Adresszeile und am Schlosssymbol Ihres
 Browsers.
 
-## 15. Keine automatisierte Entscheidungsfindung
+## 16. Keine automatisierte Entscheidungsfindung
 
 Es findet keine automatisierte Entscheidungsfindung einschließlich Profiling nach
 Art. 22 DSGVO statt.
 
-## 16. Kinder
+## 17. Kinder
 
 LexiPulse richtet sich nicht gezielt an Kinder unter 16 Jahren. Da wir keine Daten
 erheben, entsteht auch für diese Altersgruppe kein Datenbestand bei uns.
 
-## 17. Änderungen dieser Erklärung
+## 18. Änderungen dieser Erklärung
 
 Wir passen diese Datenschutzerklärung an, wenn sich die Funktionen von LexiPulse oder
 die Rechtslage ändern. Maßgeblich ist die jeweils auf lexipulse.de veröffentlichte

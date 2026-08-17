@@ -26,6 +26,7 @@ export const de = {
   'library.sourceLabel.html': 'Artikel',
   'library.sourceLabel.text': 'Text',
   'library.sourceLabel.markdown': 'Markdown',
+  'library.sourceLabel.fb2': 'FictionBook',
   'library.sourceLabel.clipboard': 'Zwischenablage',
 
   // Import
@@ -44,6 +45,14 @@ export const de = {
   'import.failed': 'Import fehlgeschlagen',
   'import.done': '„{title}" importiert, {count} Wörter',
   'import.report.title': 'Import-Bericht',
+  'import.report.sections': '{count} Abschnitte erkannt',
+  'import.report.sections.one': '1 Abschnitt erkannt',
+  'import.report.runningHeads': '{count} Kopf- und Fußzeilen entfernt',
+  'import.report.pageNumbers': '{count} Seitenzahlen entfernt',
+  'import.report.tableRows': '{count} Tabellenzeilen entfernt',
+  'import.report.artifacts': '{count} Layout-Reste entfernt',
+  'import.report.dehyphenated': '{count} getrennte Wörter zusammengefügt',
+  'import.report.clean': 'Keine Störzeilen gefunden, der Text war bereits sauber.',
   'import.invalidUrl': 'Das sieht nicht nach einer gültigen Adresse aus.',
 
   // Player
@@ -142,6 +151,17 @@ export const de = {
 
   'settings.export': 'Meine Daten exportieren',
   'settings.export.hint': 'Vollständige JSON-Sicherung (Art. 20 DSGVO)',
+  'settings.exportHighlights': 'Markierungen exportieren',
+  'settings.exportHighlights.hint': 'Als Markdown, nach Kapiteln geordnet',
+  'settings.exportHighlights.empty': 'In diesem Dokument gibt es noch keine Markierungen.',
+  'settings.exportHighlights.noDoc': 'Öffne zuerst ein Dokument.',
+  'settings.goal': 'Tagesziel',
+  'settings.goal.hint': 'Wörter pro Tag, 0 schaltet es aus',
+  'settings.goal.off': 'Aus',
+  'stats.goal': 'Tagesziel',
+  'stats.goal.progress': '{read} von {goal} Wörtern',
+  'stats.goal.met': 'Heute geschafft',
+  'stats.goal.remaining': 'noch {count} Wörter',
   'settings.export.failed': 'Export fehlgeschlagen',
   'settings.wipe': 'Alle Daten löschen',
   'settings.wipe.hint': 'Bibliothek, Fortschritt und Statistik. Unwiderruflich.',
@@ -206,6 +226,19 @@ export const de = {
   'highlight.color.pink': 'Pink',
   'highlight.color.purple': 'Violett',
   'highlight.selectHint': 'Noch ein Wort antippen, um den Bereich zu erweitern.',
+
+  'lookup.open': 'Wortübersicht',
+  'lookup.count': '{count} Fundstellen im Dokument',
+  'lookup.count.one': '1 Fundstelle im Dokument',
+  'lookup.count.many': 'Über {count} Fundstellen im Dokument',
+  'lookup.count.none': 'Keine Fundstelle im Dokument',
+  'lookup.empty': 'Dieses Wort steht nur an dieser einen Stelle.',
+  'lookup.handoff': 'Nachschlagen',
+  'lookup.handoff.hint':
+    'Gibt das Wort an eine App deiner Wahl weiter, etwa Wörterbuch, Übersetzer oder Browser. Es verlässt damit LexiPulse. Was die andere App damit macht, steht in deren Datenschutzerklärung.',
+  'lookup.handoff.none': 'Keine App zum Nachschlagen',
+  'lookup.handoff.none.body':
+    'Auf diesem Gerät ist keine App installiert, die Text zum Nachschlagen annimmt. Ein Wörterbuch oder ein Übersetzer aus dem Store schließt diese Lücke.',
 
   'library.sort': 'Sortieren',
   'library.sort.recent': 'Zuletzt geöffnet',

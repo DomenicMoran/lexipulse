@@ -1,14 +1,17 @@
 'use client';
 
-import type { LibraryEntry } from '@lexipulse/core';
+import { fold, type LexiDocument, type LibraryEntry } from '@lexipulse/core';
 import { Button, ProgressBar } from '@lexipulse/ui';
 import Link from 'next/link';
 import * as React from 'react';
 import { TrashIcon, UploadIcon } from '@/components/icons';
 import { DataTransfer } from '@/components/reader/data-transfer';
 import { ReaderNav } from '@/components/reader/reader-nav';
+import { SearchIcon } from '@/components/reader/search-dialog';
+import { TagEditor, TagFilterBar, TagIcon } from '@/components/reader/tags';
 import { useSettings } from '@/components/settings-provider';
 import { SOURCE_LABELS, formatDate, formatMinutes, formatNumber, formatPercent } from '@/lib/format';
+import { activeTagOf, allTagsOf, matchingEntries, type TagIndex } from '@/lib/library-filter';
 import { getStore } from '@/lib/store';
 
 /**
@@ -29,21 +32,50 @@ function remainingMs(entry: LibraryEntry, wpm: number): number {
 export function LibraryView() {
   const { settings } = useSettings();
   const [entries, setEntries] = React.useState<LibraryEntry[] | null>(null);
+  const [tags, setTags] = React.useState<TagIndex>({});
   const [confirming, setConfirming] = React.useState<string | null>(null);
+  const [query, setQuery] = React.useState('');
+  /** Folded, because that is the form the chip and the entry are compared in. */
+  const [selectedTag, setSelectedTag] = React.useState<string | null>(null);
+  const [editing, setEditing] = React.useState<LexiDocument | null>(null);
 
+  /*
+   * Tags live beside the documents rather than inside them, so `listLibrary` does not carry
+   * them. One indexed read for the whole screen is cheaper than widening every entry, and
+   * it is read together with the library so the two can never disagree on screen.
+   */
   const load = React.useCallback(() => {
     void getStore()
-      .then((store) => store.listLibrary())
-      .then(setEntries)
+      .then((store) => Promise.all([store.listLibrary(), store.tagIndex()]))
+      .then(([library, index]) => {
+        setEntries(library);
+        setTags(index);
+      })
       .catch(() => setEntries([]));
   }, []);
 
   React.useEffect(load, [load]);
 
+  const allTags = React.useMemo(() => allTagsOf(tags), [tags]);
+  const activeTag = activeTagOf(allTags, selectedTag);
+  const visible = React.useMemo(
+    () => (entries === null ? [] : matchingEntries(entries, tags, activeTag, query)),
+    [entries, tags, activeTag, query],
+  );
+
   const remove = async (id: string) => {
     const store = await getStore();
+    // The store drops the document's tags with it, so the screen's copy of the index has
+    // to be read again, or the filter row keeps offering a shelf nothing stands on.
     await store.deleteDocument(id);
     setConfirming(null);
+    load();
+  };
+
+  const saveTags = async (documentId: string, next: string[]) => {
+    const store = await getStore();
+    await store.setTags(documentId, next);
+    setEditing(null);
     load();
   };
 
@@ -76,10 +108,44 @@ export function LibraryView() {
         )}
 
         {entries !== null && entries.length > 0 && (
-          <ul className="mt-8 flex flex-col gap-3">
-            {entries.map((entry) => {
+          <div className="mt-8 flex flex-col gap-3">
+            <div className="flex h-10 items-center gap-2 rounded-[10px] border border-[var(--lx-border)] bg-[var(--lx-surface)] px-3">
+              <SearchIcon width={16} height={16} className="shrink-0 text-[var(--lx-text-muted)]" />
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                aria-label="Bibliothek durchsuchen"
+                placeholder="Titel, Autor oder Schlagwort"
+                className="h-full min-w-0 flex-1 bg-transparent text-[14px] text-[var(--lx-text)] outline-none"
+              />
+              {query.length > 0 && (
+                <Button size="sm" variant="ghost" onClick={() => setQuery('')}>
+                  Leeren
+                </Button>
+              )}
+            </div>
+            <TagFilterBar
+              tags={allTags}
+              active={activeTag}
+              onToggle={(tag) =>
+                setSelectedTag((previous) => (previous === fold(tag) ? null : fold(tag)))
+              }
+            />
+          </div>
+        )}
+
+        {entries !== null && entries.length > 0 && visible.length === 0 && (
+          <p className="py-16 text-center text-[15px] text-[var(--lx-text-muted)]">
+            Keine Treffer. Suchbegriff oder Schlagwort ändern.
+          </p>
+        )}
+
+        {entries !== null && visible.length > 0 && (
+          <ul className="mt-4 flex flex-col gap-3">
+            {visible.map((entry) => {
               const { document, progress } = entry;
               const percent = progress?.percent ?? 0;
+              const documentTags = tags[document.id] ?? [];
               return (
                 <li
                   key={document.id}
@@ -125,6 +191,15 @@ export function LibraryView() {
                       {formatDate(document.createdAt)}
                     </p>
 
+                    {/* One line rather than a second row of chips: the card already carries
+                        four rows, and the shelves are here to be recognised in passing. */}
+                    {documentTags.length > 0 && (
+                      <p className="flex items-center gap-2 text-[13px] text-[var(--lx-text-muted)]">
+                        <TagIcon width={14} height={14} className="shrink-0" />
+                        <span className="truncate">{documentTags.join(' · ')}</span>
+                      </p>
+                    )}
+
                     <ProgressBar value={percent} label={`Fortschritt in ${document.title}`} />
 
                     <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -134,6 +209,16 @@ export function LibraryView() {
                       >
                         {percent > 0.001 ? 'Fortsetzen' : 'Lesen'}
                       </Link>
+
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        aria-label={`Schlagwörter für ${document.title} bearbeiten`}
+                        onClick={() => setEditing(document)}
+                      >
+                        <TagIcon width={15} height={15} />
+                        Schlagwörter
+                      </Button>
 
                       {confirming === document.id ? (
                         <>
@@ -171,6 +256,16 @@ export function LibraryView() {
           <DataTransfer onChanged={load} />
         </div>
       </main>
+
+      {editing !== null && (
+        <TagEditor
+          documentTitle={editing.title}
+          tags={tags[editing.id] ?? []}
+          suggestions={allTags}
+          onCancel={() => setEditing(null)}
+          onSave={(next) => void saveTags(editing.id, next)}
+        />
+      )}
     </>
   );
 }

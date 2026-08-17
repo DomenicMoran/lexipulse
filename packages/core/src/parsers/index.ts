@@ -1,6 +1,6 @@
 import type { LexiDocument } from '../types.js';
 import { parseEpub, type EpubParseOptions } from './epub.js';
-import { parseFb2, type Fb2ParseOptions } from './fb2.js';
+import { asciiHead, parseFb2, type Fb2ParseOptions } from './fb2.js';
 import { parsePdf, type PdfParseOptions } from './pdf.js';
 import { parseText, type TextParseOptions } from './text.js';
 import { parseArticleHtml, type ArticleParseOptions } from './web.js';
@@ -33,7 +33,7 @@ export function detectKind(fileName: string, bytes?: Uint8Array): ImportKind {
      * all are common enough that the root element is worth looking for; reading the head
      * as ASCII is safe because the declaration is ASCII in every encoding FB2 uses.
      */
-    const head = new TextDecoder('ascii').decode(bytes.subarray(0, 400));
+    const head = asciiHead(bytes, 400);
     if (/<FictionBook\b/i.test(head)) return 'fb2';
   }
 

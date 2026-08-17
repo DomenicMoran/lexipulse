@@ -3,12 +3,12 @@ import { useCallback, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { dayKey, type ReadingStats } from '@lexipulse/core';
+import { dayKey, goalProgress, type ReadingStats } from '@lexipulse/core';
 
 import { Card, EmptyState, Screen, ScreenTitle, T } from '../../src/components/ui';
 import { formatHuman, formatNumber, t } from '../../src/i18n';
 import { initStore, store } from '../../src/lib/store';
-import { useTheme } from '../../src/state/settings';
+import { useSettings, useTheme } from '../../src/state/settings';
 
 /** Six months is what fits a phone width at a legible cell size. */
 const WEEKS = 26;
@@ -16,6 +16,7 @@ const DAY_MS = 86_400_000;
 
 export default function StatsScreen() {
   const theme = useTheme();
+  const { settings } = useSettings();
   const insets = useSafeAreaInsets();
   const [stats, setStats] = useState<ReadingStats | null>(null);
 
@@ -62,6 +63,10 @@ export default function StatsScreen() {
               }
             />
           </View>
+
+          {settings.dailyGoalWords > 0 ? (
+            <GoalCard daily={stats.daily} goal={settings.dailyGoalWords} />
+          ) : null}
 
           <Card style={{ padding: theme.space[4], marginBottom: theme.space[3] }}>
             <T variant="label" tone="faint">
@@ -225,4 +230,59 @@ function parseHex(color: string): [number, number, number] | null {
   if (!match?.[1]) return null;
   const value = Number.parseInt(match[1], 16);
   return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+}
+
+/**
+ * Today against the daily goal.
+ *
+ * Only rendered when a goal is set, because an empty bar every day would nag rather than
+ * inform. The bar is a plain view rather than an animation: this screen is read, not
+ * watched, and a moving bar on a statistics page is decoration.
+ */
+function GoalCard({ daily, goal }: { daily: Record<string, number>; goal: number }) {
+  const theme = useTheme();
+  const progress = goalProgress(daily, goal);
+
+  return (
+    <Card style={{ padding: theme.space[4], marginBottom: theme.space[3], gap: theme.space[3] }}>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: theme.space[2] }}>
+        <View style={{ flex: 1 }}>
+          <T variant="label" tone="faint">
+            {t('stats.goal')}
+          </T>
+        </View>
+        <T variant="small" tone={progress.met ? 'accent' : 'muted'}>
+          {progress.met
+            ? t('stats.goal.met')
+            : t('stats.goal.remaining', { count: formatNumber(progress.remaining) })}
+        </T>
+      </View>
+
+      <T variant="title">
+        {t('stats.goal.progress', {
+          read: formatNumber(progress.read),
+          goal: formatNumber(progress.goal),
+        })}
+      </T>
+
+      <View
+        accessibilityRole="progressbar"
+        accessibilityValue={{ min: 0, max: goal, now: progress.read }}
+        style={{
+          height: 8,
+          borderRadius: theme.radius.full,
+          backgroundColor: theme.colors.border,
+          overflow: 'hidden',
+        }}
+      >
+        <View
+          style={{
+            width: `${Math.round(progress.ratio * 100)}%`,
+            height: '100%',
+            backgroundColor: theme.accent.base,
+          }}
+        />
+      </View>
+    </Card>
+  );
 }

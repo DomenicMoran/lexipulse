@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { detectKind, importDocument } from './index.js';
-import { parseFb2 } from './fb2.js';
+import { asciiHead, parseFb2 } from './fb2.js';
 
 const encode = (s: string) => new TextEncoder().encode(s);
 
@@ -120,8 +120,41 @@ describe('parseFb2', () => {
     expect(doc.coverDataUrl).toBe('data:image/png;base64,QUJD');
   });
 
+  it('keeps verse lines apart instead of running a poem into one sentence', () => {
+    const poem = [
+      '<FictionBook><description><title-info><book-title>Verse</book-title></title-info></description>',
+      '<body><section><title><p>Ein Gedicht</p></title>',
+      '<subtitle>Erster Teil</subtitle>',
+      '<poem><stanza><v>Erste Zeile des Verses</v><v>Zweite Zeile des Verses</v></stanza></poem>',
+      '<p>Ein Absatz danach.</p>',
+      '</section></body></FictionBook>',
+    ].join('');
+    const text = parseFb2(encode(poem)).chapters[0]?.text ?? '';
+    const lines = text.split('\n').map((line) => line.trim()).filter(Boolean);
+    expect(lines).toContain('Erste Zeile des Verses');
+    expect(lines).toContain('Zweite Zeile des Verses');
+    expect(text).not.toContain('VersesZweite');
+    expect(text).toContain('Erster Teil');
+  });
+
   it('refuses a file that is not FictionBook', () => {
     expect(() => parseFb2(encode('<html><body>nein</body></html>'))).toThrow(/not a FictionBook/i);
+  });
+});
+
+describe('asciiHead', () => {
+  it('reads the head without TextDecoder, which Hermes rejects for the ascii label', () => {
+    // The device threw "Unknown encoding: ascii" while every test here stayed green,
+    // because Node accepts the label and Hermes does not.
+    expect(asciiHead(encode('<?xml version="1.0"?>'), 8)).toBe('<?xml ve');
+  });
+
+  it('stops at the end of a short buffer instead of reading past it', () => {
+    expect(asciiHead(encode('ab'), 10)).toBe('ab');
+  });
+
+  it('replaces bytes above 127 rather than mangling them', () => {
+    expect(asciiHead(new Uint8Array([0x41, 0xc3, 0xa4]), 3)).toBe('A' + String.fromCharCode(0xfffd) + String.fromCharCode(0xfffd));
   });
 });
 

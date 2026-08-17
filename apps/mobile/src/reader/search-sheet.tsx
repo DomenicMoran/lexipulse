@@ -113,7 +113,9 @@ export function SearchSheet({
             data={hits}
             keyExtractor={(hit) => String(hit.tokenIndex)}
             keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => <Hit hit={item} onPress={() => onSelect(item.tokenIndex)} />}
+            renderItem={({ item }) => (
+              <SearchHitRow hit={item} onPress={() => onSelect(item.tokenIndex)} />
+            )}
             ItemSeparatorComponent={Divider}
             contentContainerStyle={{ paddingBottom: insets.bottom + theme.space[6] }}
           />
@@ -123,8 +125,13 @@ export function SearchSheet({
   );
 }
 
-/** One result: the surrounding sentence with the match itself picked out. */
-function Hit({ hit, onPress }: { hit: SearchHit; onPress: () => void }) {
+/**
+ * One result: the surrounding sentence with the match itself picked out.
+ *
+ * Exported because the word overview lists the very same thing, and a second copy of this
+ * would be a second place for the marker to drift out of line with the preview.
+ */
+export function SearchHitRow({ hit, onPress }: { hit: SearchHit; onPress: () => void }) {
   const theme = useTheme();
   const before = hit.preview.slice(0, hit.previewOffset);
   const match = hit.preview.slice(hit.previewOffset, hit.previewOffset + hit.matchLength);
