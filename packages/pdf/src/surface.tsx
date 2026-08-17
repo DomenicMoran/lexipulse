@@ -255,7 +255,11 @@ export function PdfSurface({
             editedFileName(hostRef.current.fileName ?? hostRef.current.title),
             'application/pdf',
           );
-          setToast('Die bearbeitete Datei ist fertig.');
+          setToast(
+            hostRef.current.deliverKind === 'share'
+              ? 'Die bearbeitete Datei liegt im Teilen-Blatt.'
+              : 'Die bearbeitete Datei wurde heruntergeladen.',
+          );
         } else {
           await hostRef.current.replaceOriginal(output);
           setToast('Das Original wurde ersetzt.');
@@ -576,6 +580,7 @@ export function PdfSurface({
         <SaveDialog
           hasRedaction={marks.some((mark) => mark.kind === 'redact')}
           hasForm={Object.keys(formValues).length > 0}
+          deliverKind={host.deliverKind}
           onDone={(choice) => void performSave(choice)}
           onCancel={() => setSaving(false)}
         />

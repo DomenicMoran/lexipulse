@@ -103,6 +103,8 @@ export function OriginalApp() {
         return bytes ? { bytes, mime: meta?.mime ?? 'image/png' } : null;
       },
 
+      deliverKind: 'download',
+
       async deliver(bytes, fileName, mime) {
         const blob = new Blob([bytes.slice().buffer as ArrayBuffer], { type: mime });
         const url = URL.createObjectURL(blob);

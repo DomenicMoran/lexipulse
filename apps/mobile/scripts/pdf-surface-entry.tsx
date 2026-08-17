@@ -132,6 +132,7 @@ function makeHost(config: SurfaceConfig): PdfHost {
       return bytes && bytes.length > 0 ? { bytes, mime: 'image/png' } : null;
     },
 
+    deliverKind: 'share',
     deliver: (bytes, fileName, mime) =>
       call('deliver', [fileName, mime], bytes) as Promise<void>,
 

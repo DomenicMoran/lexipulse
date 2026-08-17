@@ -43,6 +43,13 @@ export interface PdfHost {
 
   /** Hand a finished file to the platform: a download here, a share sheet there. */
   deliver(bytes: Uint8Array, fileName: string, mime: string): Promise<void>;
+  /**
+   * What `deliver` does, in the reader's words.
+   *
+   * The save dialog has to say it, and "als neue Datei herunterladen" is simply wrong on
+   * a phone — there is no download, there is a share sheet. Only the host knows which.
+   */
+  deliverKind: 'download' | 'share';
 
   /**
    * Ask the platform for a picture the reader chooses.

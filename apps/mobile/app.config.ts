@@ -11,8 +11,8 @@ import type { ExpoConfig } from 'expo/config';
 const config: ExpoConfig = {
   name: 'LexiPulse',
   slug: 'lexipulse',
-  owner: 'menucloudberlin',
-  version: '1.0.0',
+  owner: 'salatibox',
+  version: '1.1.0',
   orientation: 'portrait',
   scheme: 'lexipulse',
   icon: './assets/icon.png',
@@ -202,7 +202,7 @@ const config: ExpoConfig = {
    */
   extra: {
     eas: {
-      projectId: '5aebaf91-fab9-4402-8b53-1a30052c9f14',
+      projectId: '660194c8-c524-4ba4-8dda-a9b700ce5b02',
     },
   },
 };

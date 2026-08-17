@@ -27,11 +27,14 @@ export interface SaveChoice {
 export function SaveDialog({
   hasRedaction,
   hasForm,
+  deliverKind,
   onDone,
   onCancel,
 }: {
   hasRedaction: boolean;
   hasForm: boolean;
+  /** Whether the new file is downloaded or handed to the share sheet. */
+  deliverKind: 'download' | 'share';
   onDone: (choice: SaveChoice) => void;
   onCancel: () => void;
 }) {
@@ -59,8 +62,16 @@ export function SaveDialog({
               name="lx-save-target"
               checked={target === 'download'}
               onChange={() => setTarget('download')}
-              title="Als neue Datei herunterladen"
-              hint="Das Original in der Bibliothek bleibt, wie es ist."
+              title={
+                deliverKind === 'share'
+                  ? 'Als neue Datei weitergeben'
+                  : 'Als neue Datei herunterladen'
+              }
+              hint={
+                deliverKind === 'share'
+                  ? 'Geht ins Teilen-Blatt. Das Original in der Bibliothek bleibt, wie es ist.'
+                  : 'Das Original in der Bibliothek bleibt, wie es ist.'
+              }
             />
             <Choice
               name="lx-save-target"
