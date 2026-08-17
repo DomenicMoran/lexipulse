@@ -20,13 +20,21 @@ import { readFormFields, type PdfFormField } from '@/lib/pdf-export';
 export function FormPanel({
   documentId,
   values,
-  onChange,
+  onSet,
   onClose,
   loadOriginal,
 }: {
   documentId: string;
   values: Record<string, PdfFieldValue>;
-  onChange: (next: Record<string, PdfFieldValue>) => void;
+  /**
+   * One field at a time, never the whole record.
+   *
+   * Handing back a merged object closes over the `values` of the render the handler was
+   * created in. Three edits inside one batch then all merge into the same stale copy and
+   * only the last one survives — which is exactly what happened to a ticked checkbox
+   * between a typed name and a chosen option.
+   */
+  onSet: (name: string, value: PdfFieldValue) => void;
   onClose: () => void;
   loadOriginal: () => Promise<Uint8Array | null>;
 }) {
@@ -50,7 +58,7 @@ export function FormPanel({
     };
   }, [documentId, loadOriginal]);
 
-  const set = (name: string, value: PdfFieldValue) => onChange({ ...values, [name]: value });
+  const set = onSet;
 
   return (
     <aside

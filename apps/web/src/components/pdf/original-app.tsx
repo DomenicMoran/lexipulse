@@ -98,6 +98,7 @@ export function OriginalApp() {
       setRecord(document);
       setMarks(stored);
       setFormValues(values);
+      formLoaded.current = true;
     })();
     return () => {
       cancelled = true;
@@ -109,6 +110,17 @@ export function OriginalApp() {
     const timer = window.setTimeout(() => setToast(null), 3000);
     return () => window.clearTimeout(timer);
   }, [toast]);
+
+  /*
+   * Form answers are written out whenever they change, not from the handler that changed
+   * them. The state update is then a pure function of the previous state, which is what
+   * lets three edits inside one batch all survive.
+   */
+  const formLoaded = React.useRef(false);
+  React.useEffect(() => {
+    if (!documentId || !formLoaded.current) return;
+    void getStore().then((store) => store.setFormValues(documentId, formValues));
+  }, [documentId, formValues]);
 
   /* ------------------------------------------------------------------ marks */
 
@@ -483,11 +495,9 @@ export function OriginalApp() {
           <FormPanel
             documentId={documentId}
             values={formValues}
-            onChange={async (next) => {
-              setFormValues(next);
-              const store = await getStore();
-              await store.setFormValues(documentId, next);
-            }}
+            onSet={(name, value) =>
+              setFormValues((current) => ({ ...current, [name]: value }))
+            }
             onClose={() => setPanel('none')}
             loadOriginal={loadOriginalBytes}
           />
