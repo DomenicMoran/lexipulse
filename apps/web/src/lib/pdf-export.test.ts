@@ -1,4 +1,13 @@
-import { PDFDocument, PDFName, StandardFonts } from '@cantoo/pdf-lib';
+import {
+  PDFCheckBox,
+  PDFDocument,
+  PDFDropdown,
+  PDFName,
+  PDFOptionList,
+  PDFRadioGroup,
+  PDFTextField,
+  StandardFonts,
+} from '@cantoo/pdf-lib';
 import { createMark } from '@lexipulse/core';
 import { describe, expect, it } from 'vitest';
 import {
@@ -376,5 +385,39 @@ describe('remapPage', () => {
     const op = { kind: 'insertPdf', after: 1, bytes: await samplePdf(3) } as const;
     expect(remapPage(op, 1)).toBe(1);
     expect(remapPage(op, 2)).toBe(5);
+  });
+});
+
+describe('field detection survives minification', () => {
+  /*
+   * The production build renames every class to a letter. Reading `constructor.name` to
+   * decide what a field is therefore worked in every test and reported "this document has
+   * no form" to everyone on the deployed site. This renames the classes the same way a
+   * minifier would, so the mistake cannot come back unnoticed.
+   */
+  it('still reads the fields when every class has been renamed', async () => {
+    const classes = [PDFTextField, PDFCheckBox, PDFRadioGroup, PDFDropdown, PDFOptionList];
+    const originalNames = classes.map((cls) => cls.name);
+
+    try {
+      classes.forEach((cls, index) => {
+        Object.defineProperty(cls, 'name', { value: `q${index}`, configurable: true });
+      });
+
+      const fields = await readFormFields(await samplePdf(1));
+      expect(fields.map((f) => f.type).sort()).toEqual(['checkbox', 'text']);
+
+      const filled = await buildPdf(await samplePdf(1), {
+        marks: [],
+        formValues: { 'antrag.name': 'Domenic Moran' },
+      });
+      expect(
+        (await readFormFields(filled)).find((f) => f.name === 'antrag.name')?.value,
+      ).toBe('Domenic Moran');
+    } finally {
+      classes.forEach((cls, index) => {
+        Object.defineProperty(cls, 'name', { value: originalNames[index], configurable: true });
+      });
+    }
   });
 });

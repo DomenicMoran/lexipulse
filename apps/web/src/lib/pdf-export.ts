@@ -192,11 +192,16 @@ export async function buildPdf(original: Uint8Array, options: BuildOptions): Pro
         } else if (Array.isArray(value)) {
           form.getOptionList(name).select(value);
         } else {
-          const field = form.getFieldMaybe(name);
-          const type = field?.constructor?.name ?? '';
-          if (type.includes('Dropdown')) form.getDropdown(name).select(value);
-          else if (type.includes('RadioGroup')) form.getRadioGroup(name).select(value);
-          else form.getTextField(name).setText(value);
+          switch (await fieldKind(form.getFieldMaybe(name))) {
+            case 'dropdown':
+              form.getDropdown(name).select(value);
+              break;
+            case 'radio':
+              form.getRadioGroup(name).select(value);
+              break;
+            default:
+              form.getTextField(name).setText(value);
+          }
         }
       } catch {
         // A field the document does not have, or one whose type changed since the value
@@ -642,6 +647,29 @@ export async function setProperties(
 
 /* ------------------------------------------------------------------ form reading */
 
+/**
+ * Which kind of field this is.
+ *
+ * Decided with `instanceof` against the classes pdf-lib exports, never by reading
+ * `constructor.name`. A production build renames every class to a single letter, so a
+ * name check passes every test in development and quietly reports "this document has no
+ * form" to everyone who visits the deployed site. It did exactly that.
+ */
+async function fieldKind(
+  field: import('@cantoo/pdf-lib').PDFField | undefined,
+): Promise<PdfFormField['type'] | null> {
+  if (!field) return null;
+  const { PDFTextField, PDFCheckBox, PDFRadioGroup, PDFDropdown, PDFOptionList } =
+    await getPdfLib();
+
+  if (field instanceof PDFTextField) return 'text';
+  if (field instanceof PDFCheckBox) return 'checkbox';
+  if (field instanceof PDFRadioGroup) return 'radio';
+  if (field instanceof PDFDropdown) return 'dropdown';
+  if (field instanceof PDFOptionList) return 'options';
+  return null;
+}
+
 export interface PdfFormField {
   name: string;
   type: 'text' | 'checkbox' | 'radio' | 'dropdown' | 'options' | 'button';
@@ -675,48 +703,61 @@ export async function readFormFields(original: Uint8Array): Promise<PdfFormField
 
   for (const field of form.getFields()) {
     const name = field.getName();
-    const type = field.constructor?.name ?? '';
     const readOnly = field.isReadOnly();
 
     try {
-      if (type.includes('TextField')) {
-        const text = form.getTextField(name);
-        out.push({
-          name,
-          type: 'text',
-          value: text.getText() ?? '',
-          readOnly,
-          multiline: text.isMultiline(),
-        });
-      } else if (type.includes('CheckBox')) {
-        out.push({ name, type: 'checkbox', value: form.getCheckBox(name).isChecked(), readOnly });
-      } else if (type.includes('RadioGroup')) {
-        const group = form.getRadioGroup(name);
-        out.push({
-          name,
-          type: 'radio',
-          options: group.getOptions(),
-          value: group.getSelected() ?? '',
-          readOnly,
-        });
-      } else if (type.includes('Dropdown')) {
-        const dropdown = form.getDropdown(name);
-        out.push({
-          name,
-          type: 'dropdown',
-          options: dropdown.getOptions(),
-          value: dropdown.getSelected()[0] ?? '',
-          readOnly,
-        });
-      } else if (type.includes('OptionList')) {
-        const list = form.getOptionList(name);
-        out.push({
-          name,
-          type: 'options',
-          options: list.getOptions(),
-          value: list.getSelected(),
-          readOnly,
-        });
+      switch (await fieldKind(field)) {
+        case 'text': {
+          const text = form.getTextField(name);
+          out.push({
+            name,
+            type: 'text',
+            value: text.getText() ?? '',
+            readOnly,
+            multiline: text.isMultiline(),
+          });
+          break;
+        }
+        case 'checkbox':
+          out.push({ name, type: 'checkbox', value: form.getCheckBox(name).isChecked(), readOnly });
+          break;
+        case 'radio': {
+          const group = form.getRadioGroup(name);
+          out.push({
+            name,
+            type: 'radio',
+            options: group.getOptions(),
+            value: group.getSelected() ?? '',
+            readOnly,
+          });
+          break;
+        }
+        case 'dropdown': {
+          const dropdown = form.getDropdown(name);
+          out.push({
+            name,
+            type: 'dropdown',
+            options: dropdown.getOptions(),
+            value: dropdown.getSelected()[0] ?? '',
+            readOnly,
+          });
+          break;
+        }
+        case 'options': {
+          const list = form.getOptionList(name);
+          out.push({
+            name,
+            type: 'options',
+            options: list.getOptions(),
+            value: list.getSelected(),
+            readOnly,
+          });
+          break;
+        }
+        default:
+          // A button, a signature field, or something pdf-lib does not model. Left out
+          // rather than shown as a box that answers nothing.
+          break;
       }
     } catch {
       // A field whose type pdf-lib cannot read is left out rather than shown broken.
