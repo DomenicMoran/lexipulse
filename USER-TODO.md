@@ -49,6 +49,32 @@ beschreiben Funktionen, die im geprüften 1.0-Paket nicht drin sind; sie jetzt
 einzutragen wäre ein Ablehnungsgrund und gegenüber Käufern falsch. Bei Play
 bricht ein Eingriff die laufende Prüfung ohnehin ab.
 
+**Nachgefragt am 17.08. abends, bei beiden Läden direkt:**
+
+- Apple, über die App-Store-Connect-Schnittstelle: Version 1.0, Zustand
+  `WAITING_FOR_REVIEW`, Build 10, Freigabe `AFTER_APPROVAL`. Der Versuch, den
+  1.1-Eintrag schon anzulegen, wird abgelehnt: *„You cannot create a new version
+  of the App in the current state."* Vorbereiten lässt sich der Eintrag also
+  nicht — Apple gibt ihn erst frei, wenn 1.0 die Prüfung verlassen hat.
+- Play, über die Publisher-Schnittstelle (lesend, der Entwurf wurde verworfen):
+  Spur `production` hält versionCode 9 als `completed`, Spur `internal` die 2.
+  Die öffentliche Store-Seite antwortet in allen Sprachen mit 404, die App ist
+  also noch nicht veröffentlicht. Das Paket liegt bei Google, die Erstprüfung
+  läuft.
+
+Es liegt damit an keiner Stelle etwas bei uns. Beide Läden warten auf ihre
+eigenen Prüfer.
+
+**Vorgezogen, weil es die laufende Prüfung nicht berührt:** Das iOS-Paket 1.1.0
+(Build 11) ist bei Apple hochgeladen und wird verarbeitet. Builds hängen nicht am
+Versionseintrag — der Upload ändert an 1.0 nichts, spart nach der Freigabe aber
+die Verarbeitungszeit. `ITSAppUsesNonExemptEncryption` steht auf `false`, Apple
+fragt die Ausfuhrbestimmung also nicht nach; der Build ist sofort anhängbar.
+
+Bei Play wurde bewusst **nichts** hochgeladen. Die Produktionsspur hält den
+Erstrelease, und ein neues Paket dort ersetzt ihn — mitten in der Erstprüfung
+wäre das der teuerste mögliche Zeitpunkt. Das AAB liegt fertig daneben.
+
 Sobald 1.0 freigegeben ist, läuft es in dieser Reihenfolge:
 
 1. ~~1.1 bauen (Android und iOS)~~ — erledigt, siehe unten
