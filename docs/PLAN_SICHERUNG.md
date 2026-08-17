@@ -1,6 +1,6 @@
 # Sichern, Übertragen, Zusammenführen — ohne Server
 
-Stand: 2026-08-17. Ziel: Zwei Geräte nebeneinander benutzen und ein Gerät
+Stand: 2026-08-17, **umgesetzt und am Gerät belegt**. Ziel: Zwei Geräte nebeneinander benutzen und ein Gerät
 wechseln können, ohne dass irgendwo ein Server steht.
 
 ---
@@ -145,3 +145,36 @@ klein und der Aufwand um ein Vielfaches größer.
 
 **Automatischer Abgleich.** Ohne Server gibt es keinen Auslöser. Ein Abgleich,
 der nur läuft, wenn der Nutzer daran denkt, sollte auch so heißen.
+
+---
+
+## Was daraus geworden ist
+
+Alles oben ist gebaut, in App und Web, und am Gerät nachgewiesen.
+
+Zwei Fehler kamen erst beim Bauen zum Vorschein, beide hätten still Daten
+gekostet:
+
+**`saveProgress` überschrieb `updatedAt` mit der aktuellen Zeit.** Damit ließ
+sich ein Lesestand nie mit seinem echten Zeitstempel wiederherstellen, und „das
+Neuere gewinnt" hätte zwei erfundene Zeiten verglichen. Alle drei Aufrufer
+setzen den Zeitstempel ohnehin selbst.
+
+**`clearAll` löschte den Schema-Schlüssel mit** und schrieb ihn nicht zurück.
+Nach einem Ersetzen hätte der nächste Start jede Migration gegen bereits
+aktuelle Daten laufen lassen. Heute folgenlos, weil die Migration nichts tut;
+die erste, die etwas umformt, hätte eine frisch wiederhergestellte Bibliothek
+beschädigt.
+
+Dazu drei Stellen in der App, die nicht offensichtlich sind:
+
+- Nach dem Einlesen `discard()` statt `close()`, weil ein späterer Flush sonst
+  die alte Leseposition über die eingelesene schreibt.
+- Beim Ersetzen die Einstellungen aus dem Speicher zurückholen, sonst schreibt
+  der entprellte Write das alte Farbschema zurück.
+- Die Vorschau schließt, bevor die Rückfrage aufgeht; zwei native Dialoge
+  gleichzeitig sind auf Android unzuverlässig.
+
+Offen bleibt der **iOS-Pfad**: Dort ist für „In Ordner speichern" nichts zu
+bauen, weil das Teilen-Blatt „In Dateien sichern" bereits enthält, aber geprüft
+werden konnte es ohne Mac nicht.
