@@ -337,6 +337,18 @@ describe('store.importAll', () => {
     expect((await store.getStats()).totalTokensRead).toBeGreaterThanOrEqual(1000);
   });
 
+  it('leaves the store marked as current after replacing, so no migration re-runs', async () => {
+    // `clearAll` wipes the schema key along with everything else. Without writing it
+    // back, the next `init` sees version 0 and runs every migration against data that is
+    // already current. Harmless today, corrupting the moment a migration transforms
+    // anything.
+    const driver = new MemoryDriver();
+    const fresh = new LexiStore(driver);
+    await fresh.init();
+    await fresh.importAll(JSON.stringify({ schema: 1, documents: [] }), { mode: 'replace' });
+    expect(await driver.get('lexi:schema')).toBe('1');
+  });
+
   it('survives a file that is not a backup at all', async () => {
     const result = await store.importAll('das ist kein json');
     expect(result.documentsAdded).toBe(0);

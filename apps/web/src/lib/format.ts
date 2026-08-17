@@ -27,6 +27,24 @@ export function formatDate(timestamp: number): string {
   return DATE.format(new Date(timestamp));
 }
 
+const DATE_TIME = new Intl.DateTimeFormat('de-DE', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+/**
+ * "17.08.2026, 14:32" for backups.
+ *
+ * Two backups of the same library are told apart by the hour, not by the day, so the
+ * overview before an import has to show the time as well.
+ */
+export function formatDateTime(timestamp: number): string {
+  return DATE_TIME.format(new Date(timestamp));
+}
+
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;

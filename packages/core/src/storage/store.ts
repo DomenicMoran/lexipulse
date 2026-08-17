@@ -555,15 +555,23 @@ export class LexiStore {
     return result;
   }
 
-  /** Wipe everything. Backs the "delete all my data" button. */
+  /**
+   * Wipe everything, then mark the store as current again.
+   *
+   * Without writing the schema key back, the next `init` would see version 0 and run
+   * every migration against data that is already current. Today those migrations do
+   * nothing, so the omission was harmless; the first migration that transforms anything
+   * would silently corrupt a freshly restored library.
+   */
   async clearAll(): Promise<void> {
     if (this.driver.clear) {
       await this.driver.clear();
-      return;
+    } else {
+      for (const prefix of ['lexi:']) {
+        const keys = await this.driver.keys(prefix);
+        for (const key of keys) await this.driver.delete(key);
+      }
     }
-    for (const prefix of ['lexi:']) {
-      const keys = await this.driver.keys(prefix);
-      for (const key of keys) await this.driver.delete(key);
-    }
+    await this.driver.set(KEY.schema, String(SCHEMA_VERSION));
   }
 }
