@@ -58,7 +58,7 @@ export function PageOrganiser({
   return (
     <aside
       aria-label="Seiten"
-      className="fixed top-0 right-0 z-40 flex h-[100dvh] w-full max-w-[420px] flex-col border-l border-[var(--lx-border)] bg-[var(--lx-bg)]"
+      className="flex h-full w-full shrink-0 flex-col border-l border-[var(--lx-border)] bg-[var(--lx-bg)] sm:w-[420px]"
     >
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-[var(--lx-border)] px-3">
         <h2 className="text-[14px] font-medium">Seiten</h2>

@@ -343,7 +343,13 @@ export function OriginalApp() {
         )}
       </header>
 
-      <main id="inhalt" className="flex min-h-0 flex-1 flex-col">
+      {/*
+        The panels sit beside the viewer in the same row rather than floating over it.
+        Fixed to the right edge they covered the toolbar, and the save button under them
+        could not be clicked at all.
+      */}
+      <div className="flex min-h-0 flex-1">
+        <main id="inhalt" className="flex min-h-0 min-w-0 flex-1 flex-col">
         {state.status === 'loading' && (
           <p className="py-24 text-center text-[15px] text-[var(--lx-text-muted)]">
             Original wird geöffnet…
@@ -460,32 +466,33 @@ export function OriginalApp() {
             }}
           />
         )}
-      </main>
+        </main>
 
-      {panel === 'pages' && state.status === 'ready' && (
-        <PageOrganiser
-          doc={state.doc}
-          sizes={state.sizes}
-          busy={busy !== null}
-          onApply={applyPageOp}
-          onClose={() => setPanel('none')}
-          onGoToPage={(value) => viewer.current?.goToPage(value)}
-        />
-      )}
+        {panel === 'pages' && state.status === 'ready' && (
+          <PageOrganiser
+            doc={state.doc}
+            sizes={state.sizes}
+            busy={busy !== null}
+            onApply={applyPageOp}
+            onClose={() => setPanel('none')}
+            onGoToPage={(value) => viewer.current?.goToPage(value)}
+          />
+        )}
 
-      {panel === 'form' && documentId && (
-        <FormPanel
-          documentId={documentId}
-          values={formValues}
-          onChange={async (next) => {
-            setFormValues(next);
-            const store = await getStore();
-            await store.setFormValues(documentId, next);
-          }}
-          onClose={() => setPanel('none')}
-          loadOriginal={loadOriginalBytes}
-        />
-      )}
+        {panel === 'form' && documentId && (
+          <FormPanel
+            documentId={documentId}
+            values={formValues}
+            onChange={async (next) => {
+              setFormValues(next);
+              const store = await getStore();
+              await store.setFormValues(documentId, next);
+            }}
+            onClose={() => setPanel('none')}
+            loadOriginal={loadOriginalBytes}
+          />
+        )}
+      </div>
 
       {signing && (
         <SignatureDialog
