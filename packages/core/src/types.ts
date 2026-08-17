@@ -55,7 +55,7 @@ export interface DocumentChapter {
   tokenCount: number;
 }
 
-export type DocumentSource = 'epub' | 'pdf' | 'html' | 'text' | 'markdown' | 'clipboard';
+export type DocumentSource = 'epub' | 'fb2' | 'pdf' | 'html' | 'text' | 'markdown' | 'clipboard';
 
 /** A fully imported, reader-ready document. */
 export interface LexiDocument {
@@ -192,6 +192,14 @@ export interface RsvpSettings {
   readerRuler: number;
   /** Tint laid over the page for readers who need one. */
   readerOverlay: OverlayKey;
+  /**
+   * Words to read per day, 0 when no goal is set.
+   *
+   * Words rather than minutes on purpose: minutes reward leaving the stream running,
+   * words reward reading. The statistics already count words per day, so the goal reads
+   * the same number the reader sees.
+   */
+  dailyGoalWords: number;
 }
 
 export type ReaderMode = 'rsvp' | 'page';

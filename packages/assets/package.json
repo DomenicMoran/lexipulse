@@ -11,7 +11,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint src --max-warnings 0",
-    "clean": "rimraf dist out .turbo"
+    "clean": "rimraf dist out .turbo",
+    "feature-graphic": "tsx src/feature-graphic.ts"
   },
   "dependencies": {
     "@lexipulse/core": "workspace:*",

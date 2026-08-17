@@ -1,18 +1,20 @@
 import type { LexiDocument } from '../types.js';
 import { parseEpub, type EpubParseOptions } from './epub.js';
+import { parseFb2, type Fb2ParseOptions } from './fb2.js';
 import { parsePdf, type PdfParseOptions } from './pdf.js';
 import { parseText, type TextParseOptions } from './text.js';
 import { parseArticleHtml, type ArticleParseOptions } from './web.js';
 
 export * from './clean.js';
 export * from './epub.js';
+export * from './fb2.js';
 export * from './html-text.js';
 export * from './pdf.js';
 export * from './shared.js';
 export * from './text.js';
 export * from './web.js';
 
-export type ImportKind = 'epub' | 'pdf' | 'html' | 'markdown' | 'text';
+export type ImportKind = 'epub' | 'fb2' | 'pdf' | 'html' | 'markdown' | 'text';
 
 /** Magic bytes / extension sniffing — never trust the MIME type a picker reports. */
 export function detectKind(fileName: string, bytes?: Uint8Array): ImportKind {
@@ -25,9 +27,18 @@ export function detectKind(fileName: string, bytes?: Uint8Array): ImportKind {
     }
     // PK zip header — EPUB is a zip; .zip that is not an EPUB fails later with a clear error.
     if (bytes[0] === 0x50 && bytes[1] === 0x4b) return 'epub';
+    /*
+     * FB2 is plain XML, so it has no magic number of its own and would otherwise be
+     * judged by its extension alone. Files handed over as .xml or with no extension at
+     * all are common enough that the root element is worth looking for; reading the head
+     * as ASCII is safe because the declaration is ASCII in every encoding FB2 uses.
+     */
+    const head = new TextDecoder('ascii').decode(bytes.subarray(0, 400));
+    if (/<FictionBook\b/i.test(head)) return 'fb2';
   }
 
   if (ext === 'epub') return 'epub';
+  if (ext === 'fb2') return 'fb2';
   if (ext === 'pdf') return 'pdf';
   if (ext === 'md' || ext === 'markdown' || ext === 'mdx') return 'markdown';
   if (ext === 'html' || ext === 'htm' || ext === 'xhtml') return 'html';
@@ -37,6 +48,7 @@ export function detectKind(fileName: string, bytes?: Uint8Array): ImportKind {
 export interface ImportOptions {
   fileName?: string;
   epub?: EpubParseOptions;
+  fb2?: Fb2ParseOptions;
   pdf?: PdfParseOptions;
   html?: ArticleParseOptions;
   text?: TextParseOptions;
@@ -73,6 +85,12 @@ export async function importDocument(
   switch (kind) {
     case 'epub':
       return parseEpub(bytes, { origin: fileName, ...options.epub });
+    case 'fb2':
+      return parseFb2(bytes, {
+        origin: fileName,
+        fallbackTitle: stripExtension(fileName),
+        ...options.fb2,
+      });
     case 'pdf': {
       if (!options.pdf?.loader) {
         throw new Error(

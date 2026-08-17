@@ -74,6 +74,7 @@ export const DEFAULT_SETTINGS: RsvpSettings = {
   readerBionic: 0,
   readerRuler: 0,
   readerOverlay: 'none',
+  dailyGoalWords: 0,
 };
 
 export const READER_MODES = ['rsvp', 'page'] as const;
@@ -152,6 +153,7 @@ export function normalizeSettings(input: unknown): RsvpSettings {
     readerBionic: Math.round(num(s.readerBionic, DEFAULT_SETTINGS.readerBionic, 0, 5)),
     readerRuler: Math.round(num(s.readerRuler, DEFAULT_SETTINGS.readerRuler, 0, 3)),
     readerOverlay: pick(s.readerOverlay, OVERLAYS, DEFAULT_SETTINGS.readerOverlay),
+    dailyGoalWords: Math.round(num(s.dailyGoalWords, DEFAULT_SETTINGS.dailyGoalWords, 0, 20000)),
   };
 }
 
