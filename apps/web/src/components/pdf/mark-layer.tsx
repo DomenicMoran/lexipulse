@@ -10,6 +10,7 @@ import {
   type PdfRect,
 } from '@lexipulse/core';
 import * as React from 'react';
+import { getFileStore } from '@/lib/store';
 import { boxSize, boxToPdf, clampToPage, pdfToBox, rectToStyle } from './geometry';
 import type { PageSize } from './pdf-doc';
 
@@ -361,6 +362,19 @@ export function MarkLayer({
       </svg>
 
       {marks.map((mark) =>
+        mark.kind === 'image' || mark.kind === 'signature' ? (
+          <MarkImage
+            key={`i-${mark.id}`}
+            mark={mark}
+            size={size}
+            scale={scale}
+            rotation={rotation}
+            selected={mark.id === selectedId}
+          />
+        ) : null,
+      )}
+
+      {marks.map((mark) =>
         mark.kind === 'text' || mark.kind === 'note' ? (
           <MarkText
             key={`t-${mark.id}`}
@@ -567,6 +581,83 @@ function MarkShape({
     default:
       return null;
   }
+}
+
+/**
+ * Stamped pictures and signatures.
+ *
+ * The bytes live in the file store, so the picture has to be resolved to a URL before it
+ * can be shown. Resolved once per stamp and kept for the life of the page: a signature is
+ * a few kilobytes, and re-reading it on every scroll would make the page flicker.
+ */
+const stampUrls = new Map<string, string>();
+
+function MarkImage({
+  mark,
+  size,
+  scale,
+  rotation,
+  selected,
+}: {
+  mark: PdfMark;
+  size: PageSize;
+  scale: number;
+  rotation: number;
+  selected: boolean;
+}) {
+  const [url, setUrl] = React.useState<string | null>(
+    mark.imageId ? (stampUrls.get(mark.imageId) ?? null) : null,
+  );
+
+  React.useEffect(() => {
+    const id = mark.imageId;
+    if (!id || stampUrls.has(id)) return;
+    let cancelled = false;
+
+    void (async () => {
+      const files = await getFileStore();
+      const bytes = await files.get(id);
+      const meta = await files.stat(id);
+      if (cancelled || !bytes) return;
+      const blob = new Blob([bytes.slice().buffer as ArrayBuffer], {
+        type: meta?.mime ?? 'image/png',
+      });
+      const objectUrl = URL.createObjectURL(blob);
+      stampUrls.set(id, objectUrl);
+      setUrl(objectUrl);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mark.imageId]);
+
+  const box = rectToStyle(mark.rect, size, scale, rotation);
+  if (!url) return null;
+
+  return (
+    /*
+     * A plain `<img>`, not `next/image`. The source is a blob URL for a file that never
+     * left this device; there is no server that could resize it, and routing it through
+     * the image optimiser would mean uploading a signature to do so.
+     */
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={url}
+      alt={mark.kind === 'signature' ? 'Unterschrift' : 'Eingesetztes Bild'}
+      style={{
+        position: 'absolute',
+        left: `${box.left}px`,
+        top: `${box.top}px`,
+        width: `${box.width}px`,
+        height: `${box.height}px`,
+        opacity: mark.opacity,
+        outline: selected ? '1.5px solid #3b82f6' : 'none',
+        pointerEvents: 'none',
+        objectFit: 'fill',
+      }}
+    />
+  );
 }
 
 /** Text boxes and notes, as HTML so the glyphs stay crisp at every zoom. */
