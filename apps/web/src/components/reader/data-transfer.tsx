@@ -130,7 +130,25 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
   const [pending, setPending] = React.useState<Pending | null>(null);
   const [mode, setMode] = React.useState<ImportMode>('merge');
   const [confirmingReplace, setConfirmingReplace] = React.useState(false);
+  const [lastBackup, setLastBackup] = React.useState<number | null>(null);
   const fileRef = React.useRef<HTMLInputElement>(null);
+
+  /*
+   * Read once when the section mounts. Without a server the reader is the only one who
+   * can make a backup, so the honest thing is to say when they last did, and then be
+   * quiet about it.
+   */
+  React.useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const store = await getStore();
+      const at = await store.getLastBackupAt();
+      if (!cancelled) setLastBackup(at);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const exportAll = async () => {
     setBusy(true);
@@ -149,6 +167,11 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
       anchor.remove();
       // Revoking immediately would race the download in Safari.
       window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      // Marked here rather than inside `exportAll`, because only this side knows the
+      // file was actually produced. It says a backup was made, not that it is still
+      // somewhere safe; the app cannot know the second thing.
+      await store.markBackupCreated();
+      setLastBackup(await store.getLastBackupAt());
       setMessage(`Sicherung erstellt (${Math.max(1, Math.round(json.length / 1024))} KB).`);
     } catch {
       setError('Die Sicherung konnte nicht erstellt werden.');
@@ -230,6 +253,15 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
         Bibliothek, Lesefortschritt, Lesezeichen, Markierungen, Einstellungen und Statistik als
         JSON-Datei. Alles läuft vollständig auf Ihrem Gerät; nichts wird übertragen. Die Datei
         enthält Ihre Dokumente im Volltext und gehört deshalb an einen sicheren Ort.
+      </p>
+
+      {/* An answer, not a nag: it appears here and nowhere else, and it carries no colour,
+          no badge and no exclamation mark. Without a server nobody else can make this
+          backup, so saying when it last happened is the app's whole contribution. */}
+      <p className="mt-3 text-[13px] text-[var(--lx-text-faint)]">
+        {lastBackup === null
+          ? 'Auf diesem Gerät wurde noch keine Sicherung erstellt.'
+          : `Zuletzt gesichert am ${formatDateTime(lastBackup)}.`}
       </p>
 
       <div className="mt-5 flex flex-wrap gap-2">

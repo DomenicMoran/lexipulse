@@ -148,6 +148,37 @@ der nur läuft, wenn der Nutzer daran denkt, sollte auch so heißen.
 
 ---
 
+## Was noch fehlt, damit es rund ist
+
+Zwei Dinge, die ein Ablauf ohne Server braucht und die beim ersten Durchgang
+nicht gebaut wurden.
+
+### Die Sicherung aus einer anderen App öffnen
+
+Heute führt der einzige Weg über Einstellungen, Sicherung einlesen, Datei
+wählen. Wer die Datei in seiner Cloud-App vor sich hat, erwartet, sie antippen
+zu können und in LexiPulse zu landen.
+
+Dafür braucht es eine Dateiverknüpfung: unter Android ein `intentFilter` für
+`application/json` samt `content`-Schema, unter iOS ein `CFBundleDocumentTypes`.
+Beides gehört in `app.config.ts`, nicht in die erzeugten Ordner, sonst ist es
+beim nächsten `prebuild` weg. Die App muss den eingehenden Verweis abfangen und
+in dieselbe Vorschau führen wie der Weg über die Einstellungen; ein zweiter
+Ablauf für dasselbe wäre eine zweite Fehlerquelle.
+
+### Daran erinnern, dass eine Sicherung fällig ist
+
+Ohne Server trägt der Nutzer die Verantwortung für seine Daten. Eine App, die
+das nie erwähnt, lässt ihn damit allein und wirkt erst dann unvollständig, wenn
+das Telefon weg ist.
+
+Also: den Zeitpunkt der letzten Sicherung merken und ihn im Abschnitt zeigen.
+„Zuletzt gesichert vor drei Monaten" ist eine Auskunft, keine Mahnung. Kein
+Hinweis auf anderen Bildschirmen, keine Abzeichen, keine roten Punkte. Wer nie
+gesichert hat, sieht „Noch nie gesichert", und das reicht.
+
+---
+
 ## Was daraus geworden ist
 
 Alles oben ist gebaut, in App und Web, und am Gerät nachgewiesen.
@@ -178,3 +209,15 @@ Dazu drei Stellen in der App, die nicht offensichtlich sind:
 Offen bleibt der **iOS-Pfad**: Dort ist für „In Ordner speichern" nichts zu
 bauen, weil das Teilen-Blatt „In Dateien sichern" bereits enthält, aber geprüft
 werden konnte es ohne Mac nicht.
+
+## Warum Apple hinterherhinkt
+
+Das EAS-Kontingent des kostenlosen Tarifs ist fuer diesen Monat aufgebraucht und
+setzt sich am 1. September 2026 zurueck. Ohne Mac laesst sich iOS nicht lokal
+bauen, und `expo-updates` ist nicht eingebunden, ein OTA-Weg existiert also
+auch nicht. Geprueft, nicht vermutet.
+
+Folge: Die Apple-Beschreibung wird **nicht** um Sichern und Uebertragen
+ergaenzt, solange kein iOS-Build die Funktion enthaelt. Ein Ladeneintrag, der
+etwas nennt, das im gepruefen Paket fehlt, ist ein Ablehnungsgrund und
+gegenueber Kaeufern falsch.

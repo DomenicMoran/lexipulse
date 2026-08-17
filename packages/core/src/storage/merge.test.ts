@@ -182,6 +182,46 @@ describe('keys for spotting the same mark twice', () => {
   });
 });
 
+describe('last backup', () => {
+  it('reports nothing before the first backup', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    expect(await store.getLastBackupAt()).toBeNull();
+  });
+
+  it('remembers when one was made', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.markBackupCreated(1_700_000_000_000);
+    expect(await store.getLastBackupAt()).toBe(1_700_000_000_000);
+  });
+
+  it('forgets it on a wipe, because a fresh device has never backed up', async () => {
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.markBackupCreated(1_700_000_000_000);
+    await store.clearAll();
+    expect(await store.getLastBackupAt()).toBeNull();
+  });
+
+  it('does not claim a backup after restoring a file from elsewhere', async () => {
+    // Restoring is not backing up. The receiving device still has no copy of its own,
+    // and saying otherwise would talk a reader out of making one.
+    const store = new LexiStore(new MemoryDriver());
+    await store.init();
+    await store.importAll(JSON.stringify({ schema: 1, documents: [] }), { mode: 'replace' });
+    expect(await store.getLastBackupAt()).toBeNull();
+  });
+
+  it('survives a corrupt value instead of showing a nonsense date', async () => {
+    const driver = new MemoryDriver();
+    const store = new LexiStore(driver);
+    await store.init();
+    await driver.set('lexi:lastBackup', 'gestern');
+    expect(await store.getLastBackupAt()).toBeNull();
+  });
+});
+
 describe('store.importAll', () => {
   let store: LexiStore;
 

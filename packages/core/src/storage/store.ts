@@ -39,6 +39,7 @@ const KEY = {
   annotationPrefix: (docId: string) => `lexi:hl:${docId}:`,
   allAnnotations: 'lexi:hl:',
   tags: (docId: string) => `lexi:tags:${docId}`,
+  lastBackup: 'lexi:lastBackup',
   tagsPrefix: 'lexi:tags:',
 } as const;
 
@@ -385,6 +386,32 @@ export class LexiStore {
   }
 
   // ------------------------------------------------------------------- export
+
+  /**
+   * When a backup was last created, or null if never.
+   *
+   * Without a server the reader carries the responsibility for their own data, and an
+   * app that never mentions it leaves them alone with that until the phone is gone.
+   * This is what the settings screen reports; it is an answer, not a nag.
+   */
+  async getLastBackupAt(): Promise<number | null> {
+    const raw = await this.driver.get(KEY.lastBackup);
+    if (raw === null) return null;
+    const value = Number.parseInt(raw, 10);
+    return Number.isFinite(value) && value > 0 ? value : null;
+  }
+
+  /**
+   * Record that a backup was produced.
+   *
+   * Called by the interface once the file exists, rather than from `exportAll`, because
+   * only the caller knows whether writing it actually succeeded. It cannot know whether
+   * the reader then kept the file, so this marks "a backup was made", not "a backup is
+   * safe somewhere". Anything stronger would be a claim the app cannot support.
+   */
+  async markBackupCreated(at: number = Date.now()): Promise<void> {
+    await this.driver.set(KEY.lastBackup, String(at));
+  }
 
   /** Full backup as JSON — the user's data belongs to the user (Art. 20 DSGVO). */
   async exportAll(): Promise<string> {
