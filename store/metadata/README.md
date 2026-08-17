@@ -40,8 +40,8 @@ Reihenfolge: 1.0 abwarten → 1.1 bauen und hochladen → diese Texte übertrage
 | Datei | de-DE | en-US |
 |---|---|---|
 | title | 23 / 30 | 22 / 30 |
-| subtitle | 26 / 30 | 24 / 30 |
-| short_description | 77 / 80 | 71 / 80 |
+| subtitle | 25 / 30 | 24 / 30 |
+| short_description | 74 / 80 | 71 / 80 |
 | keywords | 94 / 100 | 91 / 100 |
 | full_description | 3993 / 4000 | 3751 / 4000 |
 | release_notes | 496 / 500 | 489 / 500 |
