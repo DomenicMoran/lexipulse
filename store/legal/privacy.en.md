@@ -51,6 +51,12 @@ or open a web article, the following happens entirely on your device:
 
 - The file is read and converted into plain text.
 - The text is split into words, prepared for display and stored in the local database.
+- For a PDF, the **original file is also kept unchanged** on your device. That is the only
+  way to show the pages as they were laid out, and the only way to highlight, fill in or
+  sign them. You can delete it at any time by removing the document from your library.
+- Whatever you add to an original page — highlights, notes, drawings, signatures, filled-in
+  form fields — is likewise stored locally only. Editing and saving a PDF also runs
+  entirely on your device; the file is never transmitted.
 - Reading progress, bookmarks, settings and statistics are also stored locally only.
 
 Technically the web app uses **IndexedDB** in your browser, and the mobile apps use a
@@ -143,7 +149,7 @@ is strictly necessary for operation:
 
 | Storage | Content | Purpose |
 |---|---|---|
-| IndexedDB | imported documents, reading progress, bookmarks, statistics | core functionality |
+| IndexedDB | imported documents, original files, highlights and form entries, reading progress, bookmarks, statistics | core functionality |
 | localStorage | theme, accent colour, WPM, display settings | keeping your settings |
 | Service worker cache | application files of the web app | offline use |
 
@@ -212,6 +218,10 @@ The same file can be read back on another device. That, too, happens entirely lo
 the file is never transmitted to us or to anyone else. Where you put it is your choice:
 on the device, over a cable, or into a storage service you use. If you use such a
 service, its privacy policy applies to the file.
+
+The original files themselves are not included. A backup is a text file you should be able
+to mail to yourself; embedded PDFs would inflate it many times over. Open the same file
+again on the other device and your highlights land back where they were.
 
 One note, because it matters: the backup file contains the **complete text** of every
 document you imported, along with your notes and reading positions. It deserves the same

@@ -50,6 +50,14 @@ lokal:
 - Die Datei wird im Browser oder in der App eingelesen und in Text zerlegt.
 - Der Text wird in Wörter zerlegt, für die Anzeige aufbereitet und in der lokalen
   Datenbank abgelegt.
+- Bei einer PDF wird zusätzlich die **Originaldatei unverändert** auf Ihrem Gerät
+  behalten. Nur so lassen sich die Seiten so anzeigen, wie sie gesetzt wurden, und nur so
+  lässt sich darauf markieren, ausfüllen oder unterschreiben. Sie können die Datei
+  jederzeit löschen, indem Sie das Dokument aus der Bibliothek entfernen.
+- Was Sie auf einer Originalseite anlegen — Markierungen, Notizen, Zeichnungen,
+  Unterschriften, ausgefüllte Formularfelder — wird ebenfalls nur lokal gespeichert. Auch
+  das Bearbeiten und Speichern einer PDF läuft vollständig auf Ihrem Gerät; die Datei
+  wird zu keinem Zeitpunkt übertragen.
 - Lesefortschritt, Lesezeichen, Einstellungen und Statistik werden ebenfalls nur lokal
   gespeichert.
 
@@ -147,7 +155,7 @@ werden ausschließlich lokale Speicher, die für den Betrieb unbedingt erforderl
 
 | Speicher | Inhalt | Zweck |
 |---|---|---|
-| IndexedDB | importierte Dokumente, Lesefortschritt, Lesezeichen, Statistik | Kernfunktion der App |
+| IndexedDB | importierte Dokumente, Originaldateien, Markierungen und Formularangaben, Lesefortschritt, Lesezeichen, Statistik | Kernfunktion der App |
 | localStorage | Theme, Akzentfarbe, WPM, Anzeigeeinstellungen | Ihre Einstellungen bleiben erhalten |
 | Service-Worker-Cache | Programmdateien der Web-App | Offline-Nutzung |
 
@@ -220,6 +228,11 @@ Dieselbe Datei können Sie auf einem anderen Gerät wieder einlesen. Auch das ge
 ausschließlich lokal; die Datei wird nicht an uns oder an Dritte übertragen. Wohin Sie
 sie ablegen, entscheiden Sie: auf dem Gerät, per Kabel, oder in einen Speicherdienst
 Ihrer Wahl. Wenn Sie einen solchen Dienst nutzen, gilt dessen Datenschutzerklärung.
+
+Nicht enthalten sind die Originaldateien selbst. Eine Sicherung ist eine Textdatei, die
+Sie sich selbst zuschicken können sollen; eingebettete PDFs würden sie um ein Vielfaches
+aufblähen. Öffnen Sie dieselbe Datei auf dem anderen Gerät erneut, landen Ihre
+Markierungen wieder an derselben Stelle.
 
 Ein Hinweis dazu, weil er wichtig ist: Die Sicherungsdatei enthält den **vollständigen
 Text** aller importierten Dokumente sowie Ihre Notizen und Lesestände. Sie ist damit
