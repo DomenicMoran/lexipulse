@@ -50,6 +50,26 @@ zurückgezogen, 1.1 ist eingereicht und liegt bei den Prüfern.
       wieder zu leihen · Kostenfrage, kein Eilfall — vor dem 01.09. ist ohnehin nichts zu entscheiden
 <!-- OFFEN:END -->
 
+
+## Erledigt am 19.08.2026 — die Adressregel war überholt
+
+- **„Überall `lexipulse@menucloud-berlin.de`“ ist zurückgenommen.** Das war
+  der Stand vom 16.08.2026. Gültig ist `DomenicMoran/marke/adressen.json`:
+  `lexipulse@domenicmoran.de` — so steht es im Code
+  (`store/legal/impressum.de.md:26`). Der Absatz ist als Verlaufsnotiz
+  gekennzeichnet statt gelöscht.
+
+**Offen geblieben, weil eine andere Sitzung die Datei gerade bearbeitet:**
+`store/legal-source.md`, Abschnitt „Kontaktweg“, beschreibt den Empfangsweg
+als „Cloudflare Email Routing nimmt die Post an und leitet sie in das private
+Gmail-Postfach weiter“. Das war der Stand am **Vormittag** des 19.08.2026 und
+stimmt seit dem Nachmittag nicht mehr: Der MX von `domenicmoran.de` zeigt auf
+`mail.menucloud-berlin.de` (Priorität 10), gemessen am 19.08.2026 mit
+`Vortex/werkzeug/mailweg-pruefen.mjs`. Die Datei trug beim Nachsehen
+uncommittete Änderungen einer anderen Sitzung; sie zu überschreiben hätte
+deren Arbeit verworfen. Beim nächsten Durchgang nachziehen — auch deshalb,
+weil es für ein privates Google-Konto als Zielpostfach keinen Vertrag nach
+Art. 28 DSGVO gibt.
 Beide Prüfuhren fangen von vorn an: Apple meist 1–2 Tage, Google bis zu 7. Die
 Pakete liegen zusätzlich unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\`.
 
@@ -382,6 +402,9 @@ wird, nicht aus dem Quelltext geschlossen:
 
 Überall `lexipulse@menucloud-berlin.de`, ein Alias auf `info@menucloud-berlin.de`
 mit Sieve-Sortierung nach `Projekte/LexiPulse`.
+
+> **Ueberholt seit dem 19.08.2026.** Diese Regel galt einen halben Tag lang am 16.08.2026 und ist am 19.08.2026 zurueckgenommen worden. Gueltig ist `DomenicMoran/marke/adressen.json`: **Nur MenuCloud** bleibt auf `info@menucloud-berlin.de`, jedes andere Projekt laeuft ueber `lexipulse@domenicmoran.de`, belegt in `store/legal/impressum.de.md:26`. Der Code steht ueberall schon richtig — der Absatz darueber ist Verlaufsnotiz und **keine Vorgabe**. Wer ihn als Auftragsliste liest, zieht den Code auf den ueberholten Stand zurueck.
+
 
 Signaturmaterial liegt unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\lexipulse-ios\`
 und `...\lexipulse-android\`; `apps/mobile/credentials.json` zeigt darauf und ist
