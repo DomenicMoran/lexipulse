@@ -11,7 +11,43 @@ zurückgezogen, 1.1 ist eingereicht und liegt bei den Prüfern.
 <!-- OFFEN:START -->
 <!-- Diese Liste liest `00_Zentrale/werkzeug/aufgaben.mjs`. Zum Einreichen
      ist nichts offen; der Punkt unten ist eine Kostenentscheidung mit Datum. -->
-- [ ] **Entscheiden, ob ein bezahlter EAS-Tarif kommt** — der naechste iOS-Bau in diesem Monat muesste sich wieder ein fremdes Konto leihen; die Zaehler setzen sich am 1. September 2026 von selbst zurueck · Kostenfrage, kein Eilfall
+- [ ] **Entscheiden, ob ein bezahlter EAS-Tarif kommt** — der naechste iOS-Bau in diesem Monat muesste sich wieder ein fremdes Konto leihen; die Zaehler setzen sich am 1. September 2026 von selbst zurueck.
+
+      **Die Zahlen, damit die Entscheidung nicht im Gefuehl bleibt** (von
+      `expo.dev/pricing` am 19.08.2026):
+
+      | Tarif | Preis | Enthalten | Gleichzeitige Baeue |
+      |---|---|---|---|
+      | Free | 0 $ | 15 Android **und** 15 iOS je Monat | 1 |
+      | Starter | 19 $/Monat | 45 $ Bauguthaben, danach nach Verbrauch | 1 (je 50 $ eine mehr) |
+      | Production | 199 $/Monat | 225 $ Bauguthaben | 2 |
+
+      Einzelbau nach Verbrauch: iOS medium 2 $, iOS large 4 $, Android medium
+      1 $, Android large 2 $.
+
+      **Was das heisst.** Du hast vier Expo-Konten unter derselben Anmeldung
+      (steht oben in dieser Datei und in `Dartile/apps/mobil/app.config.ts`).
+      Das Kontingent haengt am Konto, dem das **Projekt** gehoert — also
+      4 × 15 = **60 iOS-Baeue im Monat, kostenlos**. Von Kapazitaetsmangel kann
+      keine Rede sein. Starter faengt bei 19 $ mit 45 $ Guthaben an, das sind
+      rund 22 iOS-Baeue, und bringt dieselbe eine Gleichzeitigkeit wie Free.
+      **Ein bezahlter Tarif kauft hier also keine Kapazitaet, sondern
+      Ordnung.**
+
+      **Und genau die ist das eigentliche Argument.** Das Ausleihen ist nicht
+      kostenlos, es kostet nur kein Geld: Fuer Build 9 mussten `owner`,
+      `projectId`, die Build-Nummer und zwei EAS-Schalter umgestellt und
+      danach wieder zurueckgesetzt werden (siehe oben, `docs/PLAN_SICHERUNG.md`).
+      Genau dieser Handgriff hat bei Salati 20 Tage lang stille Fehlschlaege
+      erzeugt, weil Manifest und Konfiguration danach auf **verschiedene**
+      Projekte zeigten — ohne eine einzige Fehlermeldung. Jedes Ausleihen ist
+      eine Gelegenheit, das zu wiederholen.
+
+      **Empfehlung, falls du nicht lange abwaegen willst:** jetzt nichts
+      kaufen. Ab dem 01.09. ist das eigene Kontingent ohnehin zurueck, und
+      LexiPulse baut selten. Kaufen lohnt erst, wenn du in einem Monat mehr als
+      15 iOS-Baeue am **eigenen** Konto brauchst — dann aber sofort, statt
+      wieder zu leihen · Kostenfrage, kein Eilfall — vor dem 01.09. ist ohnehin nichts zu entscheiden
 <!-- OFFEN:END -->
 
 Beide Prüfuhren fangen von vorn an: Apple meist 1–2 Tage, Google bis zu 7. Die
