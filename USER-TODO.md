@@ -9,7 +9,7 @@ zurückgezogen, 1.1 ist eingereicht und liegt bei den Prüfern.
 | Play | 1.1.0, versionCode 10, Produktionsspur | Verwaltete Veröffentlichung war für 1.0 aus und wurde nicht angefasst — geht nach der Prüfung direkt live |
 
 <!-- OFFEN:START -->
-<!-- Diese Liste liest `00_Zentrale/werkzeug/sammle-todos.mjs`. Zum Einreichen
+<!-- Diese Liste liest `00_Zentrale/werkzeug/aufgaben.mjs`. Zum Einreichen
      ist nichts offen; der Punkt unten ist eine Kostenentscheidung mit Datum. -->
 - [ ] **Entscheiden, ob ein bezahlter EAS-Tarif kommt** — der naechste iOS-Bau in diesem Monat muesste sich wieder ein fremdes Konto leihen; die Zaehler setzen sich am 1. September 2026 von selbst zurueck · Kostenfrage, kein Eilfall
 <!-- OFFEN:END -->
