@@ -18,8 +18,8 @@ Stand: 2026-08-16. Alle Angaben sind aus dem produktiven MenuCloud-Repository ge
 | Feld | Wert | Quelle |
 |---|---|---|
 | Telefon | +49 30 767 645 46 | `...\impressum\page.jsx:68` |
-| E-Mail (allgemein) | lexipulse@menucloud-berlin.de | Projekt-Alias, `MenuCloud\src\lib\projekt-postfach.json` |
-| E-Mail (Datenschutz) | lexipulse@menucloud-berlin.de | dieselbe Adresse, siehe unten |
+| E-Mail (allgemein) | lexipulse@domenicmoran.de | Projektadresse der Dachmarke, `DomenicMoran\marke\adressen.json` |
+| E-Mail (Datenschutz) | lexipulse@domenicmoran.de | dieselbe Adresse, siehe unten |
 | Website (MenuCloud) | menucloud-berlin.de | `...\impressum\page.jsx:76` |
 
 ## Steuerliches
@@ -38,7 +38,7 @@ Quelle: `...\impressum\page.jsx:113-114`
 ## Verantwortlicher im Sinne der DSGVO (Art. 4 Nr. 7)
 
 Domenic Moran, MenuCloud Berlin, Heidelberger Str. 36, 12059 Berlin,
-Telefon +49 30 767 645 46, E-Mail lexipulse@menucloud-berlin.de
+Telefon +49 30 767 645 46, E-Mail lexipulse@domenicmoran.de
 Quelle: `...\datenschutz\page.jsx:70-92`
 
 ## Streitschlichtung
@@ -69,15 +69,23 @@ Quelle: `...\datenschutz\page.jsx:376-381`
 
 ## Kontaktweg
 
-Die Rechtstexte nennen `lexipulse@menucloud-berlin.de` — für allgemeine Anfragen und
-für Datenschutzanfragen dieselbe Adresse. Sie ist ein Alias auf
-`info@menucloud-berlin.de`; dort sortiert ein Sieve-Prefilter jede an sie gerichtete
-Mail in den Ordner `Projekte/LexiPulse`. Beantwortet wird im MenuCloud-Admin, der
-unter `lexipulse@` als Absender antworten darf.
+Die Rechtstexte nennen `lexipulse@domenicmoran.de` — für allgemeine Anfragen und
+für Datenschutzanfragen dieselbe Adresse. Seit dem 19.08.2026 läuft sie nicht mehr
+über Mailcow: Cloudflare Email Routing nimmt die Post an und leitet sie in das
+private Gmail-Postfach weiter; geantwortet wird von dort über den SMTP-Weg von Brevo,
+der unter `lexipulse@domenicmoran.de` verschicken darf. Bis zum 18.08.2026 stand hier
+die gleichnamige Adresse unter der MenuCloud-Domain, ein Mailcow-Alias mit
+Sieve-Sortierung.
 
-Ein eigenes Postfach unter `lexipulse.de` ist damit nicht mehr nötig. Wer die Adresse
-trotzdem umstellen will, ändert sie zuerst in
-`MenuCloud\src\lib\projekt-postfach.json`, lässt
-`node scripts/postfach-projekte-setup.mjs` laufen und tauscht sie erst danach in
+Ein eigenes Postfach unter `lexipulse.de` ist nicht nötig. Wer die Adresse umstellen
+will, ändert sie zuerst in `DomenicMoran\marke\adressen.json`, lässt aus
+`DomenicMoran` `node werkzeug/brevo-absender.mjs --setzen` und
+`node werkzeug/cloudflare-mail.mjs --setzen` laufen, prüft mit
+`node werkzeug/mail-pruefen.mjs`, dass Post ankommt, und tauscht sie erst danach in
 `store/legal/*.md` aus. Eine im Impressum genannte, aber nicht erreichbare Adresse ist
 ein Abmahnrisiko nach § 5 Abs. 1 Nr. 2 TMG.
+
+**Was dabei noch offen ist:** Die Datenschutzerklärung beschreibt den Mailweg als
+selbst gehostet. Mit Cloudflare und Google sind zwei Empfänger dazugekommen; der
+Abschnitt zum E-Mail-Verkehr gehört nachgezogen, bevor die neue Adresse
+veröffentlicht wird.

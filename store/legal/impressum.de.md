@@ -23,7 +23,7 @@ Diensteanbieters.
 ## Kontakt
 
 Telefon: +49 30 767 645 46
-E-Mail: lexipulse@menucloud-berlin.de
+E-Mail: lexipulse@domenicmoran.de
 Website: https://lexipulse.de
 
 Diese Adresse gilt für alle Anliegen, auch für Anfragen zum Datenschutz.

@@ -64,10 +64,10 @@ export function SiteFooter() {
             GitHub
           </a>
           <a
-            href="mailto:lexipulse@menucloud-berlin.de"
+            href="mailto:lexipulse@domenicmoran.de"
             className="w-fit rounded-[6px] text-[14px] text-[var(--lx-text-muted)] transition-colors duration-140 hover:text-[var(--lx-text)]"
           >
-            lexipulse@menucloud-berlin.de
+            lexipulse@domenicmoran.de
           </a>
         </div>
       </div>

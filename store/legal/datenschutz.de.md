@@ -36,7 +36,7 @@ Heidelberger Str. 36
 Deutschland
 
 Telefon: +49 30 767 645 46
-E-Mail: lexipulse@menucloud-berlin.de
+E-Mail: lexipulse@domenicmoran.de
 
 Ein Datenschutzbeauftragter ist nicht bestellt, weil die Voraussetzungen des Art. 37
 DSGVO und des § 38 BDSG nicht erfüllt sind.
@@ -185,6 +185,13 @@ Klarnamen und keine Geräte-Identifikatoren.
 
 Wenn Sie uns schreiben, verarbeiten wir Ihre E-Mail-Adresse und den Inhalt Ihrer
 Nachricht, um die Anfrage zu bearbeiten.
+
+**Welchen Weg Ihre Nachricht nimmt.** Post an `lexipulse@domenicmoran.de` nimmt
+Cloudflare Email Routing entgegen und leitet sie unverändert an ein Gmail-Postfach
+weiter. Unsere Antwort verschicken wir über den Mailversand von Brevo, damit sie
+unter derselben Adresse bei Ihnen ankommt. Diese drei Anbieter sehen dabei Absender,
+Betreff und Inhalt Ihrer Nachricht; sie stehen einzeln in Abschnitt 11.
+
 **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO bei vertragsbezogenen Anfragen, sonst
 Art. 6 Abs. 1 lit. f DSGVO mit dem berechtigten Interesse an der Beantwortung.
 **Speicherdauer:** bis zur abschließenden Bearbeitung, danach nach den gesetzlichen
@@ -192,10 +199,29 @@ Aufbewahrungsfristen, soweit solche greifen.
 
 ## 11. Empfänger und Drittlandübermittlung
 
-Außer dem in Abschnitt 4 genannten Hoster Vercel setzen wir keine Auftragsverarbeiter
-ein. Es gibt kein Analyse-Werkzeug, kein Werbenetzwerk, keinen Fehler-Tracker und keinen
-Chat-Dienst. Eine Übermittlung Ihrer Dokumentinhalte in Drittländer findet nicht statt,
-weil diese Inhalte Ihr Gerät nicht verlassen.
+Wir setzen vier Dienstleister ein: den Hoster aus Abschnitt 4 und drei für den
+E-Mail-Weg aus Abschnitt 10. Andere gibt es nicht — kein Analyse-Werkzeug, kein
+Werbenetzwerk, keinen Fehler-Tracker, keinen Chat-Dienst.
+
+| Anbieter | Wofür | Sitz |
+|---|---|---|
+| Vercel Inc. / Vercel Germany GmbH | Hosting der Website, siehe Abschnitt 4 | USA / Deutschland |
+| Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, USA | nimmt Post an `@domenicmoran.de` an und leitet sie weiter (Email Routing) | USA |
+| Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland | betreibt das Gmail-Postfach, in dem die weitergeleitete Post liegt | Irland |
+| Brevo GmbH, Köpenicker Str. 126, 10179 Berlin | verschickt unsere Antworten | Deutschland |
+
+**Drittlandübermittlung.** Cloudflare und Google verarbeiten E-Mail auch auf Servern
+außerhalb der EU. Bei Cloudflare stützt sich die Übermittlung auf die
+EU-Standardvertragsklauseln aus dem Auftragsverarbeitungsvertrag des Anbieters; für
+das Postfach ist Google Ireland Limited unser Vertragspartner. Wenn Sie das vermeiden
+wollen, erreichen Sie uns auf dem Postweg unter der Anschrift in Abschnitt 2.
+
+**Ihre Dokumente sind davon nicht betroffen.** Sie verlassen Ihr Gerät nicht und
+werden an keinen dieser Anbieter übermittelt. Betroffen ist nur, was Sie uns von sich
+aus per E-Mail schreiben.
+
+Bis zum 18.08.2026 lief der E-Mail-Weg über einen selbst betriebenen Mailserver.
+Diese Angabe gilt für Nachrichten, die uns ab dem 19.08.2026 erreichen.
 
 ## 12. Ihre Rechte
 
@@ -209,7 +235,7 @@ Sie haben nach der DSGVO folgende Rechte:
 - **Widerspruch** gegen Verarbeitungen, die auf Art. 6 Abs. 1 lit. f DSGVO beruhen
   (Art. 21)
 
-Zur Ausübung genügt eine formlose Nachricht an lexipulse@menucloud-berlin.de.
+Zur Ausübung genügt eine formlose Nachricht an lexipulse@domenicmoran.de.
 
 **Hinweis zur Reichweite:** Weil Ihre Dokumente, Einstellungen und Statistiken
 ausschließlich auf Ihrem Gerät liegen, haben wir dazu keine Daten, über die wir Auskunft

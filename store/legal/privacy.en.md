@@ -39,7 +39,7 @@ Heidelberger Str. 36
 Germany
 
 Phone: +49 30 767 645 46
-Email: lexipulse@menucloud-berlin.de
+Email: lexipulse@domenicmoran.de
 
 We have not appointed a data protection officer because the conditions of Art. 37 GDPR
 and Section 38 BDSG are not met.
@@ -178,6 +178,13 @@ identifiers.
 
 If you write to us, we process your email address and the content of your message in
 order to handle your request.
+
+**The route your message takes.** Mail to `lexipulse@domenicmoran.de` is received by
+Cloudflare Email Routing and forwarded unchanged to a Gmail mailbox. We send our reply
+through Brevo's mail service so that it reaches you from the same address. These three
+providers see the sender, subject and content of your message; they are listed
+individually in section 11.
+
 **Legal basis:** Art. 6(1)(b) GDPR for contract-related enquiries, otherwise Art. 6(1)(f)
 GDPR with our legitimate interest in responding.
 **Retention:** until the enquiry has been dealt with, then according to statutory
@@ -185,10 +192,28 @@ retention periods where applicable.
 
 ## 11. Recipients and international transfers
 
-Apart from the host Vercel named in section 4, we use no processors. There is no
-analytics tool, no ad network, no crash reporting service and no chat service. Your
-document content is never transferred to a third country because it never leaves your
-device.
+We use four service providers: the host from section 4 and three for the email route
+described in section 10. There are no others — no analytics tool, no ad network, no
+crash reporting service, no chat service.
+
+| Provider | What for | Location |
+|---|---|---|
+| Vercel Inc. / Vercel Germany GmbH | hosting the website, see section 4 | USA / Germany |
+| Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, USA | receives mail sent to `@domenicmoran.de` and forwards it (Email Routing) | USA |
+| Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland | operates the Gmail mailbox holding the forwarded mail | Ireland |
+| Brevo GmbH, Köpenicker Str. 126, 10179 Berlin, Germany | sends our replies | Germany |
+
+**International transfers.** Cloudflare and Google also process email on servers
+outside the EU. For Cloudflare the transfer relies on the EU standard contractual
+clauses in that provider's data processing agreement; for the mailbox our contracting
+party is Google Ireland Limited. If you would rather avoid this, you can reach us by
+post at the address in section 2.
+
+**Your documents are not affected.** They never leave your device and are not
+transferred to any of these providers. Only what you choose to write to us by email is.
+
+Until 18 August 2026 the email route ran on a self-hosted mail server. The statement
+above applies to messages reaching us from 19 August 2026 onwards.
 
 ## 12. Your rights
 
@@ -201,7 +226,7 @@ Under the GDPR you have the right to:
 - **data portability** (Art. 20)
 - **object** to processing based on Art. 6(1)(f) GDPR (Art. 21)
 
-An informal message to lexipulse@menucloud-berlin.de is sufficient.
+An informal message to lexipulse@domenicmoran.de is sufficient.
 
 **Scope:** because your documents, settings and statistics exist only on your device, we
 hold no such data and cannot provide information about it. An access request can only

@@ -100,4 +100,4 @@ werden, sonst ist die Angabe falsch.
 | Support URL | https://lexipulse.de |
 | Marketing URL | https://lexipulse.de |
 | Copyright (Apple) | 2026 Domenic Moran |
-| Kontakt-E-Mail (Play, öffentlich sichtbar) | lexipulse@menucloud-berlin.de |
+| Kontakt-E-Mail (Play, öffentlich sichtbar) | lexipulse@domenicmoran.de |
