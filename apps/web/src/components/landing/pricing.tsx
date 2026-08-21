@@ -81,7 +81,7 @@ export function Pricing() {
             <span className="text-[15px] text-[var(--lx-text-muted)]">einmalig</span>
           </div>
           <p className="mt-4 mb-7 max-w-[42ch] text-[15px] leading-relaxed text-[var(--lx-text-muted)]">
-            Endpreis inkl. Umsatzsteuer. Umsatzsteuerpflichtig gemäß § 2 UStG.
+            Endpreis. Als Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus.
           </p>
           <FeatureList items={APP_FEATURES} />
 

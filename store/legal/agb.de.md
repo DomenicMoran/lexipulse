@@ -68,8 +68,8 @@ An Ihren eigenen importierten Dokumenten erwerben wir keinerlei Rechte.
 ## 6. Kauf der mobilen Apps
 
 Die mobilen Apps kosten **4,99 Euro einmalig**. Es gibt kein Abonnement, keine
-In-App-Käufe und keine Werbung. Der Preis versteht sich als Endpreis und ist inkl.
-Umsatzsteuer; wir sind umsatzsteuerpflichtig gemäß § 2 UStG.
+In-App-Käufe und keine Werbung. Der Preis versteht sich als Endpreis; als
+Kleinunternehmer nach § 19 UStG weisen wir keine Umsatzsteuer aus.
 
 Der Kaufvertrag über die App kommt ausschließlich zwischen Ihnen und dem jeweiligen
 Store-Betreiber zustande, also Apple beziehungsweise Google. Für Zahlung, Rechnung,
