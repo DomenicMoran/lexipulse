@@ -32,8 +32,7 @@ Diese Adresse gilt für alle Anliegen, auch für Anfragen zum Datenschutz.
 
 Umsatzsteuer-Identifikationsnummer nach § 27 a UStG: DE461628017
 
-Als Kleinunternehmer im Sinne von § 19 UStG wird keine Umsatzsteuer berechnet und
-folglich auch nicht ausgewiesen.
+Umsatzsteuerpflichtig gemäß § 2 UStG — alle Preise inkl. Umsatzsteuer.
 
 Bankverbindungen geben wir zur Phishing-Prävention nur auf direkte Anfrage per E-Mail
 heraus.

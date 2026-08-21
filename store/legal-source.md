@@ -26,7 +26,7 @@ Stand: 2026-08-16. Alle Angaben sind aus dem produktiven MenuCloud-Repository ge
 
 | Feld | Wert | Quelle |
 |---|---|---|
-| Kleinunternehmerregelung | Gemäß § 19 UStG wird keine Umsatzsteuer berechnet | `...\impressum\page.jsx:91` |
+| Umsatzsteuer | Umsatzsteuerpflichtig gemäß § 2 UStG — alle Preise inkl. Umsatzsteuer | `...\impressum\page.jsx:91` |
 | USt-IdNr. | DE461628017 | `...\impressum\page.jsx:95` |
 | Bankverbindung | wird nur auf direkte Anfrage per E-Mail herausgegeben (Phishing-Prävention) | `...\impressum\page.jsx:102` |
 
