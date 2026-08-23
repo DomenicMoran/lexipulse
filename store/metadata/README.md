@@ -16,10 +16,19 @@ Sprachen:
 |---|---|---|---|
 | `title.txt` | App-Informationen → Name | Store-Eintrag → App-Name | Apple 30, Google 30 |
 | `subtitle.txt` | App-Informationen → Untertitel | wird bei Google **nicht** verwendet | Apple 30 |
+| `promotional_text.txt` | Produktseite → Bewerbungstext (über der Beschreibung) | wird bei Google **nicht** verwendet | Apple 170 |
 | `short_description.txt` | wird bei Apple **nicht** verwendet | Store-Eintrag → Kurzbeschreibung | Google 80 |
 | `full_description.txt` | Version → Beschreibung | Store-Eintrag → Vollständige Beschreibung | Apple 4000, Google 4000 |
 | `keywords.txt` | Version → Keywords | wird bei Google **nicht** verwendet | Apple 100 |
 | `release_notes.txt` | Version → Neue Funktionen | Produktionsspur → Versionshinweise | Apple 4000, **Google 500** |
+
+**`promotional_text.txt` ist neu (nachgetragen 2026-08-23, Store-Audit-Korrekturlauf).**
+LexiPulse war die einzige App im Haus ohne diesen Text (`STORE-AUDIT-2026-08-23.md`,
+Abschnitt 10). Anders als Name, Untertitel und Beschreibung lässt sich dieses Feld in
+App Store Connect **ohne neue Einreichung** ändern — es hängt nicht an einer
+Version. Die Dateien liegen fertig unter `store/metadata/{de-DE,en-US}/
+promotional_text.txt` (164/170 bzw. 159/170 Zeichen) und sind noch **nicht** in ASC
+eingetragen; das Eintragen ist ein separater, bewusst nicht automatisierter Schritt.
 
 Das Google-Limit von 500 Zeichen für Versionshinweise ist die engste Grenze bei den
 Release Notes. `release_notes.txt` bleibt deshalb unter 500 Zeichen, damit derselbe Text
@@ -39,15 +48,16 @@ Der Bau ist bereits erledigt: Android als versionCode 10, iOS als Build 11, beid
 und beide unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\`. Nach der Freigabe von 1.0 bleibt
 also nur noch hochladen, Texte übertragen, einreichen.
 
-## Aktuelle Zeichenzahl (gemessen 2026-08-17, zweite Runde)
+## Aktuelle Zeichenzahl (gemessen 2026-08-23, Store-Audit-Korrekturlauf)
 
 | Datei | de-DE | en-US |
 |---|---|---|
 | title | 23 / 30 | 22 / 30 |
 | subtitle | 25 / 30 | 24 / 30 |
+| promotional_text | 164 / 170 | 159 / 170 |
 | short_description | 74 / 80 | 71 / 80 |
 | keywords | 94 / 100 | 91 / 100 |
-| full_description | 3993 / 4000 | 3751 / 4000 |
+| full_description | 3994 / 4000 | 3816 / 4000 |
 | release_notes | 496 / 500 | 489 / 500 |
 
 Nach jeder Textänderung neu messen:
@@ -97,7 +107,15 @@ werden, sonst ist die Angabe falsch.
 |---|---|
 | Privacy Policy URL (Apple und Google, Pflicht) | https://lexipulse.de/datenschutz |
 | Terms of Use / EULA URL | https://lexipulse.de/agb |
-| Support URL | https://lexipulse.de |
+| Support URL | https://lexipulse.de/#faq |
 | Marketing URL | https://lexipulse.de |
 | Copyright (Apple) | 2026 Domenic Moran |
 | Kontakt-E-Mail (Play, öffentlich sichtbar) | lexipulse@domenicmoran.de |
+
+**Support URL, offener Punkt (Store-Audit-Korrekturlauf 2026-08-23):** In App Store
+Connect steht dort aktuell `lexipulse.de/impressum` — ein Impressum ist keine
+Support-Seite (`STORE-AUDIT-2026-08-23.md`, Abschnitt 10). Der Zielwert in dieser
+Tabelle ist auf `/#faq` präzisiert: Die Sprungmarke `#faq` auf der Startseite
+(`apps/web/src/components/landing/faq.tsx`) trägt die häufigen Fragen **und** den
+Kontaktweg per E-Mail — eine echte Hilfeseite, ohne dass dafür eine neue Seite gebaut
+werden musste. Das Eintragen in ASC ist ein separater Schritt, hier nicht ausgeführt.

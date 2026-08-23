@@ -66,7 +66,7 @@ LIBRARY
 • Export all your own data as JSON (GDPR Art. 20)
 
 PRIVACY
-No account, no tracking, no ads. Your documents are processed and stored on your device only — including while you edit, fill in and sign them. The one feature that contacts a server is importing a web article by URL.
+No account, no tracking, no ads. Your documents are processed and stored on your device only — including while you edit, fill in and sign them. The one feature that contacts a server is importing a web article by URL; that also loads its preview image from the article's own server.
 
 PRICE
 4.99 euros once. No subscription, no in-app purchases, no ads. There is also a free web version at lexipulse.de.
