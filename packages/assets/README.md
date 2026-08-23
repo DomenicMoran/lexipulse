@@ -149,9 +149,12 @@ They are needed twice, in two different ways:
 
 ```
 store/screenshots/
-├── ios-6.9/            6 screens, 1290 x 2796
-├── ios-6.5/            6 screens, 1242 x 2688
-├── android-phone/      6 screens, 1080 x 1920
+├── ios-6.9/            8 screens, 1290 x 2796
+├── ios-6.5/            8 screens, 1242 x 2688
+├── ipad-13/            6 screens, 2064 x 2752   (only when supportsTablet)
+├── android-phone/      8 screens, 1080 x 1920
+├── android-tablet-7/   6 screens, 1200 x 1920
+├── android-tablet-10/  6 screens, 1600 x 2560
 ├── play-feature-graphic.png   1024 x 500
 └── en/                 the same tree, English
 ```
@@ -160,9 +163,24 @@ store/screenshots/
 | --- | --- |
 | iPhone 6.9" — 1290 x 2796 | Required App Store slot; every other iPhone size is derived from it. |
 | iPhone 6.5" — 1242 x 2688 | Legacy slot, still required for older device families. |
-| iPad 13" — 2064 x 2752 | Generated **only** when the mobile config declares `ios.supportsTablet`. Apple reviews iPad shots against an iPad build; a stretched phone layout is a rejection. |
+| iPad 13" — 2064 x 2752 | Generated **only** when the mobile config declares `ios.supportsTablet`. Apple reviews iPad shots against an iPad build; a stretched phone layout is a rejection. Currently `apps/mobile/app.config.ts` sets `supportsTablet: false`, so this folder does not exist — that is correct, not a gap. |
 | Android phone — 1080 x 1920 | Play Store phone screenshots, minimum 2, maximum 8. |
+| Android 7" tablet — 1200 x 1920 | Play Store 7"-tablet screenshots, minimum 1, maximum 8. No build-declaration gate — Play has none — but only the six screens flagged `tablet: true` in `templates/screens.ts` (same subset as the iPad set). |
+| Android 10" tablet — 1600 x 2560 | Play Store 10"-tablet screenshots, same rule and same six screens as the 7" set. |
 | Feature graphic — 1024 x 500 | Play Store, mandatory. Cropped on some surfaces, so the lockup stays inside the middle 78 %. |
+
+The two Android tablet slots were added 23.08.2026, Store-Audit 2026-08-23, Abschnitt 1:
+every app in the house except NOURI was missing Play's tablet screenshot sets. `TARGETS` in
+`store-screenshots.ts` gained two entries reusing the existing `tablet` `DeviceKind` (already
+built for the iPad slot, just never exercised because `supportsTablet` is `false`) — no new
+render path. Doing so exposed a real bug in the file-numbering check (`screen.id` was compared
+against its position in the *filtered* tablet list instead of the master `SCREENS` list, so
+`04-settings` — third in the six-screen tablet subset — tripped "sits at position 3"); fixed by
+checking against `SCREENS.indexOf(screen)`. It also showed the tablet frame's fixed top-aligned
+layout leaving a bare third of the canvas empty at the bottom on the taller Play tablet aspect
+ratios (1200x1920 and 1600x2560 are proportionally taller than the iPad slot the frame was
+tuned against); `framePage` now centers the frame vertically for `kind: 'tablet'` only — phone
+frames are untouched.
 
 The layout is one idea repeated: solid background, one big headline, one explaining
 sentence, one device. No collage, no badges, no gradient mesh.

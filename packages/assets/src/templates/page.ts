@@ -280,7 +280,18 @@ ${appCss()}
   position:relative;width:${w}px;height:${h}px;overflow:hidden;
   background:${oled.surface};
   display:flex;flex-direction:column;align-items:center;
-  padding:${(h * 0.058).toFixed(1)}px ${(w * 0.085).toFixed(1)}px 0;
+  /*
+   * Phone frames (19.5:9 device in a canvas built for exactly that shape) fill almost
+   * the whole height once the device sits under the text, so top-aligned with the
+   * leftover room below is invisible. A tablet canvas is much taller relative to what
+   * the 3:4 device needs — Google's 7"/10" tablet slots (1200x1920, 1600x2560) are
+   * proportionally taller than the iPad slot this frame was tuned against — and
+   * top-aligning there left a bare third of the canvas sitting empty below the device.
+   * Centering the whole block spreads that leftover room evenly instead of dumping it
+   * at the bottom, which is what made it read as unfinished rather than composed.
+   */
+  justify-content:${spec.kind === 'tablet' ? 'center' : 'flex-start'};
+  padding:${(h * 0.058).toFixed(1)}px ${(w * 0.085).toFixed(1)}px ${spec.kind === 'tablet' ? (h * 0.058).toFixed(1) : 0};
 }
 .headline{
   font-size:${headlineSize.toFixed(2)}px;font-weight:600;line-height:1.13;

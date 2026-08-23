@@ -47,8 +47,15 @@ interface Target {
   height: number;
   scale: number;
   kind: DeviceKind;
-  /** `tablet` targets only take the screens flagged for tablets. */
-  tabletOnly?: boolean;
+  /**
+   * Skip this target unless `apps/mobile` declares `ios.supportsTablet`. Apple-specific:
+   * Apple reviews iPad shots against an iPad build, so a target gated by this flag must
+   * also set `tabletScreens`. Play has no equivalent build declaration to check against —
+   * the Play tablet targets below use `tabletScreens` without this gate.
+   */
+  iosTabletGate?: boolean;
+  /** Only take the screens flagged `tablet: true` — the ones that read well enlarged. */
+  tabletScreens?: boolean;
 }
 
 const TARGETS: readonly Target[] = [
@@ -75,7 +82,8 @@ const TARGETS: readonly Target[] = [
     height: 2752,
     scale: 2,
     kind: 'tablet',
-    tabletOnly: true,
+    iosTabletGate: true,
+    tabletScreens: true,
   },
   {
     id: 'android-phone',
@@ -84,6 +92,24 @@ const TARGETS: readonly Target[] = [
     height: 1920,
     scale: 3,
     kind: 'phone',
+  },
+  {
+    id: 'android-tablet-7',
+    requirement: 'Play Store — 7" tablet screenshot (1200x1920, min 1, max 8)',
+    width: 1200,
+    height: 1920,
+    scale: 2,
+    kind: 'tablet',
+    tabletScreens: true,
+  },
+  {
+    id: 'android-tablet-10',
+    requirement: 'Play Store — 10" tablet screenshot (1600x2560, min 1, max 8)',
+    width: 1600,
+    height: 2560,
+    scale: 2,
+    kind: 'tablet',
+    tabletScreens: true,
   },
 ];
 
@@ -474,7 +500,7 @@ async function main(): Promise<void> {
 
   try {
     for (const target of TARGETS) {
-      if (target.tabletOnly && !tablet.supported) continue;
+      if (target.iosTabletGate && !tablet.supported) continue;
 
       const spec: FrameSpec = {
         width: target.width,
@@ -482,7 +508,7 @@ async function main(): Promise<void> {
         scale: target.scale,
         kind: target.kind,
       };
-      const screens = target.tabletOnly ? SCREENS.filter((s) => s.tablet) : SCREENS;
+      const screens = target.tabletScreens ? SCREENS.filter((s) => s.tablet) : SCREENS;
 
       const context = await browser.newContext({
         viewport: { width: target.width / target.scale, height: target.height / target.scale },
@@ -496,7 +522,7 @@ async function main(): Promise<void> {
         const dir = outDir(locale, target.id);
         mkdirSync(dir, { recursive: true });
 
-        for (const [index, screen] of screens.entries()) {
+        for (const screen of screens) {
           const devRoute = dev.get(screen.id);
           let screenImage: string | undefined;
           if (devRoute) {
@@ -515,16 +541,23 @@ async function main(): Promise<void> {
           await page.evaluate(() => document.fonts.ready);
 
           /*
-           * The id verbatim, not the position.
+           * The id verbatim, not the loop position.
            *
-           * Numbering by position while the id carried a number of its own meant `06-stats`
-           * was written as `08-stats.png`, and the six files under the old number stayed
-           * behind for good — nothing regenerates a name no longer produced, so a stale
-           * screenshot sat in the upload folder. The check below keeps the two aligned.
+           * Numbering by loop position while the id carried a number of its own meant
+           * `06-stats` was written as `08-stats.png`, and the six files under the old
+           * number stayed behind for good — nothing regenerates a name no longer
+           * produced, so a stale screenshot sat in the upload folder. The check below
+           * keeps the two aligned.
+           *
+           * Checked against the screen's position in the master `SCREENS` list, not in
+           * `screens` — a tablet target iterates a filtered subset (some ids skipped),
+           * and that filtering is not a renumbering: `04-settings` stays `04-settings.png`
+           * whether it is the third tablet screen or the fourth screen overall.
            */
-          if (screen.id !== `${String(index + 1).padStart(2, '0')}-${screen.id.replace(/^\d+-/, '')}`) {
+          const masterIndex = SCREENS.indexOf(screen);
+          if (screen.id !== `${String(masterIndex + 1).padStart(2, '0')}-${screen.id.replace(/^\d+-/, '')}`) {
             throw new Error(
-              `screen "${screen.id}" sits at position ${index + 1}; renumber it or move it`,
+              `screen "${screen.id}" sits at position ${masterIndex + 1} in SCREENS; renumber it or move it`,
             );
           }
           const name = `${screen.id}.png`;
