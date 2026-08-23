@@ -10,7 +10,9 @@ zurückgezogen, 1.1 ist eingereicht und liegt bei den Prüfern.
 
 <!-- OFFEN:START -->
 <!-- Diese Liste liest `00_Zentrale/werkzeug/aufgaben.mjs`. Zum Einreichen
-     ist nichts offen; der Punkt unten ist eine Kostenentscheidung mit Datum. -->
+     ist nichts offen; die Punkte unten sind eine Kostenentscheidung mit Datum
+     und ein Play-Console-Check, der sich aus diesem Repo heraus nicht klaeren liess. -->
+- [ ] **Play-Pflichterklaerung „Behoerden-App" fuer LexiPulse in der Console pruefen** — Store-Audit-Korrekturlauf 2026-08-23 (`STORE-AUDIT-2026-08-23.md`, Abschnitt 1) nennt diese Pflichterklaerung hausweit; offen genannt ist dort nur Aegis, Dartile ausdruecklich als sauber. LexiPulse steht in Abschnitt 10 des Berichts nicht als offen — ein Hinweis, aber kein Beleg aus der Console selbst. Der Versuch, `app-content/overview` fuer LexiPulse read-only nachzupruefen (wie im Audit beschrieben, kein Formular), ist in dieser Sitzung an der Chrome-Anmeldung gescheitert: das Profil war bei `salatibox@gmail.com` angemeldet, einem fremden Projekt-Konto, und leitete auf die Play-Console-Registrierungsseite um statt auf das LexiPulse-Dashboard. Bitte einmal mit dem richtigen Google-Konto `app-content/overview` fuer Play-App `4975711440100028027` oeffnen und den Status der Erklaerung ablesen; nur ausfuellen, falls sie dort als offen markiert ist.
 - [ ] **Entscheiden, ob ein bezahlter EAS-Tarif kommt** — der naechste iOS-Bau in diesem Monat muesste sich wieder ein fremdes Konto leihen; die Zaehler setzen sich am 1. September 2026 von selbst zurueck.
 
       **Die Zahlen, damit die Entscheidung nicht im Gefuehl bleibt** (von
