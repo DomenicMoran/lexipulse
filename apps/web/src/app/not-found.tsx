@@ -17,7 +17,7 @@ export default function NotFound() {
         </span>
         <h1 className="text-[25px] font-semibold tracking-[-0.015em]">Seite nicht gefunden</h1>
         <p className="max-w-[46ch] text-[16px] leading-relaxed text-[var(--lx-text-muted)]">
-          Diese Adresse führt ins Leere. Von hier kommen Sie zurück zur Startseite oder
+          Diese Adresse führt ins Leere. Von hier kommst du zurück zur Startseite oder
           direkt in den Reader.
         </p>
         <div className="flex flex-wrap justify-center gap-2">

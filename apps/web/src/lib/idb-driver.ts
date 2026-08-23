@@ -42,7 +42,7 @@ function openLexiDb(): Promise<IDBPDatabase<LexiDb>> {
       // Nothing to do but let the promise resolve once it is closed; saying so beats a
       // spinner that never stops.
       console.warn(
-        'LexiPulse: Ein anderer Tab hält die Datenbank offen. Bitte schließen Sie ihn.',
+        'LexiPulse: Ein anderer Tab hält die Datenbank offen. Bitte schließe ihn.',
       );
     },
   });

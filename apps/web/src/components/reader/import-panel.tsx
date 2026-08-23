@@ -81,7 +81,7 @@ export function ImportPanel({ onImported }: ImportPanelProps) {
         <div>
           <h2 className="text-[20px] font-semibold tracking-[-0.015em]">Dokument importieren</h2>
           <p className="mt-1 text-[14px] text-[var(--lx-text-muted)]">
-            Alles wird auf Ihrem Gerät verarbeitet und gespeichert.
+            Alles wird auf deinem Gerät verarbeitet und gespeichert.
           </p>
         </div>
         <SegmentedControl<Mode>

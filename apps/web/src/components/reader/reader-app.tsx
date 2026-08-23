@@ -101,7 +101,7 @@ export function ReaderApp() {
             setLoading(false);
             return;
           }
-          if (!cancelled) setError('Dieses Dokument liegt nicht mehr in Ihrer Bibliothek.');
+          if (!cancelled) setError('Dieses Dokument liegt nicht mehr in deiner Bibliothek.');
         }
 
         const library = await store.listLibrary();
@@ -279,9 +279,9 @@ export function ReaderApp() {
             )}
 
             <p className="text-[13px] leading-relaxed text-[var(--lx-text-muted)]">
-              Dokumente, Lesefortschritt und Lesezeichen liegen in der Datenbank Ihres
-              Browsers. Sie verlassen dieses Gerät nicht — und sind weg, wenn Sie die
-              Website-Daten löschen. In der Bibliothek können Sie alles als Datei sichern.
+              Dokumente, Lesefortschritt und Lesezeichen liegen in der Datenbank deines
+              Browsers. Sie verlassen dieses Gerät nicht — und sind weg, wenn du die
+              Website-Daten löschst. In der Bibliothek kannst du alles als Datei sichern.
             </p>
           </div>
         )}

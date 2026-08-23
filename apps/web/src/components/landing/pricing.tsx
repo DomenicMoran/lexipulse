@@ -46,7 +46,7 @@ export function Pricing() {
           Einmal zahlen oder gar nicht.
         </h2>
         <p className="mt-4 text-[17px] leading-relaxed text-[var(--lx-text-muted)]">
-          Kein Abo, keine Werbung, keine Datenerhebung. Es gibt nichts, was wir über Sie
+          Kein Abo, keine Werbung, keine Datenerhebung. Es gibt nichts, was wir über dich
           verkaufen könnten — wir erheben nichts.
         </p>
       </div>
@@ -109,7 +109,7 @@ export function Pricing() {
             </a>
           </div>
           <p className="mt-3 text-[13px] text-[var(--lx-text-muted)]">
-            Die Apps sind noch nicht veröffentlicht. Bis dahin nutzen Sie die Web-App.
+            Die Apps sind noch nicht veröffentlicht. Bis dahin nutzt du die Web-App.
           </p>
         </div>
       </div>

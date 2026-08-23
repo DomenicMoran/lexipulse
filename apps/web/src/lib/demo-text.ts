@@ -5,15 +5,15 @@
  * demonstrates it, and it carries the punctuation the pacing matrix reacts to — commas,
  * full stops, a long compound, a number — so the rhythm on screen is the real one.
  */
-export const DEMO_TEXT = `Beim Lesen springt Ihr Blick von Wort zu Wort. Diese Sprünge heißen Sakkaden, und sie kosten Zeit, in der Sie nichts aufnehmen.
+export const DEMO_TEXT = `Beim Lesen springt dein Blick von Wort zu Wort. Diese Sprünge heißen Sakkaden, und sie kosten Zeit, in der du nichts aufnimmst.
 
-RSVP dreht das um: Der Text kommt zu Ihnen. Ein Wort nach dem anderen, an genau derselben Stelle. Ihr Auge bleibt ruhig.
+RSVP dreht das um: Der Text kommt zu dir. Ein Wort nach dem anderen, an genau derselben Stelle. Dein Auge bleibt ruhig.
 
-Der farbige Buchstabe ist der Erkennungspunkt. Er sitzt dort, wo Ihr Gehirn ein Wort am schnellsten erfasst, und er steht in jedem Wort an derselben Position auf dem Bildschirm.
+Der farbige Buchstabe ist der Erkennungspunkt. Er sitzt dort, wo dein Gehirn ein Wort am schnellsten erfasst, und er steht in jedem Wort an derselben Position auf dem Bildschirm.
 
-LexiPulse verteilt die Zeit nicht gleichmäßig. Lange Wörter bekommen mehr, kurze Funktionswörter weniger, und am Satzende entsteht eine echte Pause. Genau dieser Rhythmus entscheidet darüber, ob Sie den Text verstehen oder nur sehen.
+LexiPulse verteilt die Zeit nicht gleichmäßig. Lange Wörter bekommen mehr, kurze Funktionswörter weniger, und am Satzende entsteht eine echte Pause. Genau dieser Rhythmus entscheidet darüber, ob du den Text verstehst oder nur siehst.
 
-Ziehen Sie den Regler nach rechts. Sie merken sofort, wo Ihre Grenze liegt.`;
+Zieh den Regler nach rechts. Du merkst sofort, wo deine Grenze liegt.`;
 
 /** Longest word in the demo, used to size the stage so it never reflows mid-stream. */
 export const DEMO_MAX_WORD_LENGTH = 18;

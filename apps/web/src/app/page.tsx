@@ -45,8 +45,8 @@ export default function LandingPage() {
                 PDF und E-Book: lesen, bearbeiten, unterschreiben.
               </h1>
               <p className="mt-6 max-w-[46ch] text-[17px] leading-relaxed text-[var(--lx-text-muted)] sm:text-[20px]">
-                LexiPulse zeigt Ihre Datei als Original mit allem, was darauf steht, als
-                Fließtext in Ihrer Schrift — oder Wort für Wort an fester Stelle, wenn es
+                LexiPulse zeigt deine Datei als Original mit allem, was darauf steht, als
+                Fließtext in deiner Schrift — oder Wort für Wort an fester Stelle, wenn es
                 schnell gehen muss. Alles im Browser, nichts wird hochgeladen.
               </p>
 

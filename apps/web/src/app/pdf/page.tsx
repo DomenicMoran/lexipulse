@@ -40,37 +40,37 @@ const FAQ: { question: string; answer: string }[] = [
   {
     question: 'Wird meine PDF beim Bearbeiten hochgeladen?',
     answer:
-      'Nein. Die Datei wird im Browser geöffnet, bearbeitet und wieder gespeichert. Sie verlässt Ihr Gerät nicht, und nach dem ersten Aufruf funktioniert alles auch ohne Internetverbindung.',
+      'Nein. Die Datei wird im Browser geöffnet, bearbeitet und wieder gespeichert. Sie verlässt dein Gerät nicht, und nach dem ersten Aufruf funktioniert alles auch ohne Internetverbindung.',
   },
   {
     question: 'Kann ich ein PDF-Formular ausfüllen?',
     answer:
-      'Ja. LexiPulse liest die Formularfelder der Datei aus — Textfelder, Kontrollkästchen, Auswahllisten und Mehrfachauswahl — und zeigt sie als Liste. Beim Speichern können Sie die Antworten festschreiben, sodass sie niemand mehr ändert.',
+      'Ja. LexiPulse liest die Formularfelder der Datei aus — Textfelder, Kontrollkästchen, Auswahllisten und Mehrfachauswahl — und zeigt sie als Liste. Beim Speichern kannst du die Antworten festschreiben, sodass sie niemand mehr ändert.',
   },
   {
     question: 'Wie unterschreibe ich eine PDF?',
     answer:
-      'Mit dem Unterschrift-Werkzeug zeichnen Sie Ihre Unterschrift, tippen Ihren Namen in einer Schreibschrift oder setzen ein Foto Ihrer Unterschrift ein; weißes Papier im Foto wird dabei transparent. Das Ergebnis ist ein Bild Ihrer Unterschrift, wie ein unterschriebener und eingescannter Ausdruck — keine qualifizierte elektronische Signatur nach eIDAS.',
+      'Mit dem Unterschrift-Werkzeug zeichnest du deine Unterschrift, tippst deinen Namen in einer Schreibschrift oder setzt ein Foto deiner Unterschrift ein; weißes Papier im Foto wird dabei transparent. Das Ergebnis ist ein Bild deiner Unterschrift, wie ein unterschriebener und eingescannter Ausdruck — keine qualifizierte elektronische Signatur nach eIDAS.',
   },
   {
     question: 'Kann ich Seiten löschen oder die Reihenfolge ändern?',
     answer:
-      'Ja. Seiten lassen sich drehen, löschen und verschieben, und Sie können eine leere Seite, eine andere PDF oder ein Bild einfügen. Ihre Markierungen wandern mit den Seiten mit.',
+      'Ja. Seiten lassen sich drehen, löschen und verschieben, und du kannst eine leere Seite, eine andere PDF oder ein Bild einfügen. Deine Markierungen wandern mit den Seiten mit.',
   },
   {
     question: 'Wird geschwärzter Text wirklich entfernt?',
     answer:
-      'Auf Wunsch ja. Beim Speichern können Sie wählen, ob die betroffenen Seiten als Bild neu geschrieben werden — dann ist der Text darunter weg, auch für Kopieren und Suchen. Ohne diese Einstellung wird er nur überdeckt und bleibt lesbar, wenn jemand ihn markiert und kopiert.',
+      'Auf Wunsch ja. Beim Speichern kannst du wählen, ob die betroffenen Seiten als Bild neu geschrieben werden — dann ist der Text darunter weg, auch für Kopieren und Suchen. Ohne diese Einstellung wird er nur überdeckt und bleibt lesbar, wenn jemand ihn markiert und kopiert.',
   },
   {
     question: 'Was ist mit gescannten PDFs und Fotos?',
     answer:
-      'Eine gescannte PDF ohne Textebene öffnen und bearbeiten Sie ganz normal — nur Wortstrom und Volltextsuche fehlen, weil es keinen Text gibt. Und wenn Sie mehrere Bilder auswählen, macht LexiPulse daraus eine PDF, in der Reihenfolge der Auswahl: abfotografieren, unterschreiben, zurückschicken.',
+      'Eine gescannte PDF ohne Textebene öffnest und bearbeitest du ganz normal — nur Wortstrom und Volltextsuche fehlen, weil es keinen Text gibt. Und wenn du mehrere Bilder auswählst, macht LexiPulse daraus eine PDF, in der Reihenfolge der Auswahl: abfotografieren, unterschreiben, zurückschicken.',
   },
   {
     question: 'Öffnet LexiPulse auch geschützte PDFs?',
     answer:
-      'Ja, wenn Sie das Kennwort haben. Es wird nur zum Öffnen verwendet, nirgends gespeichert und nirgends gesendet.',
+      'Ja, wenn du das Kennwort hast. Es wird nur zum Öffnen verwendet, nirgends gespeichert und nirgends gesendet.',
   },
 ];
 
@@ -88,10 +88,10 @@ export default function PdfPage() {
               PDF bearbeiten, ohne sie aus der Hand zu geben.
             </h1>
             <p className="mt-6 text-[17px] leading-relaxed text-[var(--lx-text-muted)] sm:text-[19px]">
-              Die meisten PDF-Dienste im Netz laden Ihre Datei auf einen fremden Server. Bei
+              Die meisten PDF-Dienste im Netz laden deine Datei auf einen fremden Server. Bei
               einem Mietvertrag, einer Gehaltsabrechnung oder einem Arztbrief ist das genau
-              das, was man nicht will. LexiPulse macht dieselbe Arbeit in Ihrem Browser: die
-              Datei bleibt auf Ihrem Gerät, von der ersten Markierung bis zur fertigen Datei.
+              das, was man nicht will. LexiPulse macht dieselbe Arbeit in deinem Browser: die
+              Datei bleibt auf deinem Gerät, von der ersten Markierung bis zur fertigen Datei.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -138,7 +138,7 @@ export default function PdfPage() {
             <p className="mt-4 max-w-[62ch] text-[16px] leading-relaxed text-[var(--lx-text-muted)]">
               Dieselbe Datei lässt sich als Wortstrom lesen: ein Wort nach dem anderen an
               fester Stelle, mit dem Erkennungspunkt farbig markiert. Die Leseposition ist
-              dieselbe wie auf der Seite — Sie springen hin und zurück, ohne Ihre Stelle zu
+              dieselbe wie auf der Seite — du springst hin und zurück, ohne deine Stelle zu
               verlieren.
             </p>
             <Link

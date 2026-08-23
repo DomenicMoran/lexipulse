@@ -25,8 +25,8 @@ const SURFACES: Surface[] = [
   },
   {
     name: 'Seite',
-    claim: 'Fließtext in Ihrer Schrift',
-    body: 'Dasselbe Dokument ohne fremdes Layout: Schriftgröße, Zeilenabstand, Ränder und Blocksatz stellen Sie ein. Vier Schriften sind dabei, darunter OpenDyslexic.',
+    claim: 'Fließtext in deiner Schrift',
+    body: 'Dasselbe Dokument ohne fremdes Layout: Schriftgröße, Zeilenabstand, Ränder und Blocksatz stellst du ein. Vier Schriften sind dabei, darunter OpenDyslexic.',
     points: ['Blättern oder scrollen', 'Auto-Scroll', 'Bionic-Hervorhebung', 'Leselineal und Farbfilter'],
   },
   {
@@ -52,8 +52,8 @@ export function Surfaces() {
             Ein Dokument, drei Arten es zu lesen.
           </h2>
           <p className="mt-4 text-[17px] leading-relaxed text-[var(--lx-text-muted)]">
-            Die Leseposition ist in allen dreien dieselbe. Sie springen aus der Seite in den
-            Wortstrom und zurück, ohne Ihre Stelle zu verlieren.
+            Die Leseposition ist in allen dreien dieselbe. Du springst aus der Seite in den
+            Wortstrom und zurück, ohne deine Stelle zu verlieren.
           </p>
         </div>
 

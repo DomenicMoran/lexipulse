@@ -199,7 +199,7 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
       }
       if (summary === 'too-new') {
         setError(
-          'Diese Sicherung stammt aus einer neueren Fassung von LexiPulse. Bitte laden Sie diese Seite neu, damit die aktuelle Fassung geladen wird, und versuchen Sie es erneut.',
+          'Diese Sicherung stammt aus einer neueren Fassung von LexiPulse. Bitte lade diese Seite neu, damit die aktuelle Fassung geladen wird, und versuch es erneut.',
         );
         return;
       }
@@ -251,8 +251,8 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
       <h2 className="text-[17px] font-semibold tracking-[-0.015em]">Meine Daten</h2>
       <p className="mt-1 max-w-[62ch] text-[14px] leading-relaxed text-[var(--lx-text-muted)]">
         Bibliothek, Lesefortschritt, Lesezeichen, Markierungen, Einstellungen und Statistik als
-        JSON-Datei. Alles läuft vollständig auf Ihrem Gerät; nichts wird übertragen. Die Datei
-        enthält Ihre Dokumente im Volltext und gehört deshalb an einen sicheren Ort.
+        JSON-Datei. Alles läuft vollständig auf deinem Gerät; nichts wird übertragen. Die Datei
+        enthält deine Dokumente im Volltext und gehört deshalb an einen sicheren Ort.
       </p>
 
       {/* An answer, not a nag: it appears here and nowhere else, and it carries no colour,
@@ -328,8 +328,8 @@ export function DataTransfer({ onChanged }: { onChanged: () => void }) {
             />
             <p className="mt-2 max-w-[62ch] text-[13px] leading-relaxed text-[var(--lx-text-muted)]">
               {mode === 'merge'
-                ? 'Nichts geht verloren. Dokumente, die schon hier sind, werden am Inhalt erkannt und nicht doppelt angelegt. Bei der Leseposition gewinnt die neuere. Ihre Einstellungen auf diesem Gerät bleiben, wie sie sind.'
-                : 'Ihre Bibliothek auf diesem Gerät wird gelöscht und durch den Stand der Datei ersetzt. Auch Einstellungen und Statistik werden überschrieben. Das ist für ein neues Gerät gedacht.'}
+                ? 'Nichts geht verloren. Dokumente, die schon hier sind, werden am Inhalt erkannt und nicht doppelt angelegt. Bei der Leseposition gewinnt die neuere. Deine Einstellungen auf diesem Gerät bleiben, wie sie sind.'
+                : 'Deine Bibliothek auf diesem Gerät wird gelöscht und durch den Stand der Datei ersetzt. Auch Einstellungen und Statistik werden überschrieben. Das ist für ein neues Gerät gedacht.'}
             </p>
           </div>
 

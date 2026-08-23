@@ -60,7 +60,7 @@ export function PdfToolkit() {
           Nicht nur lesen. Auch machen.
         </h2>
         <p className="mt-4 text-[17px] leading-relaxed text-[var(--lx-text-muted)]">
-          Alles läuft in Ihrem Browser. Keine Datei wird hochgeladen, kein Dienst schaut mit,
+          Alles läuft in deinem Browser. Keine Datei wird hochgeladen, kein Dienst schaut mit,
           und es funktioniert ohne Internetverbindung.
         </p>
       </div>
@@ -96,7 +96,7 @@ export function PdfToolkit() {
           <p className="mt-2 max-w-[54ch] text-[14px] leading-relaxed text-[var(--lx-text-muted)]">
             Umwandlung nach Word und serverseitiges Verkleinern gibt es nicht: beides
             bedeutet, die Datei hochzuladen. Und die gezeichnete Unterschrift ist ein Bild
-            Ihrer Unterschrift — wie ein unterschriebener, eingescannter Ausdruck. Eine
+            deiner Unterschrift — wie ein unterschriebener, eingescannter Ausdruck. Eine
             qualifizierte elektronische Signatur nach eIDAS ist sie nicht, und wir nennen
             sie auch nicht so.
           </p>

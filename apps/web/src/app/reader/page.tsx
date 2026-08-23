@@ -5,7 +5,7 @@ import { ReaderApp } from '@/components/reader/reader-app';
 export const metadata: Metadata = {
   title: 'Reader',
   description:
-    'EPUB, PDF, Text oder Web-Artikel importieren und per RSVP lesen. Alles bleibt auf Ihrem Gerät.',
+    'EPUB, PDF, Text oder Web-Artikel importieren und per RSVP lesen. Alles bleibt auf deinem Gerät.',
   alternates: { canonical: '/reader' },
   robots: { index: true, follow: true },
 };

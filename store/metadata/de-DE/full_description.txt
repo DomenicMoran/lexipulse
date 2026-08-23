@@ -1,10 +1,10 @@
-LexiPulse ist drei Arten, dasselbe Dokument zu lesen — und ein Werkzeugkasten für alles, was man mit einer PDF sonst noch tut. Nichts davon verlässt Ihr Gerät.
+LexiPulse ist drei Arten, dasselbe Dokument zu lesen — und ein Werkzeugkasten für alles, was man mit einer PDF sonst noch tut. Nichts davon verlässt dein Gerät.
 
 DREI ANSICHTEN, EINE LESEPOSITION
 • Original: die Seite, wie sie gesetzt wurde, mit Abbildungen, Tabellen und Formularen
-• Seite: dasselbe Dokument als Fließtext in Ihrer Schrift
+• Seite: dasselbe Dokument als Fließtext in deiner Schrift
 • Wortstrom: ein Wort nach dem anderen an fester Stelle, wenn es schnell gehen muss
-Sie wechseln jederzeit und verlieren nie Ihre Stelle.
+Du wechselst jederzeit und verlierst nie deine Stelle.
 
 DIE PDF ALS PDF
 • Zoom, Seitenbreite, ganze Seite, Drehen, dunkle Darstellung
@@ -66,15 +66,15 @@ BIBLIOTHEK
 • Export aller eigenen Daten als JSON (Art. 20 DSGVO)
 
 DATENSCHUTZ
-Kein Konto, kein Tracking, keine Werbung. Ihre Dokumente werden nur auf Ihrem Gerät verarbeitet und gespeichert — auch beim Bearbeiten, Ausfüllen und Unterschreiben. Die einzige Funktion, die einen Server anspricht, ist der Import eines Web-Artikels über eine Adresse.
+Kein Konto, kein Tracking, keine Werbung. Deine Dokumente werden nur auf deinem Gerät verarbeitet und gespeichert — auch beim Bearbeiten, Ausfüllen und Unterschreiben. Die einzige Funktion, die einen Server anspricht, ist der Import eines Web-Artikels per Adresse, samt Vorschaubild.
 
 PREIS
-4,99 Euro einmalig. Kein Abo, keine In-App-Käufe, keine Werbung. Zusätzlich gibt es eine kostenlose Web-Version unter lexipulse.de.
+4,99 Euro einmalig. Kein Abo, keine In-App-Käufe, keine Werbung. Kostenlose Web-Version zusätzlich unter lexipulse.de.
 
 WAS LEXIPULSE NICHT TUT
-Keine Umwandlung nach Word, kein serverseitiges Verkleinern — beides hieße, Ihre Datei hochzuladen. Die gezeichnete Unterschrift ist ein Bild, wie ein unterschriebener und eingescannter Ausdruck; eine qualifizierte elektronische Signatur nach eIDAS ist sie nicht. Eine gescannte PDF lässt sich ansehen und bearbeiten, aber nicht durchsuchen.
+Keine Umwandlung nach Word, kein serverseitiges Verkleinern — beides hieße, deine Datei hochzuladen. Die gezeichnete Unterschrift ist ein Bild, wie ein unterschriebener und eingescannter Ausdruck; eine qualifizierte elektronische Signatur nach eIDAS ist sie nicht. Eine gescannte PDF lässt sich ansehen und bearbeiten, aber nicht durchsuchen.
 
 HINWEIS
-LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt. Beginnen Sie beim Wortstrom bei 250 bis 300 Wörtern pro Minute.
+LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt. Fang beim Wortstrom bei 250 bis 300 Wörtern pro Minute an.
 
 Impressum, Datenschutz und Nutzungsbedingungen: lexipulse.de

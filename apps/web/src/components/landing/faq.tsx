@@ -13,7 +13,7 @@ const ITEMS: QuestionAnswer[] = [
       <>
         Beides, und zwar in dieser Reihenfolge. LexiPulse öffnet PDF und E-Books wie jeder
         andere Reader: die Originalseite mit Abbildungen und Formularen, oder Fließtext in
-        Ihrer Schrift, mit Suche, Markierungen, Lesezeichen und Bibliothek. Der Wortstrom
+        deiner Schrift, mit Suche, Markierungen, Lesezeichen und Bibliothek. Der Wortstrom
         ist die dritte Ansicht — die ungewöhnliche, nicht die einzige. Alle drei teilen
         sich eine Leseposition.
       </>
@@ -25,12 +25,12 @@ const ITEMS: QuestionAnswer[] = [
       <>
         Ja: markieren, kommentieren, zeichnen, Textfelder setzen, Formularfelder ausfüllen,
         unterschreiben, Seiten drehen, löschen, verschieben und einfügen. Das Ergebnis
-        speichern Sie als neue PDF oder ersetzen das Original. Alles läuft im Browser, keine
+        speicherst du als neue PDF oder ersetzt das Original. Alles läuft im Browser, keine
         Datei geht an einen Server. Die Einzelheiten stehen auf der{' '}
         <a href="/pdf" className="text-[var(--lx-accent-text)] underline underline-offset-[3px]">
           Seite zu den PDF-Werkzeugen
         </a>
-        . Die gezeichnete Unterschrift ist ein Bild Ihrer Unterschrift, keine qualifizierte
+        . Die gezeichnete Unterschrift ist ein Bild deiner Unterschrift, keine qualifizierte
         elektronische Signatur nach eIDAS.
       </>
     ),
@@ -51,7 +51,7 @@ const ITEMS: QuestionAnswer[] = [
     answer: (
       <>
         Nein. EPUB-, PDF-, Text- und Markdown-Dateien werden im Browser eingelesen und in
-        der IndexedDB Ihres Geräts abgelegt. Sie verlassen das Gerät nicht. Beim Import
+        der IndexedDB deines Geräts abgelegt. Sie verlassen das Gerät nicht. Beim Import
         über eine Adresse ruft unser Server die fremde Seite ab, gibt nur den Artikeltext
         zurück und speichert dabei weder die Adresse noch den Text.
       </>
@@ -63,9 +63,9 @@ const ITEMS: QuestionAnswer[] = [
       <>
         PDF, EPUB (2 und 3), FictionBook, TXT, Markdown und HTML als Datei oder per
         Drag-and-drop. Dazu Text aus der Zwischenablage und Artikel über eine
-        Internetadresse. Bei einer PDF ohne Textebene — also einem reinen Scan — sehen und
-        bearbeiten Sie die Seiten ganz normal; für den Wortstrom und die Volltextsuche
-        fehlt der Text, dafür bräuchten Sie vorher eine Texterkennung.
+        Internetadresse. Bei einer PDF ohne Textebene — also einem reinen Scan — siehst und
+        bearbeitest du die Seiten ganz normal; für den Wortstrom und die Volltextsuche
+        fehlt der Text, dafür bräuchtest du vorher eine Texterkennung.
       </>
     ),
   },
@@ -73,11 +73,11 @@ const ITEMS: QuestionAnswer[] = [
     question: 'Ist RSVP für jeden geeignet?',
     answer: (
       <>
-        Nein. RSVP nimmt Ihnen die Möglichkeit, im Satz zurückzuspringen, und genau das
+        Nein. RSVP nimmt dir die Möglichkeit, im Satz zurückzuspringen, und genau das
         tun geübte Leserinnen und Leser bei schwierigen Stellen. Für Romane, Artikel und
         Berichte funktioniert es gut, für Fachtexte, Verträge, Lyrik oder Formeln eher
-        nicht. Wenn beim Lesen Augenbelastung oder Kopfschmerzen auftreten, reduzieren Sie
-        das Tempo oder machen Sie eine Pause. LexiPulse ist ein Anzeigewerkzeug, kein
+        nicht. Wenn beim Lesen Augenbelastung oder Kopfschmerzen auftreten, reduziere
+        das Tempo oder mach eine Pause. LexiPulse ist ein Anzeigewerkzeug, kein
         Medizinprodukt und keine Trainingsmethode.
       </>
     ),
@@ -89,7 +89,7 @@ const ITEMS: QuestionAnswer[] = [
         Es gibt kein Konto, kein Tracking, keine Analyse-Werkzeuge, keine Werbung und
         keine Werbe-Identifikatoren. Gesetzt werden nur die lokalen Speicher, die die App
         zum Funktionieren braucht — deshalb erscheint auch kein Cookie-Banner. Alle lokal
-        gespeicherten Daten können Sie im Reader als JSON-Datei exportieren und wieder
+        gespeicherten Daten kannst du im Reader als JSON-Datei exportieren und wieder
         einspielen. Die Einzelheiten stehen in der Datenschutzerklärung.
       </>
     ),
@@ -120,7 +120,7 @@ export function Faq() {
             Häufige Fragen
           </h2>
           <p className="mt-4 max-w-[36ch] text-[17px] leading-relaxed text-[var(--lx-text-muted)]">
-            Etwas offen geblieben? Schreiben Sie an{' '}
+            Etwas offen geblieben? Schreib an{' '}
             <a
               href="mailto:lexipulse@domenicmoran.de"
               className="text-[var(--lx-accent-text)] underline underline-offset-[3px]"

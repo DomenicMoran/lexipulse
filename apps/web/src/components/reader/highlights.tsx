@@ -149,7 +149,7 @@ export function AnnotationList({
       <h2 className="text-[15px] font-semibold">Markierungen</h2>
       {annotations.length === 0 ? (
         <p className="mt-2 text-[13px] leading-relaxed text-[var(--lx-text-muted)]">
-          Noch nichts markiert. Öffnen Sie den Fließtext und wählen Sie eine Stelle mit der
+          Noch nichts markiert. Öffne den Fließtext und wähle eine Stelle mit der
           Maus aus — die Farben erscheinen dann unter dem Text.
         </p>
       ) : (

@@ -48,7 +48,7 @@ export function FeatureBento() {
             description="Kopf- und Fußzeilen, Seitenzahlen, Inhaltsverzeichnis-Punktlinien und Tabellenzeilen fliegen raus. Getrennte Wörter am Zeilenende werden wieder zusammengesetzt, harte Umbrüche zu Absätzen verbunden."
           />
           <p className="mt-auto pt-6 text-[13px] text-[var(--lx-text-muted)]">
-            Nach dem Import sehen Sie, was entfernt wurde. Die Originalseite bleibt daneben
+            Nach dem Import siehst du, was entfernt wurde. Die Originalseite bleibt daneben
             unberührt.
           </p>
         </BentoCell>
@@ -100,7 +100,7 @@ export function FeatureBento() {
         <BentoCell span={2} rows={1}>
           <BentoHeading
             title="Bibliothek mit Schlagwörtern"
-            description="Suchen, sortieren, filtern und auf Schlagwörter legen. Dokumente, Fortschritt, Lesezeichen und Markierungen liegen in der Datenbank Ihres Browsers."
+            description="Suchen, sortieren, filtern und auf Schlagwörter legen. Dokumente, Fortschritt, Lesezeichen und Markierungen liegen in der Datenbank deines Browsers."
           />
           <p className="mt-auto pt-6 text-[13px] text-[var(--lx-text-muted)]">
             Sichern und auf ein anderes Gerät übertragen — ohne Konto, ohne Server.
@@ -127,7 +127,7 @@ export function FeatureBento() {
         <BentoCell span={2} rows={1}>
           <BentoHeading
             title="Statistik ohne Server"
-            description="Gelesene Wörter, Lesezeit, Durchschnittstempo, Serie und eine Heatmap der letzten zwölf Wochen — berechnet auf Ihrem Gerät."
+            description="Gelesene Wörter, Lesezeit, Durchschnittstempo, Serie und eine Heatmap der letzten zwölf Wochen — berechnet auf deinem Gerät."
           />
         </BentoCell>
 

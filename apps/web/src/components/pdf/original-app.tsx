@@ -154,7 +154,7 @@ export function OriginalApp() {
     return (
       <div className="mx-auto max-w-[46ch] px-5 py-24 text-center">
         <p className="text-[15px] leading-relaxed text-[var(--lx-text-muted)]">
-          Dieses Dokument liegt nicht mehr in Ihrer Bibliothek.
+          Dieses Dokument liegt nicht mehr in deiner Bibliothek.
         </p>
         <Link
           href="/reader"

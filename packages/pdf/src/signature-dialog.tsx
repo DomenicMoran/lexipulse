@@ -190,7 +190,7 @@ export function SignatureDialog({
           <div>
             <h2 className="text-[16px] font-semibold">Unterschrift</h2>
             <p className="mt-1 text-[13px] leading-relaxed text-[var(--lx-text-muted)]">
-              Das Ergebnis ist ein Bild Ihrer Unterschrift — wie ein unterschriebener und
+              Das Ergebnis ist ein Bild deiner Unterschrift — wie ein unterschriebener und
               eingescannter Ausdruck. Es ist keine qualifizierte elektronische Signatur.
             </p>
           </div>

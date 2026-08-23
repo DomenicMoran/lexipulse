@@ -18,7 +18,7 @@ export default function OfflinePage() {
       <Wordmark className="text-[17px] font-semibold" />
       <h1 className="text-[31px] font-semibold tracking-[-0.03em]">Gerade offline</h1>
       <p className="max-w-[46ch] text-[16px] leading-relaxed text-[var(--lx-text-muted)]">
-        Diese Seite liegt noch nicht im Zwischenspeicher. Ihre bereits importierten
+        Diese Seite liegt noch nicht im Zwischenspeicher. Deine bereits importierten
         Dokumente sind davon nicht betroffen — die Bibliothek und der Player funktionieren
         auch ohne Verbindung.
       </p>

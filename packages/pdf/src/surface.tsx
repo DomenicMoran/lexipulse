@@ -633,8 +633,8 @@ function PasswordPrompt({
       <h2 className="text-[16px] font-semibold">Diese Datei ist geschützt</h2>
       <p className="mt-2 text-[14px] leading-relaxed text-[var(--lx-text-muted)]">
         {wrong
-          ? 'Das Kennwort stimmt nicht. Versuchen Sie es noch einmal.'
-          : 'Geben Sie das Kennwort ein, um die Seiten zu sehen. Es wird nirgends gespeichert und nirgends gesendet.'}
+          ? 'Das Kennwort stimmt nicht. Versuch es noch einmal.'
+          : 'Gib das Kennwort ein, um die Seiten zu sehen. Es wird nirgends gespeichert und nirgends gesendet.'}
       </p>
       <label htmlFor="lx-pdf-password" className="sr-only">
         Kennwort

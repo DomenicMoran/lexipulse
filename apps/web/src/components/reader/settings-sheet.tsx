@@ -422,7 +422,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
               label="Vorlesen"
               description={
                 speechSupported()
-                  ? 'Die Sprachausgabe Ihres Systems liest jeden Satz mit.'
+                  ? 'Die Sprachausgabe deines Systems liest jeden Satz mit.'
                   : 'Dieser Browser bietet keine Sprachausgabe an.'
               }
               disabled={!speechSupported()}

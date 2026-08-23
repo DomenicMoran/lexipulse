@@ -100,7 +100,7 @@ export function usePdfOriginal(host: PdfHost, options: OriginalOptions = {}): {
           settle({
             status: 'error',
             message:
-              'Von diesem Dokument liegt keine Originaldatei vor. Importieren Sie die PDF erneut, um die Seiten zu sehen.',
+              'Von diesem Dokument liegt keine Originaldatei vor. Importiere die PDF erneut, um die Seiten zu sehen.',
           });
           return;
         }

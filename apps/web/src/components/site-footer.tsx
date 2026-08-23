@@ -22,7 +22,7 @@ export function SiteFooter() {
         <div className="flex flex-col gap-3">
           <Wordmark className="text-[15px] font-semibold" />
           <p className="max-w-[28ch] text-[14px] leading-relaxed text-[var(--lx-text-muted)]">
-            RSVP-Reader für EPUB, PDF und Web-Artikel. Alles bleibt auf Ihrem Gerät.
+            RSVP-Reader für EPUB, PDF und Web-Artikel. Alles bleibt auf deinem Gerät.
           </p>
         </div>
 
