@@ -25,8 +25,7 @@ import { framePage } from './templates/page.js';
 import type { DeviceKind } from './templates/page.js';
 
 const CAPTURE_DIR =
-  process.env.LEXIPULSE_CAPTURES ??
-  'C:/Users/domen/AppData/Local/Temp/claude/C--Users-domen-Documents-LexiPulse/618279e2-be9e-4643-a3d6-2c9b276777b0/scratchpad/shots';
+  process.env.LEXIPULSE_CAPTURES ?? join(REPO_ROOT, 'store', 'captures');
 const OUT_ROOT = join(REPO_ROOT, 'store', 'screenshots');
 const LOCALES: readonly Locale[] = ['de', 'en'];
 
