@@ -111,11 +111,15 @@ text and returns only that text to your device, where it is stored locally.
   then discarded.
 - **Legal basis:** Art. 6(1)(b) GDPR, because the processing is necessary to provide the
   feature you explicitly requested.
-- **Note:** the operator of the remote site receives the request from our server. Your
-  own IP address is not passed on to them.
+- **Note on the article text:** the operator of the remote site receives the request
+  from our server. Your own IP address is not passed on to them.
+- **Exception — cover image:** if the page has an `og:image` preview image, LexiPulse
+  shows it in the library. Unlike the article text, this image is fetched directly by
+  your device from the remote site's own server, not through ours. That operator then
+  receives your IP address and knows their preview image was requested.
 
-If you prefer not to involve any server, use file import, clipboard import or plain text
-instead. Those paths are fully offline.
+If you prefer to avoid that, use file import, clipboard import or plain text instead.
+Those paths are fully offline.
 
 ## 6. Text to speech
 
@@ -179,11 +183,12 @@ identifiers.
 If you write to us, we process your email address and the content of your message in
 order to handle your request.
 
-**The route your message takes.** Mail to `lexipulse@domenicmoran.de` is received by
-Cloudflare Email Routing and forwarded unchanged to a Gmail mailbox. We send our reply
-through Brevo's mail service so that it reaches you from the same address. These three
-providers see the sender, subject and content of your message; they are listed
-individually in section 11.
+**The route your message takes.** Mail to `lexipulse@domenicmoran.de` arrives via the
+domain's MX record at the mail server `mail.menucloud-berlin.de` — the same Mailcow
+server the other project addresses of the parent brand run on. We send our reply
+either from there or through Brevo's mail service; both are explicitly authorised as
+senders in the domain's SPF record. These two providers see the sender, subject and
+content of your message; they are listed individually in section 11.
 
 **Legal basis:** Art. 6(1)(b) GDPR for contract-related enquiries, otherwise Art. 6(1)(f)
 GDPR with our legitimate interest in responding.
@@ -192,28 +197,28 @@ retention periods where applicable.
 
 ## 11. Recipients and international transfers
 
-We use four service providers: the host from section 4 and three for the email route
+We use three service providers: the host from section 4 and two for the email route
 described in section 10. There are no others — no analytics tool, no ad network, no
 crash reporting service, no chat service.
 
 | Provider | What for | Location |
 |---|---|---|
 | Vercel Inc. / Vercel Germany GmbH | hosting the website, see section 4 | USA / Germany |
-| Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, USA | receives mail sent to `@domenicmoran.de` and forwards it (Email Routing) | USA |
-| Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland | operates the Gmail mailbox holding the forwarded mail | Ireland |
+| Mailcow server `mail.menucloud-berlin.de` | receives and manages mail sent to `@domenicmoran.de` | Germany |
 | Brevo GmbH, Köpenicker Str. 126, 10179 Berlin, Germany | sends our replies | Germany |
 
-**International transfers.** Cloudflare and Google also process email on servers
-outside the EU. For Cloudflare the transfer relies on the EU standard contractual
-clauses in that provider's data processing agreement; for the mailbox our contracting
-party is Google Ireland Limited. If you would rather avoid this, you can reach us by
-post at the address in section 2.
+**International transfers.** The email route runs entirely within the EU; no
+international transfer takes place there. The EU standard contractual clauses named
+in section 4 continue to apply to the website hosting.
 
 **Your documents are not affected.** They never leave your device and are not
 transferred to any of these providers. Only what you choose to write to us by email is.
 
-Until 18 August 2026 the email route ran on a self-hosted mail server. The statement
-above applies to messages reaching us from 19 August 2026 onwards.
+Until 18 August 2026 the email route ran on a Mailcow alias under the MenuCloud
+domain. From the morning to midday on 19 August 2026 it briefly ran through
+Cloudflare Email Routing and a private Gmail mailbox; since that afternoon it has run
+through the Mailcow server described above, under the new address. The statement
+above applies to messages reaching us since then.
 
 ## 12. Your rights
 

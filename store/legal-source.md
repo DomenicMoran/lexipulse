@@ -70,22 +70,41 @@ Quelle: `...\datenschutz\page.jsx:376-381`
 ## Kontaktweg
 
 Die Rechtstexte nennen `lexipulse@domenicmoran.de` — für allgemeine Anfragen und
-für Datenschutzanfragen dieselbe Adresse. Seit dem 19.08.2026 läuft sie nicht mehr
-über Mailcow: Cloudflare Email Routing nimmt die Post an und leitet sie in das
-private Gmail-Postfach weiter; geantwortet wird von dort über den SMTP-Weg von Brevo,
-der unter `lexipulse@domenicmoran.de` verschicken darf. Bis zum 18.08.2026 stand hier
-die gleichnamige Adresse unter der MenuCloud-Domain, ein Mailcow-Alias mit
-Sieve-Sortierung.
+für Datenschutzanfragen dieselbe Adresse.
+
+**Nachgetragen am 23.08.2026, Store-Audit-Korrekturlauf:** Der Absatz an dieser
+Stelle behauptete bis heute, die Post laufe über Cloudflare Email Routing in ein
+privates Gmail-Postfach. Das war der Stand vom Vormittag des 19.08.2026 und ist
+überholt — nachweisbar per DNS, ohne dass dafür ein anderes Repository geöffnet
+werden musste:
+
+```
+> nslookup -type=MX domenicmoran.de
+domenicmoran.de   MX preference = 10, mail exchanger = mail.menucloud-berlin.de
+
+> nslookup -type=TXT domenicmoran.de
+domenicmoran.de   text = "v=spf1 include:spf.brevo.com a:mail.menucloud-berlin.de ~all"
+```
+
+Der MX-Eintrag zeigt auf denselben Mailcow-Server, über den auch die anderen
+Projektadressen der Dachmarke laufen — nicht auf Cloudflares Routing-Server. Der
+SPF-Eintrag gibt sowohl Brevo als auch `mail.menucloud-berlin.de` als zulässige
+Absender frei, es kommt also kein Google/Gmail-Empfänger mehr vor. `store/legal/
+datenschutz.de.md` (Abschnitt 10/11) und `privacy.en.md` sind entsprechend
+korrigiert: Empfang über Mailcow, Antwort über Mailcow oder Brevo, keine
+Drittlandübermittlung mehr für den Mail-Weg.
+
+Offen — außerhalb der Reichweite dieses Repositories und daher nicht in diesem Lauf
+geprüft: die genaue interne Zustellung auf dem Mailcow-Server selbst (eigenes
+Postfach für `lexipulse@domenicmoran.de` oder Alias auf ein bestehendes Postfach mit
+Sieve-Sortierung, analog zum Stand vor dem 18.08.2026). Das lässt sich nur aus der
+Mailcow-Verwaltung selbst beantworten, die zu einem anderen Projekt gehört. Für die
+Rechtstexte reicht die verifizierte Außensicht (MX + SPF): Empfänger ist der
+Mailcow-Server, nicht Cloudflare/Google.
 
 Ein eigenes Postfach unter `lexipulse.de` ist nicht nötig. Wer die Adresse umstellen
 will, ändert sie zuerst in `DomenicMoran\marke\adressen.json`, lässt aus
-`DomenicMoran` `node werkzeug/brevo-absender.mjs --setzen` und
-`node werkzeug/cloudflare-mail.mjs --setzen` laufen, prüft mit
+`DomenicMoran` `node werkzeug/brevo-absender.mjs --setzen` laufen, prüft mit
 `node werkzeug/mail-pruefen.mjs`, dass Post ankommt, und tauscht sie erst danach in
 `store/legal/*.md` aus. Eine im Impressum genannte, aber nicht erreichbare Adresse ist
 ein Abmahnrisiko nach § 5 Abs. 1 Nr. 2 TMG.
-
-**Was dabei noch offen ist:** Die Datenschutzerklärung beschreibt den Mailweg als
-selbst gehostet. Mit Cloudflare und Google sind zwei Empfänger dazugekommen; der
-Abschnitt zum E-Mail-Verkehr gehört nachgezogen, bevor die neue Adresse
-veröffentlicht wird.

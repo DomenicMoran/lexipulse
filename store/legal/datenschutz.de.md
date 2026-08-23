@@ -115,10 +115,16 @@ gespeichert wird.
   abgelegt, sondern nur weitergereicht und danach verworfen.
 - **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO, da die Verarbeitung zur Erbringung
   der von Ihnen ausdrücklich angeforderten Funktion erforderlich ist.
-- **Hinweis:** Der Betreiber der von Ihnen aufgerufenen fremden Seite erhält die Anfrage
-  von unserem Server. Ihre eigene IP-Adresse wird dabei nicht an ihn übermittelt.
+- **Hinweis zum Artikeltext:** Der Betreiber der von Ihnen aufgerufenen fremden Seite
+  erhält die Anfrage von unserem Server. Ihre eigene IP-Adresse wird dabei nicht an ihn
+  übermittelt.
+- **Ausnahme Vorschaubild:** Findet sich in der Seite ein hinterlegtes Vorschaubild
+  (`og:image`), zeigt LexiPulse es in der Bibliothek an. Dieses Bild wird — anders als
+  der Artikeltext — direkt von Ihrem Gerät beim Betreiber der fremden Seite abgerufen,
+  nicht über unseren Server. Dabei erhält dieser Betreiber Ihre IP-Adresse und weiß,
+  dass sein Vorschaubild abgerufen wurde.
 
-Wer keinen Server einbinden möchte, nutzt statt des URL-Imports den Import über Datei,
+Wer das vermeiden möchte, nutzt statt des URL-Imports den Import über Datei,
 Zwischenablage oder Text. Diese Wege sind vollständig offline.
 
 ## 6. Vorlesefunktion (TTS)
@@ -186,11 +192,13 @@ Klarnamen und keine Geräte-Identifikatoren.
 Wenn Sie uns schreiben, verarbeiten wir Ihre E-Mail-Adresse und den Inhalt Ihrer
 Nachricht, um die Anfrage zu bearbeiten.
 
-**Welchen Weg Ihre Nachricht nimmt.** Post an `lexipulse@domenicmoran.de` nimmt
-Cloudflare Email Routing entgegen und leitet sie unverändert an ein Gmail-Postfach
-weiter. Unsere Antwort verschicken wir über den Mailversand von Brevo, damit sie
-unter derselben Adresse bei Ihnen ankommt. Diese drei Anbieter sehen dabei Absender,
-Betreff und Inhalt Ihrer Nachricht; sie stehen einzeln in Abschnitt 11.
+**Welchen Weg Ihre Nachricht nimmt.** Post an `lexipulse@domenicmoran.de` kommt über
+den MX-Eintrag der Domain am Mailserver `mail.menucloud-berlin.de` an — demselben
+Mailcow-Server, über den auch die anderen Projektadressen der Dachmarke laufen.
+Unsere Antwort verschicken wir von dort oder über den Mailversand von Brevo; beide
+sind im SPF-Eintrag der Domain ausdrücklich als Absender freigegeben. Diese beiden
+Anbieter sehen dabei Absender, Betreff und Inhalt Ihrer Nachricht; sie stehen einzeln
+in Abschnitt 11.
 
 **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO bei vertragsbezogenen Anfragen, sonst
 Art. 6 Abs. 1 lit. f DSGVO mit dem berechtigten Interesse an der Beantwortung.
@@ -199,29 +207,29 @@ Aufbewahrungsfristen, soweit solche greifen.
 
 ## 11. Empfänger und Drittlandübermittlung
 
-Wir setzen vier Dienstleister ein: den Hoster aus Abschnitt 4 und drei für den
+Wir setzen drei Dienstleister ein: den Hoster aus Abschnitt 4 und zwei für den
 E-Mail-Weg aus Abschnitt 10. Andere gibt es nicht — kein Analyse-Werkzeug, kein
 Werbenetzwerk, keinen Fehler-Tracker, keinen Chat-Dienst.
 
 | Anbieter | Wofür | Sitz |
 |---|---|---|
 | Vercel Inc. / Vercel Germany GmbH | Hosting der Website, siehe Abschnitt 4 | USA / Deutschland |
-| Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, USA | nimmt Post an `@domenicmoran.de` an und leitet sie weiter (Email Routing) | USA |
-| Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland | betreibt das Gmail-Postfach, in dem die weitergeleitete Post liegt | Irland |
+| Mailcow-Server `mail.menucloud-berlin.de` | empfängt und verwaltet Post an `@domenicmoran.de` | Deutschland |
 | Brevo GmbH, Köpenicker Str. 126, 10179 Berlin | verschickt unsere Antworten | Deutschland |
 
-**Drittlandübermittlung.** Cloudflare und Google verarbeiten E-Mail auch auf Servern
-außerhalb der EU. Bei Cloudflare stützt sich die Übermittlung auf die
-EU-Standardvertragsklauseln aus dem Auftragsverarbeitungsvertrag des Anbieters; für
-das Postfach ist Google Ireland Limited unser Vertragspartner. Wenn Sie das vermeiden
-wollen, erreichen Sie uns auf dem Postweg unter der Anschrift in Abschnitt 2.
+**Drittlandübermittlung.** Der E-Mail-Weg läuft vollständig innerhalb der EU; eine
+Drittlandübermittlung findet dabei nicht statt. Für das Hosting der Website aus
+Abschnitt 4 gelten weiterhin die dort genannten EU-Standardvertragsklauseln.
 
 **Ihre Dokumente sind davon nicht betroffen.** Sie verlassen Ihr Gerät nicht und
 werden an keinen dieser Anbieter übermittelt. Betroffen ist nur, was Sie uns von sich
 aus per E-Mail schreiben.
 
-Bis zum 18.08.2026 lief der E-Mail-Weg über einen selbst betriebenen Mailserver.
-Diese Angabe gilt für Nachrichten, die uns ab dem 19.08.2026 erreichen.
+Bis zum 18.08.2026 lief der E-Mail-Weg über einen Mailcow-Alias unter der
+MenuCloud-Domain. Vom 19.08.2026 vormittags bis mittags lief er kurzzeitig über
+Cloudflare Email Routing und ein privates Gmail-Postfach; seit dem Nachmittag des
+19.08.2026 läuft er über den oben beschriebenen Mailcow-Server unter der neuen
+Adresse. Diese Angabe gilt für Nachrichten, die uns seither erreichen.
 
 ## 12. Ihre Rechte
 
