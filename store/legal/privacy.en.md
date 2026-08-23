@@ -99,24 +99,34 @@ Vercel privacy notice: https://vercel.com/legal/privacy-policy
 
 ## 5. Importing web articles by URL
 
-When you paste a web address into LexiPulse, your browser cannot read the remote page
-directly for security reasons. The web app therefore sends the address to our
-`/api/extract` endpoint. That endpoint fetches the page server-side, extracts the article
-text and returns only that text to your device, where it is stored locally.
+When you paste a web address into LexiPulse, the path differs by platform, because a
+browser cannot read the remote page directly for security reasons, while an app can.
 
-- **Data processed:** the URL you entered, plus the IP address of your request as part
-  of the general server logs described in section 4.
-- **No storage:** the requested URL is not logged, not stored and not linked to any
-  user. The extracted article text is not kept on the server; it is passed through and
-  then discarded.
+- **Web app:** it sends the address to our `/api/extract` endpoint. That endpoint fetches
+  the page server-side, extracts the article text and returns only that text to your
+  device, where it is stored locally. The operator of the remote site receives the
+  request from our server; your own IP address is not passed on to them.
+- **Mobile apps (iOS/Android):** here the app fetches the address directly from your
+  device, with no server in between — technically the same kind of request a browser
+  would send to the site. The operator of the remote site receives the request directly
+  from your device, and with it your IP address, exactly as with any ordinary web
+  visit.
+
+That applies to the whole article text, not just to a possible preview image.
+
+- **Data processed:** the URL you entered, plus the IP address of your request — for the
+  web app, as part of the general server logs described in section 4; for the mobile
+  apps, at the operator of the requested site itself.
+- **No storage by us:** the requested URL is not logged, not stored and not linked to any
+  user by us. The extracted article text is not kept on our server; it is passed through
+  (web app) or never routed through a server at all (mobile apps).
 - **Legal basis:** Art. 6(1)(b) GDPR, because the processing is necessary to provide the
   feature you explicitly requested.
-- **Note on the article text:** the operator of the remote site receives the request
-  from our server. Your own IP address is not passed on to them.
-- **Exception — cover image:** if the page has an `og:image` preview image, LexiPulse
-  shows it in the library. Unlike the article text, this image is fetched directly by
-  your device from the remote site's own server, not through ours. That operator then
-  receives your IP address and knows their preview image was requested.
+- **Cover image:** if the page has an `og:image` preview image, LexiPulse shows it in the
+  library. On both platforms this image is fetched directly by your device from the
+  remote site's own server, not through ours. For the web app this is the one exception
+  to the server-side path; for the mobile apps the whole import is already a direct
+  fetch.
 
 If you prefer to avoid that, use file import, clipboard import or plain text instead.
 Those paths are fully offline.

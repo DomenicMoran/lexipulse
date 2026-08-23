@@ -19,9 +19,14 @@ tatsächliche Funktionsumfang von LexiPulse.
   Sentry, kein Facebook SDK, kein AdMob, kein Attributions-SDK.
 - Kein Zugriff auf IDFA oder Advertising ID, kein App Tracking Transparency-Prompt
   nötig.
-- Der URL-Import ruft `/api/extract` auf dem eigenen Server auf. Die URL wird
-  weitergereicht, nicht protokolliert und nicht gespeichert. Es entsteht keine
-  Verknüpfung zu einer Person oder einem Gerät.
+- Der URL-Import läuft je nach Plattform unterschiedlich: Die **Web-App** ruft
+  `/api/extract` auf dem eigenen Server auf, der die Seite serverseitig lädt und nur den
+  Text weiterreicht. Die **mobilen Apps** (iOS/Android, das sind die hier eingereichten
+  Store-Einträge) rufen die eingegebene Adresse **direkt vom Gerät** ab, ohne eigenen
+  Server dazwischen — wie ein Browser es auch täte. In keinem Fall protokolliert oder
+  speichert *LexiPulse selbst* die URL oder verknüpft sie mit einer Person oder einem
+  Gerät; bei den mobilen Apps sieht aber der Betreiber der aufgerufenen fremden Seite
+  die Geräte-IP, so wie bei jedem gewöhnlichen Webseitenaufruf.
 - Keine Werbung, keine In-App-Käufe, kein Abo. Einmalkauf 4,99 Euro über den Store.
 
 Daraus folgt für beide Fragebögen: **es werden keine Daten erhoben.**
@@ -40,11 +45,17 @@ Pfad: App Store Connect → App auswählen → Seitenleiste **App-Datenschutz** 
 Apple blendet danach alle Datenkategorien aus. Es ist keine weitere Kategorie
 auszuwählen.
 
-Wichtig für die Begründung im Review-Fall: Apple definiert „collect" als Übertragung vom
-Gerät weg in einer Form, die über die reine Bearbeitung der aktuellen Anfrage hinaus
-zugänglich bleibt. Der Aufruf von `/api/extract` fällt nicht darunter, weil die URL nur
-für die Dauer der Anfrage verarbeitet und nicht gespeichert wird. Diese Formulierung
-steht auch so in der Datenschutzerklärung, sodass Angabe und Text zusammenpassen.
+Wichtig für die Begründung im Review-Fall — **für die App gilt ein anderer Mechanismus
+als für die Web-App**: Die mobile App ruft die vom Nutzer eingegebene URL direkt vom
+Gerät ab, ohne eigenen Server dazwischen (siehe Faktenlage oben und Abschnitt 5 der
+Datenschutzerklärung). Apple definiert „collect" als Übertragung an *uns* oder unsere
+Partner in einer Form, die über die reine Bearbeitung der aktuellen Anfrage hinaus
+zugänglich bleibt. Der App selbst fließt dabei nichts zu — sie leitet die vom Nutzer
+gewählte Adresse nur technisch weiter, wie ein Browser es auch täte, und speichert
+weder die URL noch den Artikeltext dauerhaft. Dass dabei der Betreiber der fremden
+Seite die Geräte-IP sieht, ist keine Erhebung *durch LexiPulse*. **Vor der Einreichung
+gegenprüfen, ob diese Einordnung so Bestand hat** — die vorherige Fassung dieses
+Dokuments verwies fälschlich auf `/api/extract`, das nur die Web-App nutzt.
 
 ### Weitere Felder auf derselben Seite
 

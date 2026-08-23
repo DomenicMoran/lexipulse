@@ -102,27 +102,37 @@ Datenschutzhinweise von Vercel: https://vercel.com/legal/privacy-policy
 
 ## 5. Import von Web-Artikeln über eine URL
 
-Wenn Sie eine Internetadresse in LexiPulse einfügen, kann Ihr Browser die fremde Seite
-aus Sicherheitsgründen nicht direkt auslesen. Deshalb ruft die Web-App die Adresse an
-unseren Endpunkt `/api/extract`. Dieser Endpunkt lädt die angegebene Seite serverseitig,
-löst den Artikeltext heraus und gibt nur diesen Text an Ihr Gerät zurück, wo er lokal
-gespeichert wird.
+Wenn Sie eine Internetadresse in LexiPulse einfügen, unterscheidet sich der Weg je
+nach Plattform, weil ein Browser die fremde Seite aus Sicherheitsgründen nicht direkt
+auslesen kann, eine App das aber sehr wohl darf.
+
+- **Web-App:** Sie ruft die Adresse an unseren Endpunkt `/api/extract`. Dieser Endpunkt
+  lädt die angegebene Seite serverseitig, löst den Artikeltext heraus und gibt nur
+  diesen Text an Ihr Gerät zurück, wo er lokal gespeichert wird. Der Betreiber der
+  aufgerufenen fremden Seite erhält die Anfrage von unserem Server; Ihre eigene
+  IP-Adresse wird dabei nicht an ihn übermittelt.
+- **Mobile Apps (iOS/Android):** Hier ruft die App die Adresse direkt vom Gerät ab, ohne
+  Umweg über unseren Server — technisch dieselbe Art von Anfrage, die auch ein
+  Browser an die Seite schickt. Der Betreiber der aufgerufenen fremden Seite erhält die
+  Anfrage direkt von Ihrem Gerät und damit auch Ihre IP-Adresse, so wie beim Aufruf
+  jeder gewöhnlichen Webseite.
+
+Das gilt für den gesamten Artikeltext, nicht nur für ein eventuelles Vorschaubild.
 
 - **Verarbeitete Daten:** die von Ihnen eingegebene URL sowie technisch die IP-Adresse
-  Ihrer Anfrage im Rahmen der allgemeinen Server-Logs nach Abschnitt 4.
-- **Keine Speicherung:** Die aufgerufene URL wird nicht protokolliert, nicht gespeichert
-  und keinem Nutzer zugeordnet. Der abgerufene Artikeltext wird nicht auf dem Server
-  abgelegt, sondern nur weitergereicht und danach verworfen.
+  Ihrer Anfrage — bei der Web-App im Rahmen der allgemeinen Server-Logs nach
+  Abschnitt 4, bei den mobilen Apps beim Betreiber der aufgerufenen Seite selbst.
+- **Keine Speicherung durch uns:** Die aufgerufene URL wird von uns nicht protokolliert,
+  nicht gespeichert und keinem Nutzer zugeordnet. Der abgerufene Artikeltext wird nicht
+  auf unserem Server abgelegt, sondern nur weitergereicht (Web-App) beziehungsweise gar
+  nicht erst über einen Server geleitet (mobile Apps).
 - **Rechtsgrundlage:** Art. 6 Abs. 1 lit. b DSGVO, da die Verarbeitung zur Erbringung
   der von Ihnen ausdrücklich angeforderten Funktion erforderlich ist.
-- **Hinweis zum Artikeltext:** Der Betreiber der von Ihnen aufgerufenen fremden Seite
-  erhält die Anfrage von unserem Server. Ihre eigene IP-Adresse wird dabei nicht an ihn
-  übermittelt.
-- **Ausnahme Vorschaubild:** Findet sich in der Seite ein hinterlegtes Vorschaubild
-  (`og:image`), zeigt LexiPulse es in der Bibliothek an. Dieses Bild wird — anders als
-  der Artikeltext — direkt von Ihrem Gerät beim Betreiber der fremden Seite abgerufen,
-  nicht über unseren Server. Dabei erhält dieser Betreiber Ihre IP-Adresse und weiß,
-  dass sein Vorschaubild abgerufen wurde.
+- **Vorschaubild:** Findet sich in der Seite ein hinterlegtes Vorschaubild (`og:image`),
+  zeigt LexiPulse es in der Bibliothek an. Dieses Bild wird — auf beiden Plattformen —
+  direkt von Ihrem Gerät beim Betreiber der fremden Seite abgerufen, nicht über unseren
+  Server. Bei der Web-App ist das die einzige Ausnahme vom serverseitigen Weg; bei den
+  mobilen Apps gilt ohnehin bereits der ganze Import als Direktabruf.
 
 Wer das vermeiden möchte, nutzt statt des URL-Imports den Import über Datei,
 Zwischenablage oder Text. Diese Wege sind vollständig offline.
