@@ -49,7 +49,15 @@ export default function ImportScreen() {
   );
 
   const fail = useCallback((error: unknown) => {
-    alert(t('import.failed'), error instanceof Error ? error.message : String(error));
+    // An aborted fetch surfaces as `AbortError` with a runtime-specific, unhelpful
+    // message ("Aborted") — the timeout in `fetchWithTimeout` deserves its own sentence.
+    const message =
+      error instanceof Error && error.name === 'AbortError'
+        ? t('import.url.timeout')
+        : error instanceof Error
+          ? error.message
+          : String(error);
+    alert(t('import.failed'), message);
   }, [alert]);
 
   const onPickFile = useCallback(() => {

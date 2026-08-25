@@ -174,7 +174,30 @@ export async function readFileBytes(uri: string): Promise<Uint8Array> {
  */
 export async function importFromUrl(url: string): Promise<LexiDocument> {
   const normalized = normalizeUrl(url);
-  return fetchArticle(normalized, fetch);
+  return fetchArticle(normalized, fetchWithTimeout);
+}
+
+/** Bounds how long "Load article" can sit on a request that never answers. */
+const URL_IMPORT_TIMEOUT_MS = 15_000;
+
+/**
+ * Plain `fetch`, but bounded.
+ *
+ * The web app's server-side extractor (`apps/web/src/app/api/extract/route.ts`) has
+ * carried a 10s `AbortController` timeout from the start, because a server holding an
+ * open socket forever is an obvious resource leak. This direct, on-device call had none:
+ * a host that accepts the connection and then never sends a response left `onImportUrl`
+ * awaiting a promise that would not settle, with no cancel button on the busy screen —
+ * indistinguishable from a hang. Apple's review rejected 1.1 for exactly this shape
+ * ("unresponsive when tapping Load article", Guideline 2.1a).
+ */
+function fetchWithTimeout(
+  input: string,
+  init?: { headers?: Record<string, string>; redirect?: 'follow' },
+): ReturnType<typeof fetch> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), URL_IMPORT_TIMEOUT_MS);
+  return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
 }
 
 /** Import text the user copied somewhere else. */

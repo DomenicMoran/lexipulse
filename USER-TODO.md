@@ -2,14 +2,45 @@
 
 Stand: 2026-08-25. Erledigtes steht in [`ERLEDIGT.md`](./ERLEDIGT.md), nicht hier.
 
-**Store-Stand (zuletzt geprüft 2026-08-17/19, danach nicht erneut verifiziert):**
+**Store-Stand (zuletzt geprüft 2026-08-25, danach nicht erneut verifiziert):**
 
 | | Stand | Danach |
 |---|---|---|
-| Apple | 1.1, Build 11, `WAITING_FOR_REVIEW` | Freigabe `AFTER_APPROVAL` — geht ohne weiteren Klick live |
+| Apple | 1.1, Build 11, **abgelehnt** (Submission `bab9e91f-259e-43fb-a70a-4328a60595cb`, 25.08.2026) — Guideline 2.1(a), „unresponsive when tapping Load article" | Code-Fix liegt vor, siehe Punkt 0 — neuer Bau + Neueinreichung nötig |
 | Play | 1.1.0, versionCode 10, Produktionsspur | Verwaltete Veröffentlichung war für 1.0 aus und wurde nicht angefasst — geht nach der Prüfung direkt live |
 
 ---
+
+## 0. iOS-Ablehnung „Load article unresponsive" — Fix liegt vor, neuer Bau nötig
+
+**Befund:** `apps/mobile/src/lib/import.ts` → `importFromUrl()` rief `fetchArticle(url, fetch)`
+ohne jedes Timeout auf. Ein Server, der die Verbindung annimmt und nie antwortet, lässt das
+native `fetch` unbegrenzt hängen — der Busy-Screen (`app/import.tsx`) hat keinen
+Abbrechen-Button. Genau das erklärt „unresponsive when tapping Load article": nicht ein
+Absturz, sondern ein Promise, das nie auflöst. Die Web-App hatte dieses Risiko längst
+erkannt — `apps/web/src/app/api/extract/route.ts` setzt seit Beginn ein 10s-`AbortController`-
+Timeout —, nur der native Direktabruf der mobilen Apps hatte keins.
+
+Reproduziert mit einem lokalen Server, der Verbindungen annimmt und nie antwortet: ohne
+Timeout blieb `fetch` nach 3 s beweisbar noch offen; mit `AbortController` löste dieselbe
+Anfrage nach der gesetzten Frist zuverlässig auf.
+
+**Behoben (noch nicht gebaut/eingereicht):** `fetchWithTimeout()` in `import.ts` bricht nach
+15 s ab; `app/import.tsx` zeigt bei einem Abbruch jetzt „Die Seite hat nicht rechtzeitig
+geantwortet." statt der rohen `AbortError`-Meldung. Typecheck und Testsuiten
+(`apps/mobile`, `packages/core`) laufen grün. Nicht committet — noch keine Freigabe dafür
+erteilt.
+
+**Schritte:**
+1. Diff prüfen (`git diff`), dann committen und pushen (Konto-Wechsel nötig, siehe
+   [[feedback_github_konto_wechseln_statt_todo]] bzw. `project_lexipulse_deploy_und_push`).
+2. Neuen iOS-Bau anstoßen. Das eigene EAS-Kontingent für iOS ist diesen Monat verbraucht
+   (siehe Punkt 3 unten) — entweder bis 01.09.2026 warten oder ein fremdes Konto leihen.
+3. In App Store Connect auf die Ablehnung antworten (Submission-ID oben) und Build 12 zur
+   erneuten Prüfung einreichen.
+4. Nach Freigabe: mit derselben Reproduktion (langsamer/nicht antwortender Host) am echten
+   Gerät nachweisen, dass „Load article" jetzt nach ~15 s eine Fehlermeldung statt eines
+   Hängers zeigt — nicht nur am Typecheck glauben.
 
 ## 1. App-Privacy-Antwort vor der nächsten Apple-Einreichung gegenprüfen
 

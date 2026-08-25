@@ -54,6 +54,7 @@ export const de = {
   'import.report.dehyphenated': '{count} getrennte Wörter zusammengefügt',
   'import.report.clean': 'Keine Störzeilen gefunden, der Text war bereits sauber.',
   'import.invalidUrl': 'Das sieht nicht nach einer gültigen Adresse aus.',
+  'import.url.timeout': 'Die Seite hat nicht rechtzeitig geantwortet.',
 
   // Player
   'player.empty.title': 'Kein Dokument geöffnet',
