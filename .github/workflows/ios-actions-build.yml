@@ -1,0 +1,197 @@
+name: iOS Release IPA (Actions, not EAS)
+
+# Baut die signierte App-Store-IPA auf einem macOS-Actions-Laeufer, statt bei
+# EAS. Dieses Repo ist oeffentlich (DomenicMoran/lexipulse) — oeffentliche
+# Repos zahlen fuer GitHub-gehostete Laeufer nichts, auch nicht fuer macOS
+# (belegt: siehe 00_Zentrale/werkzeug/ios-bau-ohne-eas.md). EAS-Baukontingent
+# wird dadurch nicht angefasst.
+#
+# Signing kommt ausschliesslich aus verschluesselten Actions-Secrets (Dist-
+# Zertifikat .p12 + Provisioning-Profil), beide unveraendert vom bestehenden
+# Apple-Team ZKG548NGDR uebernommen — es wird KEIN neues Zertifikat erzeugt.
+#
+# Vorbild: SalatiTech apps/mobile/.github/workflows/ios.yml (nur lesend
+# eingesehen). Gleiches Muster: unsigniert archivieren, signiert exportieren,
+# damit Xcodes Auto-Signing nicht dazwischenfunkt.
+#
+# Manuell ausgeloest. Laedt NICHT zu App Store Connect hoch — nur Bauen und
+# als Artefakt ablegen. Hochladen/Einreichen ist ein bewusst separater,
+# manueller Schritt.
+
+on:
+  workflow_dispatch:
+    inputs:
+      buildNumber:
+        description: 'CFBundleVersion (muss hoeher sein als jeder schon hochgeladene Build)'
+        required: true
+        default: '12'
+
+env:
+  TEAM_ID: ZKG548NGDR
+  BUNDLE_ID: de.lexipulse.app
+  PROFIL_NAME: LexiPulse App Store
+
+jobs:
+  build-ios:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: pnpm installieren
+        run: npm install -g pnpm@10.33.0
+
+      - name: pnpm install
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+
+      # Build-Nummer von aussen setzen, nie aus der committeten Konfiguration
+      # (die haelt bewusst keine, siehe Kommentar in app.config.ts). Apple
+      # lehnt eine bereits hochgeladene CFBundleVersion ab.
+      - name: Build-Nummer eintragen
+        env:
+          NUMMER: ${{ inputs.buildNumber }}
+        run: |
+          set -e
+          perl -i -pe "s/(bundleIdentifier: 'de\.lexipulse\.app',)/\$1\n    buildNumber: '\$ENV{NUMMER}',/" app.config.ts
+          grep -n "buildNumber" app.config.ts | grep -q "'${NUMMER}'"
+          grep -n "buildNumber" app.config.ts
+
+      # Expo SDK 57 + Xcode 26: dieselben zwei Swift-6.2-Stolpersteine wie bei
+      # SalatiTech (dort in scripts/expo-swift62-fix.sh, hier inline
+      # uebernommen, weil es ein anderes Repo ist). Reine Namens-/Attribut-
+      # Korrekturen an expo-modules-jsi, keine Verhaltensaenderung. Faellt die
+      # betroffene Zeile in einer spaeteren Paketversion weg, laeuft der Block
+      # leer (Zaehler 0) statt zu brechen.
+      - name: Swift-6.2-Anpassungen an expo-modules-jsi
+        working-directory: .
+        run: |
+          set -e
+          anzahl=0
+          while IFS= read -r datei; do
+            perl -i -pe 's/\bweak let /nonisolated(unsafe) weak var /g' "$datei"
+            anzahl=$((anzahl + 1))
+          done < <(grep -rl "weak let " node_modules --include="*.swift" 2>/dev/null || true)
+          echo "weak-let -> nonisolated(unsafe) weak var in $anzahl Swift-Dateien"
+          anzahl=0
+          while IFS= read -r datei; do
+            perl -i -pe 's/(?<![.\w])abs\(milliseconds\)/Swift.abs(milliseconds)/g' "$datei"
+            anzahl=$((anzahl + 1))
+          done < <(grep -rl "abs(milliseconds)" node_modules --include="*.swift" 2>/dev/null || true)
+          echo "abs() eindeutig gemacht in $anzahl Swift-Dateien"
+
+      - name: Xcode-Version waehlen (neuestes Xcode 26)
+        run: |
+          set -e
+          echo "--- vorhandene Xcode-Versionen ---"
+          ls -d /Applications/Xcode*.app 2>/dev/null || true
+          XCODE=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          test -n "$XCODE" || { echo "FEHLER: kein Xcode 26 auf dem Laeufer"; exit 1; }
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+
+      - name: expo prebuild (iOS-Projekt generieren)
+        run: npx expo prebuild -p ios --no-install
+
+      - name: CocoaPods installieren
+        working-directory: apps/mobile/ios
+        run: pod install --repo-update
+
+      - name: Signing einrichten (Keychain + Zertifikat + Profil)
+        env:
+          P12_BASE64: ${{ secrets.IOS_DIST_P12_BASE64 }}
+          P12_PASSWORD: ${{ secrets.IOS_DIST_P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+          PROFIL: ${{ secrets.IOS_PROFILE_MAIN }}
+        run: |
+          set -e
+          KC="$RUNNER_TEMP/lexipulse.keychain-db"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KC"
+          echo "$P12_BASE64" | base64 -d > "$RUNNER_TEMP/dist.p12"
+          security import "$RUNNER_TEMP/dist.p12" -k "$KC" -P "$P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KC" >/dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | sed s/\"//g)
+          security default-keychain -s "$KC"
+          PROF_DIR="$HOME/Library/MobileDevice/Provisioning Profiles"
+          mkdir -p "$PROF_DIR"
+          echo "$PROFIL" | base64 -d > "$PROF_DIR/lexipulse.mobileprovision"
+          security find-identity -v -p codesigning "$KC"
+
+      - name: exportOptions.plist schreiben
+        run: |
+          cat > "$RUNNER_TEMP/exportOptions.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>teamID</key><string>${TEAM_ID}</string>
+            <key>uploadSymbols</key><true/>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>${BUNDLE_ID}</key><string>${PROFIL_NAME}</string>
+            </dict>
+          </dict>
+          </plist>
+          PLIST
+          cat "$RUNNER_TEMP/exportOptions.plist"
+
+      # Nur fuer -allowProvisioningUpdates bei exportArchive (rein lesend
+      # gegen ASC, kein Hochladen einer Binärdatei). Ohne diesen Schluessel
+      # wird nicht eingereicht — der Upload-Schritt fehlt in diesem Workflow
+      # bewusst.
+      - name: ASC-API-Key ablegen
+        env:
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+        run: echo "$ASC_KEY_P8_BASE64" | base64 -d > "$RUNNER_TEMP/asc.p8"
+
+      - name: Archiv bauen (xcodebuild archive, unsigniert)
+        working-directory: apps/mobile/ios
+        run: |
+          set -o pipefail
+          WORKSPACE=$(ls -d *.xcworkspace | head -1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          xcodebuild archive \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/LexiPulse.xcarchive" \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM=${TEAM_ID} \
+            SWIFT_STRICT_CONCURRENCY=minimal \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=NO
+
+      - name: IPA exportieren
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/LexiPulse.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/exportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$RUNNER_TEMP/asc.p8" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+          ls -la "$RUNNER_TEMP/export"
+
+      - name: IPA als Artefakt hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: lexipulse-release-ipa
+          path: ${{ runner.temp }}/export/*.ipa
+          if-no-files-found: error
+          retention-days: 14
