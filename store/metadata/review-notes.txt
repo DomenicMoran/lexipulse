@@ -42,8 +42,10 @@ Unterschreiben. Es gibt kein Konto, kein Tracking und keine Werbung. Die einzige
 Netzwerkanfrage der App ist der Abruf einer Seite, deren Adresse die Nutzerin oder der
 Nutzer selbst eingibt.
 
-In den Einstellungen laesst sich jederzeit "Meine Daten exportieren" (JSON) und "Alle
-Daten loeschen" ausfuehren.
+In den Einstellungen, Abschnitt "Sichern und Uebertragen", laesst sich jederzeit
+"Sicherung erstellen" ausfuehren (vollstaendige JSON-Sicherung von Bibliothek,
+Fortschritt, Markierungen und Statistik, Art. 20 DSGVO). Im Abschnitt "Daten" steht
+"Alle Daten loeschen".
 
 Die gezeichnete Unterschrift ist ein Bild der Unterschrift, wie ein unterschriebener und
 eingescannter Ausdruck. Sie ist keine qualifizierte elektronische Signatur nach eIDAS,
