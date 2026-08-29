@@ -71,8 +71,8 @@ Kein Konto, kein Tracking, keine Werbung. Deine Dokumente werden nur auf deinem 
 PREIS
 4,99 Euro einmalig. Kein Abo, keine In-App-Käufe, keine Werbung. Kostenlose Web-Version zusätzlich unter lexipulse.de.
 
-WAS LEXIPULSE NICHT TUT
-Keine Umwandlung nach Word, kein serverseitiges Verkleinern — beides hieße, deine Datei hochzuladen. Die gezeichnete Unterschrift ist ein Bild, wie ein unterschriebener und eingescannter Ausdruck; eine qualifizierte elektronische Signatur nach eIDAS ist sie nicht. Eine gescannte PDF lässt sich ansehen und bearbeiten, aber nicht durchsuchen.
+GRENZEN
+Keine Umwandlung nach Word und keine Verkleinerung auf einem Server: Beides hieße, die Datei hochzuladen. Die gezeichnete Unterschrift ist ein Bild wie ein unterschriebener und eingescannter Ausdruck, keine qualifizierte elektronische Signatur nach eIDAS. Eine gescannte PDF lässt sich ansehen und bearbeiten, aber nicht durchsuchen.
 
 HINWEIS
 LexiPulse ist ein Werkzeug zur Textdarstellung, kein Medizinprodukt. Fang beim Wortstrom bei 250 bis 300 Wörtern pro Minute an.

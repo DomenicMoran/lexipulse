@@ -71,8 +71,8 @@ No account, no tracking, no ads. Your documents are processed and stored on your
 PRICE
 4.99 euros once. No subscription, no in-app purchases, no ads. There is also a free web version at lexipulse.de.
 
-WHAT LEXIPULSE DOES NOT DO
-No conversion to Word and no server-side compression — both would mean uploading your file. The drawn signature is a picture of your signature, like a printout you signed and scanned; it is not a qualified electronic signature under eIDAS. A scanned PDF can be viewed and edited, but not searched.
+LIMITS
+No conversion to Word and no server-side compression: both would mean uploading your file. The drawn signature is a picture, like a printout you signed and scanned, not a qualified electronic signature under eIDAS. A scanned PDF can be viewed and edited, but not searched.
 
 PLEASE NOTE
 LexiPulse is a tool for displaying text, not a medical device. Start the word stream at 250 to 300 words per minute.

@@ -48,7 +48,7 @@ Der Bau ist bereits erledigt: Android als versionCode 10, iOS als Build 11, beid
 und beide unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\`. Nach der Freigabe von 1.0 bleibt
 also nur noch hochladen, Texte übertragen, einreichen.
 
-## Aktuelle Zeichenzahl (gemessen 2026-08-23, Store-Audit-Korrekturlauf)
+## Aktuelle Zeichenzahl (gemessen 2026-08-29, Lückentext-Korrektur „GRENZEN"/„LIMITS")
 
 | Datei | de-DE | en-US |
 |---|---|---|
@@ -57,7 +57,7 @@ also nur noch hochladen, Texte übertragen, einreichen.
 | promotional_text | 164 / 170 | 159 / 170 |
 | short_description | 74 / 80 | 71 / 80 |
 | keywords | 94 / 100 | 91 / 100 |
-| full_description | 3994 / 4000 | 3816 / 4000 |
+| full_description | 3969 / 4000 | 3771 / 4000 |
 | release_notes | 496 / 500 | 489 / 500 |
 
 Nach jeder Textänderung neu messen:
