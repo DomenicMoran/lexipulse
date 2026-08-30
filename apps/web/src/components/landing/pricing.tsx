@@ -87,10 +87,21 @@ export function Pricing() {
 
           <div className="mt-8 flex flex-col gap-2 sm:flex-row">
             {/*
-              Both apps are still in development. Linking a store button that leads
-              nowhere would be a promise we cannot keep today, so the buttons say what
-              they are and are disabled until the listings are actually live.
+              Die beiden Läden geben eine App nie am selben Tag frei. Play führt
+              de.lexipulse.app seit dem 17.08.2026 öffentlich (nachgemessen:
+              play.google.com/store/apps/details?id=de.lexipulse.app antwortet mit
+              200 und dem Listing "LexiPulse: PDF & E-Book", 4,99 €). Apple steht
+              noch auf WAITING_FOR_REVIEW. Ein Knopf, der "Jetzt laden" verspricht
+              und ins Leere führt, ist irreführende Werbung nach § 5 UWG — deshalb
+              bleibt der Apple-Knopf ein Feld ohne Verweis, bis die echte Adresse
+              feststeht.
             */}
+            <a
+              href="https://play.google.com/store/apps/details?id=de.lexipulse.app"
+              className="inline-flex h-11 flex-1 items-center justify-center rounded-[10px] bg-[var(--lx-accent)] px-5 text-[15px] font-medium text-[var(--lx-accent-on)] transition-colors duration-140 hover:bg-[var(--lx-accent-strong)]"
+            >
+              Bei Google Play
+            </a>
             <a
               href="#"
               aria-disabled="true"
@@ -99,17 +110,10 @@ export function Pricing() {
             >
               Bald im App Store
             </a>
-            <a
-              href="#"
-              aria-disabled="true"
-              tabIndex={-1}
-              className="pointer-events-none inline-flex h-11 flex-1 items-center justify-center rounded-[10px] border border-[var(--lx-border)] px-5 text-[15px] text-[var(--lx-text-faint)]"
-            >
-              Bald bei Google Play
-            </a>
           </div>
           <p className="mt-3 text-[13px] text-[var(--lx-text-muted)]">
-            Die Apps sind noch nicht veröffentlicht. Bis dahin nutzt du die Web-App.
+            Bei Google Play jetzt verfügbar. Im App Store prüft Apple noch; bis dahin
+            nutzt du die Web-App.
           </p>
         </div>
       </div>
