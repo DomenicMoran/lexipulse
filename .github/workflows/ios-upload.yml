@@ -1,0 +1,55 @@
+name: iOS Upload to App Store Connect (manual, ad hoc)
+
+# Laedt eine bereits gebaute IPA (Artefakt aus "iOS Release IPA (Actions, not
+# EAS)") zu App Store Connect hoch. Bewusst getrennt vom Bau-Workflow (siehe
+# dessen Kommentarkopf: Hochladen ist ein separater, manueller Schritt) --
+# dieser Workflow wird nur von Hand ausgeloest, nie automatisch bei jedem Bau.
+#
+# Nutzt dieselben Secrets wie der Bau-Workflow (ASC_KEY_P8_BASE64, ASC_KEY_ID,
+# ASC_ISSUER_ID). Kein neues Zertifikat, kein neuer Schluessel.
+
+on:
+  workflow_dispatch:
+    inputs:
+      sourceRunId:
+        description: 'Lauf-ID des Bau-Workflows, dessen IPA-Artefakt hochgeladen wird'
+        required: true
+
+jobs:
+  upload-ios:
+    runs-on: macos-15
+    steps:
+      - name: IPA-Artefakt aus dem Bau-Lauf laden
+        uses: actions/download-artifact@v4
+        with:
+          name: lexipulse-release-ipa
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ inputs.sourceRunId }}
+          path: ipa
+
+      - name: Geladene Datei anzeigen
+        run: ls -la ipa
+
+      - name: ASC-API-Key ablegen
+        env:
+          ASC_KEY_P8_BASE64: ${{ secrets.ASC_KEY_P8_BASE64 }}
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+        run: |
+          set -e
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$ASC_KEY_P8_BASE64" | base64 -d > ~/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8
+
+      - name: Hochladen mit altool
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: |
+          set -e
+          IPA=$(ls ipa/*.ipa | head -1)
+          echo "Lade hoch: $IPA"
+          xcrun altool --upload-app \
+            -f "$IPA" \
+            -t ios \
+            --apiKey "$ASC_KEY_ID" \
+            --apiIssuer "$ASC_ISSUER_ID" \
+            --verbose
