@@ -14,7 +14,7 @@ import { useLibrary } from '../src/state/library';
 import { useReader } from '../src/state/reader';
 import { useTheme } from '../src/state/settings';
 
-type Busy = { kind: 'idle' } | { kind: 'working'; detail: string };
+type Busy = { kind: 'idle' } | { kind: 'working'; detail: string; onCancel?: () => void };
 
 export default function ImportScreen() {
   const alert = useAlert();
@@ -51,12 +51,18 @@ export default function ImportScreen() {
   const fail = useCallback((error: unknown) => {
     // An aborted fetch surfaces as `AbortError` with a runtime-specific, unhelpful
     // message ("Aborted") — the timeout in `fetchWithTimeout` deserves its own sentence.
-    const message =
-      error instanceof Error && error.name === 'AbortError'
-        ? t('import.url.timeout')
-        : error instanceof Error
-          ? error.message
-          : String(error);
+    // Measured on-device (Hermes' built-in fetch, Android): the rejection is a plain
+    // `TypeError` with message "fetch failed: Fetch request has been canceled", not an
+    // `AbortError` — so the name check alone missed it and leaked that raw English text
+    // past a German UI. Matching on the message too catches both shapes.
+    const isAbort =
+      error instanceof Error &&
+      (error.name === 'AbortError' || /aborted|cancel(l)?ed/i.test(error.message));
+    const message = isAbort
+      ? t('import.url.timeout')
+      : error instanceof Error
+        ? error.message
+        : String(error);
     alert(t('import.failed'), message);
   }, [alert]);
 
@@ -83,12 +89,26 @@ export default function ImportScreen() {
       alert(t('import.failed'), t('import.invalidUrl'));
       return;
     }
-    setBusy({ kind: 'working', detail: t('import.busy') });
+    // A host that accepts the connection and never answers can hold this open for up to
+    // the 15s ceiling in `fetchWithTimeout` — that is the one import path with real,
+    // unpredictable network wait. The Cancel button aborts it immediately instead of
+    // making the person sit out the full 15s; `canceledByUser` tells the catch block
+    // below not to show a failure alert for a cancellation the person asked for.
+    const controller = new AbortController();
+    let canceledByUser = false;
+    setBusy({
+      kind: 'working',
+      detail: t('import.busy'),
+      onCancel: () => {
+        canceledByUser = true;
+        controller.abort();
+      },
+    });
     void (async () => {
       try {
-        await finish(await importFromUrl(url));
+        await finish(await importFromUrl(url, controller.signal));
       } catch (error) {
-        fail(error);
+        if (!canceledByUser) fail(error);
       } finally {
         setBusy({ kind: 'idle' });
       }
@@ -120,10 +140,19 @@ export default function ImportScreen() {
   }, [alert, fail, finish]);
 
   if (busy.kind === 'working') {
+    // Guideline 2.1a ("became unresponsive after it loaded an article"): a spinner alone,
+    // with nothing to tap, reads as a hang whether or not a timer is quietly running
+    // behind it — the reviewer has no way to tell the two apart. `Screen` keeps this
+    // scrollable rather than a hard `scroll={false}` block, and a Cancel button — visible
+    // immediately, not hidden behind the header's back arrow — gives an on-screen way out
+    // for however long the network takes.
     return (
-      <Screen scroll={false} contentStyle={{ alignItems: 'center', justifyContent: 'center', gap: theme.space[4] }}>
+      <Screen contentStyle={{ alignItems: 'center', justifyContent: 'center', gap: theme.space[4], minHeight: '100%' }}>
         <ActivityIndicator color={theme.accent.base} size="large" />
         <T tone="muted">{busy.detail}</T>
+        {busy.onCancel ? (
+          <Button label={t('import.cancel')} variant="secondary" onPress={busy.onCancel} />
+        ) : null}
       </Screen>
     );
   }

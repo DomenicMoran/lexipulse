@@ -171,33 +171,48 @@ export async function readFileBytes(uri: string): Promise<Uint8Array> {
  *
  * Native has no same-origin policy, so unlike the web app this needs no proxy — the page
  * is fetched directly and never touches a server of ours.
+ *
+ * `signal` lets the caller cancel on demand (a Cancel button on the busy screen) rather
+ * than wait out the internal timeout below — see the note on `fetchWithTimeout` for why
+ * both exist.
  */
-export async function importFromUrl(url: string): Promise<LexiDocument> {
+export async function importFromUrl(url: string, signal?: AbortSignal): Promise<LexiDocument> {
   const normalized = normalizeUrl(url);
-  return fetchArticle(normalized, fetchWithTimeout);
+  return fetchArticle(normalized, (input, init) => fetchWithTimeout(input, init, signal));
 }
 
 /** Bounds how long "Load article" can sit on a request that never answers. */
 const URL_IMPORT_TIMEOUT_MS = 15_000;
 
 /**
- * Plain `fetch`, but bounded.
+ * Plain `fetch`, but bounded — and cancelable from outside.
  *
  * The web app's server-side extractor (`apps/web/src/app/api/extract/route.ts`) has
  * carried a 10s `AbortController` timeout from the start, because a server holding an
  * open socket forever is an obvious resource leak. This direct, on-device call had none:
  * a host that accepts the connection and then never sends a response left `onImportUrl`
- * awaiting a promise that would not settle, with no cancel button on the busy screen —
- * indistinguishable from a hang. Apple's review rejected 1.1 for exactly this shape
- * ("unresponsive when tapping Load article", Guideline 2.1a).
+ * awaiting a promise that would not settle. Bounding it to 15s (below) fixed the
+ * "unbounded" part but not the actual complaint: a busy screen with nothing to do for up
+ * to 15s still reads as unresponsive to a reviewer who does not know a timer is running.
+ * `signal` is how `app/import.tsx` wires a visible, immediate Cancel button to this
+ * fetch — the 15s bound stays as the worst-case ceiling when nobody cancels.
  */
 function fetchWithTimeout(
   input: string,
   init?: { headers?: Record<string, string>; redirect?: 'follow' },
+  externalSignal?: AbortSignal,
 ): ReturnType<typeof fetch> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), URL_IMPORT_TIMEOUT_MS);
-  return fetch(input, { ...init, signal: controller.signal }).finally(() => clearTimeout(timer));
+  const abortNow = () => controller.abort();
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort();
+    else externalSignal.addEventListener('abort', abortNow);
+  }
+  return fetch(input, { ...init, signal: controller.signal }).finally(() => {
+    clearTimeout(timer);
+    externalSignal?.removeEventListener('abort', abortNow);
+  });
 }
 
 /** Import text the user copied somewhere else. */

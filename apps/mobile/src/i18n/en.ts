@@ -53,6 +53,7 @@ export const en: Record<keyof typeof de, string> = {
   'import.report.clean': 'Nothing to clean up, the text was already tidy.',
   'import.invalidUrl': 'That does not look like a valid address.',
   'import.url.timeout': 'The page did not respond in time.',
+  'import.cancel': 'Cancel',
 
   'player.empty.title': 'No document open',
   'player.empty.body': 'Pick a document in your library.',
