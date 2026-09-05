@@ -120,3 +120,14 @@ siehe `ERLEDIGT.md`). Belegt in `store/legal/impressum.de.md:26`.
 Signaturmaterial liegt unter `C:\Users\domen\Documents\90_Werkstatt\mc-build\lexipulse-ios\`
 und `...\lexipulse-android\`; `apps/mobile/credentials.json` zeigt darauf und ist per
 `.gitignore` ausgeschlossen.
+
+## Offene Punkte aus der Dokumenten-Planung (aus `docs/PLAN_DOKUMENTE.md` übernommen)
+
+- Der Weg über die echte WebView ist noch nicht am Gerät gelaufen — nur im Browser gegen
+  einen Stellvertreter-Wirt belegt.
+- Zusammenführen läuft über „PDF einfügen", Herauslösen ist gebaut; Dokumenteigenschaften
+  haben ihren Kern, aber noch keine Oberfläche.
+- EPUB im Originallayout (Abbildungen, Auszeichnung, Kapitel) — offen.
+- Texterkennung für gescannte PDFs, zuschaltbar, im Gerät — offen.
+- Offline-Wörterbuch, mitgeliefert — offen.
+- Vorlesen im Seiten- und Originalmodus, nicht nur im Wortstrom — offen.

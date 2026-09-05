@@ -70,3 +70,13 @@ coverage/
 *.log
 npm-debug.log*
 pnpm-debug.log*
+
+# Werkzeug-/Editor-Reste
+.aider*
+*.orig
+*.rej
+*.bak
+*~
+desktop.ini
+npm-debug.log*
+yarn-error.log
