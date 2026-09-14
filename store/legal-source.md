@@ -7,7 +7,7 @@ Stand: 2026-08-16. Alle Angaben sind aus dem produktiven MenuCloud-Repository ge
 
 | Feld | Wert | Quelle |
 |---|---|---|
-| Unternehmen | MenuCloud Berlin | `C:\Users\domen\Documents\MenuCloud\src\app\impressum\page.jsx:45` |
+| Unternehmen | MenuCloud Berlin | `C:\Users\domen\Documents\Projekte\MenuCloud\src\app\impressum\page.jsx:45` |
 | Inhaber | Domenic Moran | `...\impressum\page.jsx:49` |
 | Straße | Heidelberger Str. 36 | `...\impressum\page.jsx:53` |
 | PLZ / Ort | 12059 Berlin | `...\impressum\page.jsx:53` |
